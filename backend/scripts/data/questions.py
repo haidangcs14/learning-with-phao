@@ -1,0 +1,17 @@
+QUESTIONS = [  # (question, level, topic, options, đáp án, giải thích)
+    ("What is the opposite of 'big'?", "A1", "Vocabulary", ["small", "long", "high", "wide"], "small", "Small is the opposite of big."),
+    ("She ___ to school every day.", "A1", "Present Simple", ["go", "goes", "going", "gone"], "goes", "Ngôi thứ ba số ít thêm -es."),
+    ("I ___ TV when he called.", "A2", "Past Continuous", ["watched", "was watching", "watch", "am watching"], "was watching", "Hành động đang diễn ra thì bị cắt ngang."),
+    ("What is the past simple of 'go'?", "A1", "Irregular Verbs", ["goed", "went", "gone", "going"], "went", "go - went - gone."),
+    ("I have lived here ___ 2020.", "A2", "Present Perfect", ["for", "since", "ago", "in"], "since", "since + mốc thời gian."),
+    ("If it rains, we ___ at home.", "B1", "Conditionals", ["will stay", "would stay", "stayed", "stay"], "will stay", "Điều kiện loại 1: If + hiện tại đơn, will + V."),
+    ("This is ___ interesting book.", "A1", "Articles", ["a", "an", "the", "no article"], "an", "An đứng trước nguyên âm."),
+    ("What is the opposite of 'difficult'?", "A1", "Vocabulary", ["easy", "hard", "long", "slow"], "easy", "Easy là từ trái nghĩa của difficult."),
+    ("The window ___ yesterday.", "B1", "Passive Voice", ["broke", "was broken", "is broken", "breaks"], "was broken", "Bị động quá khứ đơn: was/were + V3."),
+    ("He is ___ than his brother.", "A2", "Comparatives", ["tall", "taller", "tallest", "more tall"], "taller", "Tính từ ngắn + -er + than."),
+    ("Which word means 'giáo viên'?", "A1", "Vocabulary", ["teacher", "doctor", "farmer", "driver"], "teacher", "Teacher = giáo viên."),
+    ("I'm interested ___ music.", "A2", "Prepositions", ["on", "at", "in", "for"], "in", "interested in."),
+    ("By next year, I ___ my degree.", "B2", "Future Perfect", ["will finish", "will have finished", "finish", "am finishing"], "will have finished", "Hoàn thành trước một mốc tương lai."),
+    ("Which word contains the sound /θ/?", "A2", "IPA", ["think", "this", "ship", "chair"], "think", "'th' trong think là /θ/ (vô thanh)."),
+    ("What is the past participle of 'write'?", "A1", "Irregular Verbs", ["wrote", "written", "writed", "writing"], "written", "write - wrote - written."),
+]

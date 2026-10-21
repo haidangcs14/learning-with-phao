@@ -1,0 +1,2 @@
+# Optional: local speech-to-text for the Speaking module (AI_PROVIDER=local)
+faster-whisper>=1.0

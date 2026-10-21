@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "flag-icons/css/flag-icons.min.css";
+
+/* Theme tokens: the page colours come from CSS variables so text/background can never end up the same colour */
+:root {
+  --bg: #ffffff;
+  --fg: #0f172a;
+  color-scheme: light;
+}
+.dark {
+  --bg: #020617;
+  --fg: #f1f5f9;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+input,
+select,
+textarea {
+  color: var(--fg);
+}
+option {
+  background-color: var(--bg);
+  color: var(--fg);
+} /* native <select> popups ignore Tailwind bg/text classes */
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* 3D flip card */
+.flip-scene {
+  perspective: 1200px;
+}
+.flip-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+.flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.85);
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+.animate-modal {
+  animation: modal-in 0.2s ease-out;
+}
+.animate-pop {
+  animation: pop 0.3s ease-out;
+}
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}

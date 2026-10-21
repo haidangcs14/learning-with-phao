@@ -1,0 +1,18 @@
+TOPICS = [  # (title, prompt, level, 5 câu hỏi gợi ý)
+    ("My Daily Routine", "Tell us about your daily routine.", "A1",
+     ["What time do you wake up?", "What do you usually have for breakfast?", "How do you get to school or work?", "What do you do in the evening?", "What time do you go to bed?"]),
+    ("My Family", "Describe the members of your family.", "A1",
+     ["How many people are in your family?", "What do your parents do?", "Do you have brothers or sisters?", "What do you like doing together?", "Who are you closest to, and why?"]),
+    ("Favorite Food", "Talk about your favorite food and why you like it.", "A2",
+     ["What is your favorite dish?", "What ingredients does it have?", "Who cooks it for you?", "How often do you eat it?", "Would you recommend it to a visitor? Why?"]),
+    ("A Place I Want to Visit", "Describe a place you want to visit and explain why.", "A2",
+     ["Where would you like to go?", "Why does this place interest you?", "Who would you go with?", "What would you do there?", "What would you take with you?"]),
+    ("My Hometown", "Describe your hometown and what people can do there.", "A2",
+     ["Where is your hometown?", "What is it famous for?", "What do people usually do there?", "What do you like most about it?", "Would you like to live there in the future?"]),
+    ("My Weekend", "What did you do last weekend?", "A2",
+     ["What did you do on Saturday?", "Who did you spend time with?", "Where did you go?", "What was the best part?", "What are you going to do next weekend?"]),
+    ("A Person I Admire", "Talk about a person you admire and why.", "B1",
+     ["Who is this person?", "How do you know them?", "What are they like?", "What have they achieved?", "What have you learned from them?"]),
+    ("Technology in My Life", "How does technology help you study or work?", "B1",
+     ["Which devices do you use every day?", "How do you use technology to study or work?", "What are the advantages?", "Are there any problems?", "How will technology change in the next ten years?"]),
+]
