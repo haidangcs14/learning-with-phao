@@ -62,3 +62,14 @@ export async function apiBlob(path: string): Promise<Blob> {
   if (!res.ok) throw new ApiError(res.status, "BLOB_ERROR", "Could not download the file");
   return res.blob();
 }
+
+/** Authenticated fetch that returns the raw Response (used for streaming). Retries once after refreshing the session. */
+export async function apiStream(path: string, init: RequestInit, retry = true): Promise<Response> {
+  const res = await fetch(`${API_URL}${path}`, { ...init, headers: authHeaders(init), credentials: "include" });
+  if (res.status === 401 && retry && (await refreshSession())) return apiStream(path, init, false);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new ApiError(res.status, body?.error_code ?? "UNKNOWN", body?.message ?? res.statusText);
+  }
+  return res;
+}

@@ -60,3 +60,8 @@ class WordRepository:
     async def delete(self, word_id: str) -> bool:
         oid = to_oid(word_id)
         return bool(oid) and (await self.col.delete_one({"_id": oid})).deleted_count == 1
+
+    async def topics(self, level: str | None = None) -> list[dict]:
+        pipeline: list[dict] = ([{"$match": {"level": level}}] if level else []) + [
+            {"$unwind": "$topics"}, {"$group": {"_id": "$topics", "count": {"$sum": 1}}}, {"$sort": {"_id": 1}}]
+        return [{"topic": r["_id"], "count": r["count"]} async for r in self.col.aggregate(pipeline)]

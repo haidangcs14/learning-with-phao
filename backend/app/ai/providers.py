@@ -26,7 +26,11 @@ class SpeakingEvaluator(Protocol):
 
 
 class LLMProvider(Protocol):
-    async def complete(self, messages: list[dict], context: list[str]) -> str: ...
+    async def complete(self, messages: list[dict], system: str) -> str: ...
+
+    def stream(self, messages: list[dict], system: str):
+        """Async iterator of text chunks."""
+        ...
 
 
 _stt = None

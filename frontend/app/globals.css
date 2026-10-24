@@ -97,3 +97,20 @@ textarea::placeholder {
 .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
+
+@keyframes gentle-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-1deg);
+  }
+  75% {
+    transform: rotate(1deg);
+  }
+}
+
+.hover-shake:hover {
+  animation: gentle-shake 0.5s ease-in-out;
+}

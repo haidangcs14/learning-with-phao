@@ -31,4 +31,7 @@ export interface Evaluation {
   comments: string[];
   stats?: { words?: number; unique?: number; wpm?: number | null; pauses?: number; pause_time?: number; fillers?: number };
   method?: Record<string, string | null>;
+  summary?: string;
+  assessment?: Assessment;
 }
+export interface Assessment { band: "excellent" | "good" | "fair" | "needs_work"; strengths: string[]; improve: string[]; tips: string[] }

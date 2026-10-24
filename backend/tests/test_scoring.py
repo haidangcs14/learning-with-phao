@@ -59,5 +59,13 @@ def test_speech_stats_without_timestamps_still_works():
 
 def test_llm_output_is_validated():
     ok = parse_grade('{"grammar_score": 150, "vocabulary_score": "70", "corrections": [{"original": "a", "better": "b", "why": "c"}, {"x": 1}], "comments": ["tip"]}')
-    assert ok == {"grammar": 100, "vocabulary": 70, "corrections": [{"original": "a", "better": "b", "why": "c"}], "comments": ["tip"]}
+    assert ok == {"grammar": 100, "vocabulary": 70, "corrections": [{"original": "a", "better": "b", "why": "c"}], "comments": ["tip"], "summary": ""}
     assert parse_grade("not json") is None and parse_grade('{"foo": 1}') is None
+
+
+def test_text_assessment_names_strengths_weaknesses_and_tips():
+    toks = TEXT.replace(".", "").split()
+    good = score_speech("x", TEXT, 20, _words(toks, gap=0.3))["assessment"]
+    assert good["band"] in ("excellent", "good") and "grammar" in good["strengths"] and good["improve"] == []
+    weak = score_speech("x", "I like cats.", 4, [])["assessment"]
+    assert weak["band"] == "needs_work" and "speak_more" in weak["tips"]

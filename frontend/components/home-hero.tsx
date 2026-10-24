@@ -21,6 +21,8 @@ const DEFS = [
   ["Speak", "Nói", "Ghi âm theo chủ đề, xem sóng âm và lưu lại bài nói.", "#f97316", "/speaking"],
   ["Listen", "Nghe", "Nghe hội thoại và bài nói theo cấp độ, rồi trả lời câu hỏi.", "#0e7490", "/listening"],
   ["Read", "Đọc", "Bài đọc từ A1 đến C1 kèm từ vựng và câu hỏi trắc nghiệm.", "#1d4ed8", "/reading"],
+  ["Write", "Viết", "Viết đoạn văn theo đề, AI chấm điểm và sửa lỗi.", "#be185d", "/writing"],
+  ["Exam", "Kiểm tra", "Làm bài kiểm tra có tính giờ do giáo viên tải lên.", "#b45309", "/exams"],
   ["Quiz", "Trắc nghiệm", "Làm bài trắc nghiệm nhanh, đúng sai hiện rõ màu sắc.", "#ca8a04", "/quiz"],
   ["Match", "Lật thẻ", "Trò chơi lật thẻ ghi nhớ cặp từ - nghĩa, tính điểm cao nhất.", "#db2777", "/games?game=match"],
   ["Fill", "Điền từ", "Chọn từ đúng điền vào chỗ trống trong câu.", "#0891b2", "/games?game=blank"],
@@ -57,7 +59,7 @@ export function HomeHero() {
         <div className="max-w-md space-y-5">
           <p className="inline-block rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur">{t("Miễn phí cho người Việt")}</p>
           <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
-            {t("Học cùng")} <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">Phao</span>
+            Học cùng <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">Phao</span>
           </h1>
           <p className="text-lg text-slate-200">{t("Học tiếng Anh mỗi ngày")}</p>
           <p className="hidden text-sm text-slate-300 sm:block">{t("Bấm vào các phím trên bàn phím 3D để chọn kỹ năng bạn muốn luyện.")}</p>

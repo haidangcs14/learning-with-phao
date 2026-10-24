@@ -1,5 +1,6 @@
 "use client";
 
+import { AssessmentText } from "@/components/assessment-text";
 import { useT } from "@/lib/i18n";
 import type { Evaluation } from "@/types";
 
@@ -48,6 +49,7 @@ export function SpeakingEvaluation({ ev, status }: { ev: Evaluation | null; stat
         <div><p className="text-lg font-semibold">{t("Điểm tổng")} / 100</p>
           {ev.stats?.wpm ? <p className="text-sm text-slate-600 dark:text-slate-300">{t("{n} từ/phút", { n: ev.stats.wpm })} · {t("{n} từ", { n: ev.stats.words ?? 0 })}</p> : null}</div>
       </div>
+      {ev.assessment && <AssessmentText a={ev.assessment} kind="speaking" />}
       <div className="space-y-3">
         <Bar label={t("Độ trôi chảy")} value={ev.fluency} />
         <Bar label={t("Phát âm")} value={ev.pronunciation} note={ev.pronunciation !== null ? t("Phát âm được ước lượng từ độ rõ mà bộ nhận dạng giọng nói nghe được, không thay thế được giáo viên.") : undefined} />
@@ -76,6 +78,7 @@ export function SpeakingEvaluation({ ev, status }: { ev: Evaluation | null; stat
           </ul>
         </div>
       )}
+      {ev.summary && <div><p className="mb-1 text-sm font-semibold">{t("Đánh giá của AI")}</p><p className="text-sm leading-relaxed">{ev.summary}</p></div>}
       {ev.comments.length > 0 && (
         <div><p className="mb-1 text-sm font-semibold">{t("Nhận xét của AI")}</p><ul className="list-disc space-y-1 pl-5 text-sm">{ev.comments.map((c, i) => <li key={i}>{c}</li>)}</ul></div>
       )}

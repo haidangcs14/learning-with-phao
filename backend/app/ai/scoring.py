@@ -161,7 +161,30 @@ def score_speech(prompt: str, transcript: str, duration: float, words: list[dict
         total = min(total, 45)
     return {
         **scores, "overall": total, "feedback": build_feedback(st, scores, issues, words),
-        "corrections": issues[:5], "comments": [],
+        "corrections": issues[:5], "comments": [], "summary": "", "assessment": build_assessment(scores, st, issues),
         "stats": {k: st[k] for k in ("words", "unique", "wpm", "pauses", "pause_time", "fillers")},
         "method": {"pronunciation": "asr-confidence" if scores["pronunciation"] is not None else None, "grammar": "rules"},
     }
+
+
+# ----------------------------------------------------------------------------- written assessment
+def band_of(total: int) -> str:
+    return "excellent" if total >= 85 else "good" if total >= 70 else "fair" if total >= 55 else "needs_work"
+
+
+def build_assessment(scores: dict, st: dict, issues: list[dict]) -> dict:
+    """Structured text assessment: the frontend turns these codes into sentences in the user's language."""
+    strengths = [k for k in ("fluency", "pronunciation", "grammar", "vocabulary") if (scores.get(k) or 0) >= 75]
+    improve = [k for k in ("fluency", "pronunciation", "grammar", "vocabulary") if scores.get(k) is not None and scores[k] < 65]
+    tips = []
+    if st["words"] < 25:
+        tips.append("speak_more")
+    if "fluency" in improve:
+        tips.append("shadowing")
+    if "pronunciation" in improve:
+        tips.append("record_repeat")
+    if "grammar" in improve or issues:
+        tips.append("grammar_review")
+    if "vocabulary" in improve:
+        tips.append("new_words")
+    return {"band": band_of(overall(scores)), "strengths": strengths, "improve": improve, "tips": tips[:4]}

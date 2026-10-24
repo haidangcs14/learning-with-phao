@@ -14,6 +14,7 @@ from scripts.data.questions import QUESTIONS
 from scripts.data.sentences import SENTENCES
 from scripts.data.speaking import TOPICS
 from scripts.data.verbs import VERBS
+from scripts.data.writing import PROMPTS as WRITING
 from scripts.data.words import WORDS
 
 
@@ -50,13 +51,17 @@ async def main() -> None:
     for sentence, answer, wrong, level, vi in CLOZE:
         await db.cloze_questions.update_one({"sentence": sentence}, {"$set": {
             "sentence": sentence, "answer": answer, "options": [answer, *wrong], "level": level, "vi": vi}}, upsert=True)
+    for i, (title, level, instruction, lo, hi, hints, keywords) in enumerate(WRITING):
+        await db.writing_prompts.update_one({"title": title}, {"$set": {
+            "title": title, "level": level, "instruction": instruction, "min_words": lo, "max_words": hi,
+            "hints": hints, "keywords": keywords, "order": i}}, upsert=True)
     for item in READING + LISTENING:
         await db.practice_items.update_one({"kind": item["kind"], "slug": item["slug"]}, {"$set": item}, upsert=True)
     for i, (title, prompt, level, hints) in enumerate(TOPICS):
         await db.speaking_topics.update_one({"title": title}, {"$set": {
             "title": title, "prompt": prompt, "level": level, "hints": hints, "order": i}}, upsert=True)
     print(f"IPA {len(IPA)} | grammar {len(GRAMMAR)} | verbs {len(VERBS)} | sentences {len(SENTENCES)} "
-          f"| reading {len(READING)} | listening {len(LISTENING)} | cloze {len(CLOZE)} | questions {len(QUESTIONS)} | words {len(WORDS)}")
+          f"| writing {len(WRITING)} | reading {len(READING)} | listening {len(LISTENING)} | cloze {len(CLOZE)} | questions {len(QUESTIONS)} | words {len(WORDS)}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,23 @@
+"""Đề viết theo cấp độ: (tiêu đề, level, yêu cầu, min_words, max_words, gợi ý, từ khoá)."""
+PROMPTS = [
+    ("About Me", "A1", "Write a short text about yourself: your name, your age, your family and what you like doing.", 30, 60,
+     ["Say your name and age", "Talk about your family", "Say what you like doing"], ["name", "family", "like"]),
+    ("My Favourite Food", "A1", "Write about your favourite food. What is it? When do you eat it? Why do you like it?", 30, 60,
+     ["Name the food", "Say when and where you eat it", "Give one reason you like it"], ["food", "like", "eat"]),
+    ("An Email to a Friend", "A2", "Write an email to a friend about what you did last weekend.", 60, 100,
+     ["Say where you went", "Say who you were with", "Say what you enjoyed", "Ask your friend a question"], ["weekend", "went", "friend"]),
+    ("My Dream Holiday", "A2", "Describe the holiday you would like to have. Where would you go and what would you do?", 60, 100,
+     ["Choose a place", "Say who you would go with", "Say what you would do there"], ["holiday", "would", "visit"]),
+    ("Is Technology Good for Students?", "B1", "Do you think technology helps students to learn? Write a paragraph giving your opinion.", 100, 150,
+     ["State your opinion clearly", "Give two reasons with examples", "Finish with a short conclusion"], ["technology", "students", "because"]),
+    ("A Memorable Day", "B1", "Write about a day you will never forget. What happened and how did you feel?", 100, 150,
+     ["Say when and where it happened", "Tell the story in order", "Describe your feelings"], ["day", "remember", "felt"]),
+    ("A Letter of Complaint", "B1", "You bought a product that does not work. Write a letter to the shop to explain the problem and ask for a solution.", 100, 150,
+     ["Say what you bought and when", "Explain the problem", "Say what you want them to do"], ["bought", "problem", "refund"]),
+    ("Working from Home", "B2", "Some people work from home. Discuss the advantages and disadvantages of this and give your own opinion.", 180, 250,
+     ["Introduce the topic", "One paragraph about advantages", "One paragraph about disadvantages", "Conclude with your opinion"], ["home", "advantages", "disadvantages"]),
+    ("Cars in City Centres", "B2", "Should cities ban cars from their centres? Write an essay giving reasons for your opinion.", 180, 250,
+     ["Give your position in the introduction", "Support it with reasons and examples", "Mention the opposite view", "Conclude"], ["cars", "city", "pollution"]),
+    ("Social Media and Society", "C1", "To what extent has social media changed the way people communicate? Write an essay.", 250, 320,
+     ["Write a clear introduction", "Develop at least two main points", "Use precise vocabulary and linking words", "Write a balanced conclusion"], ["social media", "communicate", "society"]),
+]

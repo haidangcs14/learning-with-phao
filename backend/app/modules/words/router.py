@@ -34,6 +34,11 @@ async def list_words(
     return ApiResponse(data=items, meta=meta)
 
 
+@router.get("/topics", response_model=ApiResponse)
+async def topics(service: ServiceDep, level: str | None = Query(None, pattern=r"^(A1|A2|B1|B2|C1|C2)$")):
+    return ApiResponse(data=await service.topics(level))
+
+
 @router.get("/{word_id}", response_model=ApiResponse)
 async def get_word(word_id: str, service: ServiceDep):
     return ApiResponse(data=await service.get_word(word_id))

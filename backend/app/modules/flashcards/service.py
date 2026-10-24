@@ -33,3 +33,12 @@ class FlashcardService:
     async def stats(self, user_id: str) -> dict:
         return {"by_status": await self.repo.counts_by_status(user_id),
                 "due": await self.repo.count_due(user_id, utcnow())}
+
+    async def add_topic(self, user_id: str, topic: str) -> int:
+        ids = await self.repo.word_ids_by_topic(topic)
+        if not ids:
+            raise NotFoundError("TOPIC_NOT_FOUND", "Topic not found")
+        now = utcnow()
+        for word_id in ids:
+            await self.repo.upsert_new(user_id, word_id, now)  # idempotent: words already in the list are kept as they are
+        return len(ids)

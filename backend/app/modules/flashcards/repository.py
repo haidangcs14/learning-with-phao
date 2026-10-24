@@ -39,3 +39,6 @@ class FlashcardRepository:
 
     async def count_due(self, user_id: str, now) -> int:
         return await self.progress.count_documents({"user_id": user_id, "next_review_at": {"$lte": now}})
+
+    async def word_ids_by_topic(self, topic: str, limit: int = 300) -> list[str]:
+        return [str(w["_id"]) async for w in self.words.find({"topics": topic}, {"_id": 1}).limit(limit)]

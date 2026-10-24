@@ -55,3 +55,6 @@ class WordService:
     async def delete(self, word_id: str) -> None:
         if not await self.repo.delete(word_id):
             raise NotFoundError("WORD_NOT_FOUND", "Word not found")
+
+    async def topics(self, level: str | None = None) -> list[dict]:
+        return await self.repo.topics(level)

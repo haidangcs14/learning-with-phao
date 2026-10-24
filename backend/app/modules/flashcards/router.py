@@ -6,7 +6,7 @@ from app.common.responses import ApiResponse
 from app.dependencies.auth import CurrentUser
 from app.dependencies.database import db_dependency
 from app.modules.flashcards.repository import FlashcardRepository
-from app.modules.flashcards.schema import AddCardIn, ReviewIn
+from app.modules.flashcards.schema import AddCardIn, AddTopicIn, ReviewIn
 from app.modules.flashcards.service import FlashcardService
 from app.modules.leaderboard.service import XpService
 
@@ -24,6 +24,11 @@ Service = Annotated[FlashcardService, Depends(get_service)]
 async def add_card(data: AddCardIn, user: CurrentUser, service: Service):
     await service.add(user["id"], data.word_id)
     return ApiResponse(message="Added to learning list")
+
+
+@router.post("/topic", response_model=ApiResponse, status_code=201)
+async def add_topic(data: AddTopicIn, user: CurrentUser, service: Service):
+    return ApiResponse(data={"added": await service.add_topic(user["id"], data.topic)})
 
 
 @router.get("/due", response_model=ApiResponse)

@@ -9,3 +9,7 @@ class AddCardIn(BaseModel):
 
 class ReviewIn(AddCardIn):
     rating: Literal["again", "hard", "good", "easy"]
+
+
+class AddTopicIn(BaseModel):
+    topic: str = Field(min_length=1, max_length=50)

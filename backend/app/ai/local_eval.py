@@ -18,6 +18,7 @@ class LocalSpeakingEvaluator:
                     result["vocabulary"] = round(0.5 * result["vocabulary"] + 0.5 * graded["vocabulary"])
                 result["corrections"] = (graded["corrections"] or result["corrections"])[:5]
                 result["comments"] = graded["comments"]
+                result["summary"] = graded.get("summary", "")
                 result["method"]["grammar"] = f"rules+llm:{model}"
                 result["overall"] = overall(result)
                 if result["stats"]["words"] < 10:

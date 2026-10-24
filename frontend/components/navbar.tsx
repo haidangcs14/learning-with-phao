@@ -12,8 +12,8 @@ import { useLang } from "@/store/lang-store";
 
 const GROUPS = [
   { label: "Học", items: [["/vocabulary", "Từ vựng"], ["/flashcards", "Flashcard"], ["/ipa", "Bảng IPA"], ["/grammar", "Ngữ pháp"]] },
-  { label: "Kỹ năng", items: [["/speaking", "Luyện nói"], ["/reading", "Đọc hiểu"], ["/listening", "Luyện nghe"]] },
-  { label: "Luyện tập", items: [["/quiz", "Quiz"], ["/games", "Trò chơi"]] },
+  { label: "Kỹ năng", items: [["/speaking", "Luyện nói"], ["/reading", "Đọc hiểu"], ["/listening", "Luyện nghe"], ["/writing", "Luyện viết"]] },
+  { label: "Luyện tập", items: [["/quiz", "Quiz"], ["/games", "Trò chơi"], ["/exams", "Bài kiểm tra"]] },
   { label: "Cộng đồng", items: [["/leaderboard", "Xếp hạng"], ["/friends", "Bạn bè"]] },
 ] as const;
 
@@ -52,45 +52,14 @@ function Dropdown({ label, active, align = "left", title, children }:
 function LangMenu() {
   const t = useT();
   const { lang, setLang } = useLang();
-  const flags = {
-    vi: "vn",
-    en: "gb",
-  } as const;
   return (
-    <Dropdown
-      align="right"
-      title={t("Ngôn ngữ")}
-      label={
-        <span className="text-xs font-bold">
-          <span className={`fi fi-${flags[lang]}`} aria-hidden="true" />{" "} {lang.toUpperCase()}
-        </span>
-      }
-    >
+    <Dropdown align="right" title={t("Ngôn ngữ")} label={<span className="text-xs font-bold">🌐 {lang.toUpperCase()}</span>}>
       {(close) => (
         <>
           <p className={menuTitle}>{t("Ngôn ngữ")}</p>
-          {(
-            [
-              ["vi", "Tiếng Việt"],
-              ["en", "English"],
-            ] as const
-          ).map(([code, name]) => (
-            <button
-              key={code}
-              role="menuitemradio"
-              aria-checked={lang === code}
-              onClick={() => {
-                setLang(code);
-                close();
-              }}
-              className={menuItem(lang === code)}
-            >
-              <span>
-                <b className="mr-2 inline-block w-5 text-xs">
-                  {code.toUpperCase()}
-                </b>
-                {name}
-              </span>
+          {([["vi", "Tiếng Việt"], ["en", "English"]] as const).map(([code, name]) => (
+            <button key={code} role="menuitemradio" aria-checked={lang === code} onClick={() => { setLang(code); close(); }} className={menuItem(lang === code)}>
+              <span><b className="mr-2 inline-block w-5 text-xs">{code.toUpperCase()}</b>{name}</span>
               {lang === code && <span>✓</span>}
             </button>
           ))}
@@ -100,7 +69,7 @@ function LangMenu() {
   );
 }
 
-const THEMES = [["light", "☀️", "Sáng"], ["dark", "🌙", "Tối"], ["system", "💻", "Hệ thống"]] as const;
+const THEMES = [["light", "☀️", "Sáng"], ["dark", "🌙", "Tối"], ["system", "💻", "Theo hệ thống"]] as const;
 
 function ThemeMenu() {
   const t = useT();
@@ -147,8 +116,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
-        <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 font-bold text-indigo-600">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">🐷</span>
+        <Link href={user ? "/" : "/"} className="flex items-center gap-2 font-bold text-indigo-600">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">P</span>
           <span className="hidden sm:inline">Học cùng Phao</span>
         </Link>
 

@@ -41,6 +41,11 @@ async def connect() -> None:
         ("practice_items", [("kind", 1), ("slug", 1)], {"unique": True}),
         ("practice_items", [("kind", 1), ("level", 1)], {}),
         ("practice_attempts", [("user_id", 1), ("kind", 1), ("slug", 1)], {}),
+        ("writing_prompts", [("level", 1), ("order", 1)], {}),
+        ("writing_submissions", [("user_id", 1), ("created_at", -1)], {}),
+        ("exams", [("status", 1), ("created_at", -1)], {}),
+        ("exam_attempts", [("exam_id", 1), ("user_id", 1), ("status", 1)], {}),
+        ("exam_attempts", [("user_id", 1), ("started_at", -1)], {}),
         ("import_previews", [("created_at", 1)], {"expireAfterSeconds": 1800}),
     ]
     for col, keys, opts in idx:
