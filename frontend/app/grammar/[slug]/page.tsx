@@ -7,6 +7,7 @@ import { ErrorBox, Spinner } from "@/components/ui";
 import { VideoEmbed } from "@/components/video-embed";
 import { useGet } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { BackLink } from "@/components/back-link";
 import { useLang } from "@/store/lang-store";
 
 interface Exercise { question: string; options: string[]; answer: string; explanation: string }
@@ -75,7 +76,7 @@ export default function GrammarDetailPage() {
   const h2 = "mb-2 text-xl font-semibold";
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-4 py-8">
-      <Link href="/grammar" className="text-sm text-indigo-600">{t("← Tất cả bài học")}</Link>
+      <BackLink href="/grammar">{t("← Tất cả bài học")}</BackLink>
       <h1 className="text-3xl font-bold">{l.title} <span className="text-base text-slate-500">({l.level})</span></h1>
       <p className="text-slate-600 dark:text-slate-400">{l.description}</p>
 

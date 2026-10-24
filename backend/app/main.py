@@ -22,6 +22,7 @@ from app.modules.leaderboard.router import router as leaderboard_router
 from app.modules.speaking.router import router as speaking_router
 from app.modules.practice.router import router as practice_router
 from app.modules.quiz.router import router as quiz_router
+from app.modules.users.router import router as users_router
 from app.modules.words.router import router as words_router
 from app.modules.writing.router import router as writing_router
 
@@ -55,7 +56,7 @@ def create_app() -> FastAPI:
     api_v1 = APIRouter(prefix="/api/v1")
     for r in (auth_router, words_router, favorites_router, flashcards_router, quiz_router,
               games_router, leaderboard_router, admin_router, friends_router, speaking_router,
-              chat_router, activity_router, practice_router, writing_router, exams_router, *content_routers):
+              chat_router, activity_router, practice_router, writing_router, exams_router, users_router, *content_routers):
         api_v1.include_router(r)
     app.include_router(api_v1)
     return app

@@ -7,6 +7,7 @@ import { TtsPlayer } from "@/components/tts-player";
 import { Button, Card, ErrorBox, Spinner } from "@/components/ui";
 import { useGet, useSend } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { BackLink } from "@/components/back-link";
 import { useLang } from "@/store/lang-store";
 import { speak } from "@/lib/utils";
 import { useAuth } from "@/store/auth-store";
@@ -38,7 +39,7 @@ export function PracticeDetail({ kind, slug }: { kind: Kind; slug: string }) {
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-4 py-6">
-      <Link href={`/${kind}`} className="text-sm text-indigo-600">{kind === "reading" ? t("← Tất cả bài đọc") : t("← Tất cả bài nghe")}</Link>
+      <BackLink href={`/${kind}`}>{kind === "reading" ? t("← Tất cả bài đọc") : t("← Tất cả bài nghe")}</BackLink>
       <div>
         <h1 className="text-2xl font-bold sm:text-3xl">{d.title}</h1>
         <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">

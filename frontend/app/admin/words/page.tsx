@@ -8,7 +8,7 @@ import { useT } from "@/lib/i18n";
 import { qs } from "@/lib/utils";
 import type { Word } from "@/types";
 
-const EMPTY = { word: "", phonetic: "", level: "A1", topic: "", part_of_speech: "noun", definition: "", translation_vi: "", example: "" };
+const EMPTY = { word: "", phonetic: "", level: "A1", topic: "", part_of_speech: "noun", definition: "", translation_vi: "", example: "", definition_vi: "", example_vi: "", emoji: "", image_url: "" };
 
 export default function AdminWords() {
   const t = useT();
@@ -17,8 +17,8 @@ export default function AdminWords() {
   const [form, setForm] = useState(EMPTY);
   const words = useGet<Word[]>(`/words?${qs({ page, limit: 10 })}`);
   const create = useSend<unknown, typeof EMPTY>("POST", "/words", ["/words"], (f) => ({
-    word: f.word, phonetic: f.phonetic, level: f.level, topics: f.topic ? [f.topic] : [],
-    meanings: [{ part_of_speech: f.part_of_speech, definition: f.definition, translation_vi: f.translation_vi, examples: f.example ? [f.example] : [] }],
+    word: f.word, phonetic: f.phonetic, level: f.level, topics: f.topic ? [f.topic] : [], emoji: f.emoji, image_url: f.image_url,
+    meanings: [{ part_of_speech: f.part_of_speech, definition: f.definition, translation_vi: f.translation_vi, definition_vi: f.definition_vi, examples: f.example ? [f.example] : [], examples_vi: f.example_vi ? [f.example_vi] : [] }],
   }));
   const del = useSend<unknown, string>("DELETE", (id) => `/words/${id}`, ["/words"]);
   const set = (k: keyof typeof EMPTY) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [k]: e.target.value });
@@ -34,6 +34,10 @@ export default function AdminWords() {
           <input required className={inputCls} placeholder={t("Nghĩa tiếng Việt")} value={form.translation_vi} onChange={set("translation_vi")} />
           <input className={inputCls} placeholder={t("Ví dụ")} value={form.example} onChange={set("example")} />
           <input className={inputCls} placeholder={t("Chủ đề")} value={form.topic} onChange={set("topic")} />
+          <input className={inputCls} placeholder={t("Định nghĩa tiếng Việt")} value={form.definition_vi} onChange={set("definition_vi")} />
+          <input className={inputCls} placeholder={t("Ví dụ tiếng Việt")} value={form.example_vi} onChange={set("example_vi")} />
+          <input className={inputCls} placeholder={t("Emoji minh họa")} maxLength={8} value={form.emoji} onChange={set("emoji")} />
+          <input className={inputCls} type="url" placeholder={t("Link ảnh minh họa (https://...)")} value={form.image_url} onChange={set("image_url")} />
           <Button type="submit" disabled={create.isPending} className="sm:col-span-2">{t("Thêm từ")}</Button>
         </form>
         {create.error && <div className="mt-2"><ErrorBox error={create.error} /></div>}

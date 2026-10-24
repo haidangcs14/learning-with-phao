@@ -8,6 +8,7 @@ import type { ExamGroup, ExamQuestion } from "@/components/exam/types";
 import { Button, Card, ErrorBox, Page, Spinner, inputCls } from "@/components/ui";
 import { useGet, useSend } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { BackLink } from "@/components/back-link";
 
 interface Manage { id: string; title: string; duration_minutes: number; total_score: number; status: "draft" | "published"; transcript: string; warnings: string[]; has_audio?: boolean; audio?: { ext: string; size: number } | null; groups: ExamGroup[] }
 interface Row { id: string; username: string; status: string; started_at: string; score: number | null; max_score: number | null }
@@ -74,7 +75,7 @@ function Editor({ initial }: { initial: Manage }) {
   return (
     <Page title={t("Chỉnh sửa bài kiểm tra")}>
       <div className="flex flex-wrap items-center gap-2">
-        <Link href="/admin/exams" className="text-sm text-indigo-600">{t("← Tất cả bài kiểm tra")}</Link>
+        <BackLink href="/admin/exams">{t("← Tất cả bài kiểm tra")}</BackLink>
         <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${published ? "bg-green-600 text-white" : "bg-slate-300 text-slate-800"}`}>{published ? t("Đã công khai") : t("Bản nháp")}</span>
         <Link href={`/exams/${initial.id}`} className="text-sm text-indigo-600 underline">{t("Xem thử như học sinh")}</Link>
         <span className="ml-auto flex gap-2">

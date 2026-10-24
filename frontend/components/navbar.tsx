@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Avatar } from "@/components/avatar";
+import { useGet } from "@/hooks/api";
 import { apiFetch } from "@/lib/api";
 import { useT } from "@/lib/i18n";
 import { useAuth } from "@/store/auth-store";
@@ -16,6 +18,7 @@ const GROUPS = [
   { label: "Luyện tập", items: [["/quiz", "Quiz"], ["/games", "Trò chơi"], ["/exams", "Bài kiểm tra"]] },
   { label: "Cộng đồng", items: [["/leaderboard", "Xếp hạng"], ["/friends", "Bạn bè"]] },
 ] as const;
+const ADMIN_LINKS = [["/admin", "Dashboard"], ["/admin/users", "Người dùng"], ["/admin/words", "Từ vựng"], ["/admin/questions", "Câu hỏi"], ["/admin/exams", "Bài kiểm tra"]] as const;
 
 const ghost = "rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800";
 const menuItem = (active: boolean) =>
@@ -103,6 +106,9 @@ export function Navbar() {
   const { user, ready, clear } = useAuth();
   const [mobile, setMobile] = useState(false);
   useEffect(() => setMobile(false), [pathname]);
+  const isAdmin = user?.role === "admin";
+  const xp = useGet<{ level: number }>(user && !isAdmin ? "/leaderboard/me" : null);
+  const level = xp.data?.data.level;
 
   async function logout() {
     await apiFetch("/auth/logout", { method: "POST" }).catch(() => undefined);
@@ -112,21 +118,24 @@ export function Navbar() {
   }
   const itemCls = (href: string) =>
     `block rounded-lg px-3 py-2 text-sm ${pathname.startsWith(href) ? "bg-indigo-50 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"}`;
+  const adminCls = (href: string) => `${ghost} ${(href === "/admin" ? pathname === "/admin" : pathname.startsWith(href)) ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300" : ""}`;
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
-        <Link href={user ? "/" : "/"} className="flex items-center gap-2 font-bold text-indigo-600">
+        <Link href={isAdmin ? "/admin" : user ? "/dashboard" : "/"} className="flex items-center gap-2 font-bold text-indigo-600">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">P</span>
-          <span className="hidden sm:inline">Học cùng Phao</span>
+          <span className="hidden sm:inline">{isAdmin ? "Phao Admin" : "Học cùng Phao"}</span>
         </Link>
 
         <nav className="ml-4 hidden items-center gap-1 md:flex">
-          {GROUPS.map((g) => (
-            <Dropdown key={g.label} label={t(g.label)} active={g.items.some(([h]) => pathname.startsWith(h))}>
-              {(close) => g.items.map(([href, label]) => <Link key={href} href={href} onClick={close} className={itemCls(href)}>{t(label)}</Link>)}
-            </Dropdown>
-          ))}
+          {isAdmin
+            ? ADMIN_LINKS.map(([href, label]) => <Link key={href} href={href} className={adminCls(href)}>{t(label)}</Link>)
+            : GROUPS.map((g) => (
+              <Dropdown key={g.label} label={t(g.label)} active={g.items.some(([h]) => pathname.startsWith(h))}>
+                {(close) => g.items.map(([href, label]) => <Link key={href} href={href} onClick={close} className={itemCls(href)}>{t(label)}</Link>)}
+              </Dropdown>
+            ))}
         </nav>
 
         <div className="ml-auto flex items-center gap-1.5">
@@ -135,13 +144,16 @@ export function Navbar() {
           {ready && (user ? (
             <Dropdown align="right" label={
               <span className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold uppercase text-white">{user.username.slice(0, 1)}</span>
+                <span className="flex flex-col items-center leading-none">
+                  <Avatar user={user} size={28} />
+                  {!isAdmin && level !== undefined && <span className="mt-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">Lv.{level}</span>}
+                </span>
                 <span className="hidden max-w-24 truncate lg:inline">{user.username}</span>
               </span>}>
               {(close) => (
                 <>
-                  <Link href="/dashboard" onClick={close} className={itemCls("/dashboard")}>{t("Tổng quan")}</Link>
-                  {user.role === "admin" && <Link href="/admin" onClick={close} className={itemCls("/admin")}>Admin</Link>}
+                  <Link href="/profile" onClick={close} className={itemCls("/profile")}>{t("Hồ sơ cá nhân")}</Link>
+                  {!isAdmin && <Link href="/dashboard" onClick={close} className={itemCls("/dashboard")}>{t("Tổng quan")}</Link>}
                   <button onClick={() => { close(); void logout(); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-slate-100 dark:hover:bg-slate-800">{t("Đăng xuất")}</button>
                 </>
               )}
@@ -156,12 +168,14 @@ export function Navbar() {
 
       {mobile && (
         <nav className="max-h-[70vh] space-y-3 overflow-y-auto border-t border-slate-200 p-3 md:hidden dark:border-slate-800">
-          {GROUPS.map((g) => (
-            <div key={g.label}>
-              <p className={menuTitle}>{t(g.label)}</p>
-              {g.items.map(([href, label]) => <Link key={href} href={href} className={itemCls(href)}>{t(label)}</Link>)}
-            </div>
-          ))}
+          {isAdmin
+            ? ADMIN_LINKS.map(([href, label]) => <Link key={href} href={href} className={itemCls(href)}>{t(label)}</Link>)
+            : GROUPS.map((g) => (
+              <div key={g.label}>
+                <p className={menuTitle}>{t(g.label)}</p>
+                {g.items.map(([href, label]) => <Link key={href} href={href} className={itemCls(href)}>{t(label)}</Link>)}
+              </div>
+            ))}
         </nav>
       )}
     </header>

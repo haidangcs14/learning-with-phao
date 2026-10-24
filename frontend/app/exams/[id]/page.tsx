@@ -12,6 +12,7 @@ import { Protected } from "@/components/protected";
 import { Button, Card, ErrorBox, Page, Spinner } from "@/components/ui";
 import { useGet, useSend } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { BackLink } from "@/components/back-link";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -97,7 +98,7 @@ function Intro() {
   const e = q.data.data;
   return (
     <Page title={e.title}>
-      <Link href="/exams" className="text-sm text-indigo-600">{t("← Tất cả bài kiểm tra")}</Link>
+      <BackLink href="/exams">{t("← Tất cả bài kiểm tra")}</BackLink>
       <Card className="space-y-3">
         <ul className="space-y-1 text-sm">
           <li>⏱ {t("Thời gian làm bài: {n} phút", { n: e.duration_minutes })}</li>

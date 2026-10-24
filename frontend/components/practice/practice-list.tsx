@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Card, Empty, ErrorBox, Page, Pager, Spinner, Tabs, inputCls } from "@/components/ui";
 import { useGet } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { useRestoreScroll, usePersistedState } from "@/lib/persist";
 import { qs } from "@/lib/utils";
 import { useAuth } from "@/store/auth-store";
 
@@ -21,14 +22,15 @@ const LEVELS = ["", "A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export function PracticeList({ kind }: { kind: Kind }) {
   const t = useT();
   const user = useAuth((s) => s.user);
-  const [level, setLevel] = useState<string>("");
-  const [input, setInput] = useState("");
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
+  const [level, setLevel] = usePersistedState<string>(`${kind}.level`, "");
+  const [input, setInput] = usePersistedState(`${kind}.input`, "");
+  const [q, setQ] = usePersistedState(`${kind}.q`, "");
+  const [page, setPage] = usePersistedState(`${kind}.page`, 1);
   const list = useGet<Item[]>(`/practice/${kind}?${qs({ level, q, page, limit: 12 })}`);
   const prog = useGet<Progress>(user ? `/practice/${kind}/progress` : null);
   const items = list.data?.data ?? [];
   const best = prog.data?.data.best ?? {};
+  useRestoreScroll(kind, !list.isLoading);
 
   return (
     <Page title={kind === "reading" ? t("Đọc hiểu") : t("Luyện nghe")}>

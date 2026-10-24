@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button, Card, Empty, ErrorBox, Page, Pager, Spinner, inputCls } from "@/components/ui";
 import { useGet } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { useRestoreScroll, usePersistedState } from "@/lib/persist";
 import { useLang } from "@/store/lang-store";
 import { qs, speak } from "@/lib/utils";
 
@@ -13,12 +14,13 @@ const TOPICS = ["Greetings", "Travel", "Shopping", "Restaurant", "School", "Work
 export default function SentencesPage() {
   const t = useT();
   const lang = useLang((s) => s.lang);
-  const [input, setInput] = useState("");
-  const [q, setQ] = useState("");
-  const [topic, setTopic] = useState("");
-  const [page, setPage] = useState(1);
+  const [input, setInput] = usePersistedState("sent.input", "");
+  const [q, setQ] = usePersistedState("sent.q", "");
+  const [topic, setTopic] = usePersistedState("sent.topic", "");
+  const [page, setPage] = usePersistedState("sent.page", 1);
   const res = useGet<Sentence[]>(`/sentences?${qs({ q, topic, page, limit: 12 })}`);
   const rows = res.data?.data ?? [];
+  useRestoreScroll("sentences", !res.isLoading);
   return (
     <Page title={t("Mẫu câu giao tiếp")}>
       <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); setQ(input); setPage(1); }}>

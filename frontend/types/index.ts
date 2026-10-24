@@ -1,12 +1,12 @@
 export interface User { id: string; email: string; username: string; full_name: string; avatar_url: string; role: "user" | "admin"; is_active: boolean }
-export interface Meaning { part_of_speech: string; definition: string; translation_vi: string; examples: string[] }
-export interface Word { id: string; word: string; slug: string; phonetic: string; level: string; topics: string[]; meanings: Meaning[]; synonyms: string[]; antonyms: string[]; collocations: string[] }
+export interface Meaning { part_of_speech: string; definition: string; translation_vi: string; examples: string[]; definition_vi?: string; examples_vi?: string[] }
+export interface Word { id: string; word: string; slug: string; phonetic: string; level: string; topics: string[]; meanings: Meaning[]; synonyms: string[]; antonyms: string[]; collocations: string[]; emoji?: string; image_url?: string }
 export interface Favorite { id: string; target_id: string; target_type: string; item?: Word | null }
 export interface Card { id: string; word_id: string; status: string; word: Word }
 export interface Question { id: string; question: string; options: string[]; level: string; topic: string }
 export interface QuizResult { total: number; correct: number; accuracy: number; xp_awarded: number; results: { question_id: string; correct: boolean; your_answer: string; correct_answer: string; explanation: string }[] }
 export interface Pair { pair_id: string; en: string; vi: string }
-export interface LbRow { rank: number; user_id: string; username: string; xp: number }
+export interface LbRow { rank: number; user_id: string; username: string; xp: number; level: number }
 export interface Brief { id: string; username: string; avatar_url: string }
 export interface Friend extends Brief { total_xp: number }
 export interface FriendRequest { id: string; user: Brief | null }

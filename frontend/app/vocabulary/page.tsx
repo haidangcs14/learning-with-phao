@@ -6,6 +6,8 @@ import { Button, Card, Empty, ErrorBox, Page, Pager, Spinner, Tabs, inputCls } f
 import { WordActions, useFavoriteIds } from "@/components/word-actions";
 import { useGet, useSend } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { useRestoreScroll, usePersistedState } from "@/lib/persist";
+import { WordVisual } from "@/components/word-visual";
 import { topicInfo } from "@/lib/topics";
 import { qs } from "@/lib/utils";
 import { useAuth } from "@/store/auth-store";
@@ -19,12 +21,12 @@ export default function VocabularyPage() {
   const t = useT();
   const lang = useLang((s) => s.lang);
   const user = useAuth((s) => s.user);
-  const [input, setInput] = useState("");
-  const [q, setQ] = useState("");
-  const [level, setLevel] = useState("");
-  const [topic, setTopic] = useState("");
-  const [page, setPage] = useState(1);
-  const [tab, setTab] = useState<"all" | "fav">("all");
+  const [input, setInput] = usePersistedState("vocab.input", "");
+  const [q, setQ] = usePersistedState("vocab.q", "");
+  const [level, setLevel] = usePersistedState("vocab.level", "");
+  const [topic, setTopic] = usePersistedState("vocab.topic", "");
+  const [page, setPage] = usePersistedState("vocab.page", 1);
+  const [tab, setTab] = usePersistedState<"all" | "fav">("vocab.tab", "all");
   const topics = useGet<TopicCount[]>(tab === "all" ? `/words/topics${level ? `?level=${level}` : ""}` : null);
   const words = useGet<Word[]>(tab === "all" ? `/words?${qs({ q, level, topic, page, limit: 24 })}` : null);
   const { favs, ids } = useFavoriteIds();
@@ -36,6 +38,7 @@ export default function VocabularyPage() {
   const loading = tab === "all" ? words.isLoading : favs.isLoading;
   const error = tab === "all" ? words.error : favs.error;
   const total = topics.data?.data.reduce((s, x) => s + x.count, 0) ?? 0;
+  useRestoreScroll("vocab", !loading);
   const pick = (name: string) => { setTopic(name); setPage(1); addTopic.reset(); };
   const current = topic ? topicInfo(topic, lang) : null;
   const cardCls = (active: boolean) => `flex items-center gap-2 rounded-xl border p-3 text-left text-sm transition ${active ? "border-indigo-600 bg-indigo-50 font-semibold dark:bg-indigo-950" : "border-slate-200 bg-white hover:border-indigo-400 dark:border-slate-800 dark:bg-slate-900/60"}`;
@@ -84,6 +87,7 @@ export default function VocabularyPage() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((w) => (
             <Card key={w.id} className="space-y-2">
+              <WordVisual word={w} size="sm" />
               <div className="flex items-start justify-between">
                 <Link href={`/vocabulary/${w.id}`} className="text-lg font-semibold hover:text-indigo-600">{w.word}</Link>
                 <span className="rounded bg-indigo-100 px-2 py-0.5 text-xs text-indigo-800">{w.level}</span>

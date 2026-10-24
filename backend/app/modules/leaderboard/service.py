@@ -5,6 +5,14 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.common.mongo import to_oid, utcnow
 
 
+LEVEL_XP = 100
+
+
+def level_of(total_xp: int) -> int:
+    """100 XP = 1 level; everyone starts at level 1."""
+    return total_xp // LEVEL_XP + 1
+
+
 def period_start(period: str):
     now = utcnow()
     day = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -47,14 +55,18 @@ class XpService:
         rows = [r async for r in self.col.aggregate([
             {"$match": match},
             {"$group": {"_id": "$user_id", "xp": {"$sum": "$amount"}}},
-            {"$sort": {"xp": -1}}, {"$limit": limit},
+            {"$sort": {"xp": -1}}, {"$limit": limit + 20},  # a few extra rows: admin accounts are removed below
         ])]
         oids = [o for o in (to_oid(r["_id"]) for r in rows) if o]
-        names = {str(u["_id"]): u async for u in self.db["users"].find(
-            {"_id": {"$in": oids}}, {"username": 1, "avatar_url": 1})}
-        return [{"rank": i + 1, "user_id": r["_id"], "xp": r["xp"],
-                 "username": names.get(r["_id"], {}).get("username", "unknown"),
-                 "avatar_url": names.get(r["_id"], {}).get("avatar_url", "")}
+        users = {str(u["_id"]): u async for u in self.db["users"].find(
+            {"_id": {"$in": oids}}, {"username": 1, "avatar_url": 1, "role": 1})}
+        rows = [r for r in rows if users.get(r["_id"], {}).get("role") != "admin"][:limit]  # admins don't play: not ranked
+        totals = {r["_id"]: r["xp"] async for r in self.col.aggregate([
+            {"$match": {"user_id": {"$in": [r["_id"] for r in rows]}}},
+            {"$group": {"_id": "$user_id", "xp": {"$sum": "$amount"}}}])}
+        return [{"rank": i + 1, "user_id": r["_id"], "xp": r["xp"], "level": level_of(totals.get(r["_id"], r["xp"])),
+                 "username": users.get(r["_id"], {}).get("username", "unknown"),
+                 "avatar_url": users.get(r["_id"], {}).get("avatar_url", "")}
                 for i, r in enumerate(rows)]
 
     async def summary(self, user_id: str) -> dict:
@@ -62,7 +74,9 @@ class XpService:
             {"$match": {"user_id": user_id}},
             {"$group": {"_id": "$source", "xp": {"$sum": "$amount"}}},
         ])}
-        return {"total_xp": sum(by_source.values()), "by_source": by_source}
+        total = sum(by_source.values())
+        return {"total_xp": total, "by_source": by_source, "level": level_of(total),
+                "xp_into_level": total % LEVEL_XP, "xp_for_next": LEVEL_XP}
 
     async def total(self, user_id: str, period: str) -> int:
         start = period_start(period)

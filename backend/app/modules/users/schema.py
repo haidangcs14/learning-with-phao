@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserOut(BaseModel):
@@ -16,3 +16,8 @@ class UserOut(BaseModel):
 class UserAdminUpdate(BaseModel):
     role: Literal["user", "admin"] | None = None
     is_active: bool | None = None
+
+
+class ProfileUpdateIn(BaseModel):
+    full_name: str | None = Field(None, max_length=100)
+    username: str | None = Field(None, pattern=r"^[A-Za-z0-9_]{3,30}$")

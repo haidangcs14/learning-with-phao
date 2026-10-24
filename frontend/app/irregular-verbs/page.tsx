@@ -4,19 +4,21 @@ import { useState } from "react";
 import { Button, Empty, ErrorBox, Page, Pager, Spinner, inputCls } from "@/components/ui";
 import { useGet } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
+import { useRestoreScroll, usePersistedState } from "@/lib/persist";
 import { qs, speak } from "@/lib/utils";
 
 interface Verb { id: string; base: string; past: string; past_participle: string; meaning_vi: string }
 
 export default function IrregularVerbsPage() {
   const t = useT();
-  const [input, setInput] = useState("");
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
-  const [hide, setHide] = useState(false);
+  const [input, setInput] = usePersistedState("verbs.input", "");
+  const [q, setQ] = usePersistedState("verbs.q", "");
+  const [page, setPage] = usePersistedState("verbs.page", 1);
+  const [hide, setHide] = usePersistedState("verbs.hide", false);
   const [shown, setShown] = useState<Set<string>>(new Set());
   const res = useGet<Verb[]>(`/irregular-verbs?${qs({ q, page, limit: 20 })}`);
   const rows = res.data?.data ?? [];
+  useRestoreScroll("verbs", !res.isLoading);
 
   const cell = (id: string, key: string, text: string) => hide && !shown.has(`${id}${key}`)
     ? <button className="rounded bg-slate-200 px-3 py-0.5 text-slate-500 dark:bg-slate-700" onClick={() => setShown(new Set(shown).add(`${id}${key}`))}>• • •</button>

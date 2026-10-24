@@ -7,7 +7,9 @@ class Meaning(BaseModel):
     part_of_speech: str
     definition: str
     translation_vi: str
+    definition_vi: str = ""
     examples: list[str] = []
+    examples_vi: list[str] = []
 
 
 class WordOut(BaseModel):
@@ -22,6 +24,8 @@ class WordOut(BaseModel):
     synonyms: list[str] = []
     antonyms: list[str] = []
     collocations: list[str] = []
+    emoji: str = ""
+    image_url: str = ""
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
@@ -43,6 +47,8 @@ class WordCreate(BaseModel):
     synonyms: list[str] = []
     antonyms: list[str] = []
     collocations: list[str] = []
+    emoji: str = Field("", max_length=8)
+    image_url: str = Field("", max_length=500, pattern=r"^(|https?://\S+)$")
 
 
 class WordUpdate(BaseModel):
@@ -55,3 +61,5 @@ class WordUpdate(BaseModel):
     synonyms: list[str] | None = None
     antonyms: list[str] | None = None
     collocations: list[str] | None = None
+    emoji: str | None = Field(None, max_length=8)
+    image_url: str | None = Field(None, max_length=500, pattern=r"^(|https?://\S+)$")
