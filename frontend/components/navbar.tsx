@@ -18,9 +18,9 @@ const GROUPS = [
   { label: "Luyện tập", items: [["/quiz", "Quiz"], ["/games", "Trò chơi"], ["/exams", "Bài kiểm tra"]] },
   { label: "Cộng đồng", items: [["/leaderboard", "Xếp hạng"], ["/friends", "Bạn bè"]] },
 ] as const;
-const ADMIN_LINKS = [["/admin", "Dashboard"], ["/admin/users", "Người dùng"], ["/admin/words", "Từ vựng"], ["/admin/questions", "Câu hỏi"], ["/admin/exams", "Bài kiểm tra"]] as const;
+const ADMIN_LINKS = [["/admin", "Dashboard"], ["/admin/users", "Người dùng"], ["/admin/words", "Từ vựng"], ["/admin/questions", "Câu hỏi"], ["/admin/exams", "Bài kiểm tra"], ["/admin/videos", "Video bài nghe"]] as const;
 
-const ghost = "rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800";
+  const ghost = "rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800";
 const menuItem = (active: boolean) =>
   `flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${active ? "bg-indigo-50 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"}`;
 const menuTitle = "px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-400";

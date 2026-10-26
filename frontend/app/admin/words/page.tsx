@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { WordImport } from "@/components/admin/word-import";
 import { useConfirm } from "@/components/confirm";
 import { Button, Card, ErrorBox, Page, Pager, Spinner, inputCls } from "@/components/ui";
 import { useGet, useSend } from "@/hooks/api";
@@ -24,6 +25,7 @@ export default function AdminWords() {
   const set = (k: keyof typeof EMPTY) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [k]: e.target.value });
   return (
     <Page title={t("Quản lý từ vựng")}>
+      <WordImport />
       <Card>
         <form className="grid gap-2 sm:grid-cols-2" onSubmit={(e) => { e.preventDefault(); create.mutate(form, { onSuccess: () => setForm(EMPTY) }); }}>
           <input required className={inputCls} placeholder={t("Từ (word)")} value={form.word} onChange={set("word")} />

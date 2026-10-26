@@ -22,6 +22,9 @@ export interface ChatMessage { id: string; role: "user" | "assistant"; content: 
 export interface AdminStats {
   users: number; new_users_7d: number; active_users_today: number; words: number; questions: number;
   quiz_attempts: number; games_played: number; speaking_sessions: number; daily_active_users: { date: string; users: number }[];
+  series: { dates: string[]; new_users: number[]; active_users: number[]; events: number[] };
+  xp_by_source: { label: string; value: number }[]; words_by_level: { label: string; value: number }[]; words_by_topic: { label: string; value: number }[];
+  users_by_role: { label: string; value: number }[]; users_by_level: { label: string; value: number }[];
 }
 
 export interface Evaluation {

@@ -15,7 +15,7 @@ export function useGet<T>(path: string | null) {
 
 /** Mutation helper. `invalidate` = path prefixes whose cached queries must be refetched on success. */
 export function useSend<T = unknown, V = void>(
-  method: "GET" | "POST" | "PATCH" | "DELETE",
+  method: "GET" | "POST" | "PATCH" | "DELETE" | "PUT",
   path: string | ((v: V) => string),
   invalidate: string[] = [],
   body?: (v: V) => unknown,
