@@ -8,7 +8,7 @@ from app.dependencies.auth import CurrentUser
 from app.dependencies.database import db_dependency
 from app.modules.leaderboard.service import XpService
 from app.modules.quiz.repository import QuizRepository
-from app.modules.quiz.schema import SubmitIn
+from app.modules.quiz.schema import GenerateIn, SubmitIn
 from app.modules.quiz.service import QuizService
 
 router = APIRouter(prefix="/quiz", tags=["quiz"])
@@ -26,6 +26,21 @@ async def get_questions(user: CurrentUser, service: Service,
                         level: str | None = Query(None, pattern=r"^(A1|A2|B1|B2|C1|C2)$"),
                         topic: str | None = Query(None, max_length=50), limit: int = Query(10, ge=1, le=50)):
     return ApiResponse(data=await service.questions(level, topic, limit))
+
+
+@router.get("/topics", response_model=ApiResponse)
+async def topics(user: CurrentUser, service: Service):
+    return ApiResponse(data=await service.topics())
+
+
+@router.post("/generate", response_model=ApiResponse)
+async def generate(data: GenerateIn, user: CurrentUser, service: Service):
+    return ApiResponse(data=await service.generate(user["id"], data))
+
+
+@router.post("/sessions/{session_id}/submit", response_model=ApiResponse)
+async def submit_session(session_id: str, data: SubmitIn, user: CurrentUser, service: Service):
+    return ApiResponse(data=await service.submit_session(user["id"], session_id, data))
 
 
 @router.post("/submit", response_model=ApiResponse)

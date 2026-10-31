@@ -50,3 +50,11 @@ class GameRepository:
         q: dict = {"user_id": user_id, "game": game}
         q["mode"] = {"$in": [mode, None]} if mode == "classic" else mode  # old results had no mode
         return await self.results.find_one(q, sort=[("score", -1), ("flips", 1), ("duration", 1)])
+
+    async def sample_topic_words(self, topic: str | None, n: int, need_example: bool) -> list[dict]:
+        match: dict = {"meanings.0.translation_vi": {"$exists": True}}
+        if topic:
+            match["topics"] = topic
+        if need_example:
+            match["meanings.0.examples.0"] = {"$exists": True}
+        return [w async for w in self.words.aggregate([{"$match": match}, {"$sample": {"size": n}}])]

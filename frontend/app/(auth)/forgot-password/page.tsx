@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BackLink } from "@/components/back-link";
 import { useState } from "react";
 import { AuthCard, useShake } from "@/components/auth-card";
 import { Checklist } from "@/components/checklist";
@@ -51,7 +52,7 @@ export default function ForgotPasswordPage() {
           <Checklist title={t("Điều kiện")} rules={[{ label: t("Email hợp lệ"), ok, touched }]} />
         </form>
       )}
-      <p className="mt-5 text-center text-sm"><Link className="text-indigo-600 hover:underline" href="/login">{t("← Quay lại đăng nhập")}</Link></p>
+      <p className="mt-5 text-center text-sm"><BackLink href="/login">{t("← Quay lại đăng nhập")}</BackLink></p>
     </AuthCard>
   );
 }

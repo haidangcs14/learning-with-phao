@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/protected";
+import { BackButton } from "@/components/back-link";
 import { WritingEvaluation } from "@/components/writing-evaluation";
 import { WritingHistory, type Submission } from "@/components/writing-history";
 import { Button, Card, Empty, ErrorBox, Page, Spinner, Tabs } from "@/components/ui";
@@ -32,7 +33,7 @@ function Editor({ prompt, onBack }: { prompt: Prompt | null; onBack: () => void 
   }
   return (
     <div className="space-y-4">
-      <button onClick={onBack} className="text-sm text-indigo-600">{t("← Chọn đề khác")}</button>
+      <BackButton onClick={onBack}>{t("← Chọn đề khác")}</BackButton>
       <Card className="space-y-2">
         <div className="flex items-center gap-2">
           {prompt && <span className={`rounded px-2 py-0.5 text-xs font-semibold ${LEVEL_COLOR[prompt.level] ?? ""}`}>{prompt.level}</span>}

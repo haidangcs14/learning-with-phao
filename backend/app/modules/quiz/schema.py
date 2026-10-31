@@ -26,3 +26,10 @@ class AnswerIn(BaseModel):
 
 class SubmitIn(BaseModel):
     answers: list[AnswerIn] = Field(min_length=1, max_length=50)
+
+
+class GenerateIn(BaseModel):
+    kind: Literal["word_to_meaning", "meaning_to_word", "definition_to_word"]
+    topic: str | None = Field(None, max_length=50)
+    level: str | None = Field(None, pattern=r"^(A1|A2|B1|B2|C1|C2)$")
+    count: int = Field(10, ge=3, le=30)
