@@ -60,3 +60,11 @@ async def test_avatar_upload_is_validated_public_and_removable(api, tmp_path, mo
     gone = await api.delete("/api/v1/users/me/avatar", headers=h)
     assert gone.json()["data"]["avatar_url"] == "" and (await api.get(f"/api/v1/users/{uid}/avatar")).status_code == 404
     get_settings.cache_clear()
+
+
+async def test_leaderboard_rows_carry_the_full_name(api, db):
+    h = await signup(api, "n@x.com", "nguyen")
+    await db["users"].update_one({"email": "n@x.com"}, {"$set": {"full_name": "Nguyen Van A"}})
+    await _xp(db, await _me(api, h), 40)
+    row = (await api.get("/api/v1/leaderboard?period=all")).json()["data"][0]
+    assert row["full_name"] == "Nguyen Van A" and row["username"] == "nguyen"

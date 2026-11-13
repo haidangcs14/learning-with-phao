@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { GameDemo } from "@/components/games/demos";
 import { TopicPicker } from "@/components/games/topic-picker";
 import { Button, Card, ErrorBox, Spinner } from "@/components/ui";
 import { useSend } from "@/hooks/api";
 import { sfx, useSound } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
+import { VirtualKeyboard, useVirtualKeyboard } from "@/components/virtual-keyboard";
 import { useT } from "@/lib/i18n";
 import { shuffle } from "@/lib/utils";
 
@@ -31,6 +33,7 @@ const freshGame = () => ({
 export function VocabRain() {
   const t = useT();
   const [sound, setSound] = useSound();
+  const [kb, setKb] = useVirtualKeyboard();
   const [topic, setTopic] = useState("");
   const [topicLabel, setTopicLabel] = useState("");
   const [lives, setLives] = useState(4);
@@ -270,6 +273,7 @@ export function VocabRain() {
           <p>🌧️ {t("Từ vựng rơi như những giọt mưa. Mỗi thẻ cho biết nghĩa tiếng Việt: hãy gõ từ tiếng Anh tương ứng trước khi nó chạm đất.")}</p>
           <p>⌨️ {t("Gõ đúng từng chữ cái để mở khóa các ô chữ. Gõ sai bị trừ điểm, sai 3 lần mất 1 mạng; để từ rơi xuống đất cũng mất 1 mạng.")}</p>
         </Card>
+        <GameDemo kind="rain" />
         <h2 className="font-semibold">{t("Chọn chủ đề")}</h2>
         <TopicPicker value={topic} onChange={(v) => { setTopic(v); setTopicLabel(v); }} />
         <div className="flex flex-wrap items-center gap-3">
@@ -288,7 +292,7 @@ export function VocabRain() {
     <div className="space-y-3">
       <div ref={box} className="relative w-full overflow-hidden rounded-2xl bg-[#050d2b]" style={{ height: "min(72vh, 560px)" }} onClick={() => input.current?.focus()}>
         <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-label={t("Màn chơi Mưa từ vựng")} />
-        <input ref={input} value="" autoFocus autoComplete="off" autoCapitalize="off" spellCheck={false} aria-label={t("Gõ từ tiếng Anh")}
+        <input ref={input} value="" autoFocus inputMode={kb ? "none" : "text"} autoComplete="off" autoCapitalize="off" spellCheck={false} aria-label={t("Gõ từ tiếng Anh")}
           className="absolute bottom-0 left-0 h-px w-px opacity-0"
           onChange={(e) => { for (const ch of e.target.value) typeChar(ch); }}
           onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); if (live.current.phase === "playing") pause(); else resume(); } }}
@@ -299,6 +303,7 @@ export function VocabRain() {
           <div className="flex items-center gap-2 font-bold"><span className="rounded-full bg-white/15 px-3 py-1">⭐ {hud.score}</span>{hud.combo >= 2 && <span className="rounded-full bg-pink-500/80 px-3 py-1">🔥 x{hud.combo}</span>}<span aria-label={t("Số mạng")}>{Array.from({ length: lives }, (_, i) => <span key={i}>{i < hud.lives ? "❤️" : "🖤"}</span>)}</span></div>
           <div className="pointer-events-auto flex gap-1.5">
             <button className={btn} onClick={() => (phase === "paused" ? resume() : pause())} aria-label={phase === "paused" ? t("Tiếp tục") : t("Tạm dừng")}>{phase === "paused" ? "▶" : "⏸"}</button>
+            <button className={btn} onClick={() => setKb(!kb)} aria-pressed={kb} aria-label={t("Bàn phím ảo")}>⌨</button>
             <button className={btn} onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={t("Âm thanh")}>{sound ? "🔊" : "🔇"}</button>
             <button className={btn} onClick={exit} aria-label={t("Thoát")}>✕</button>
           </div>
@@ -313,6 +318,7 @@ export function VocabRain() {
         {phase === "result" && outcome && <div className="absolute inset-0 bg-black/40" />}
       </div>
 
+      {kb && phase === "playing" && <VirtualKeyboard extra onKey={(k) => { if (k.length === 1) typeChar(k); }} />}
       {phase === "result" && outcome && (
         <Card className="space-y-4">
           <p className="text-center text-2xl font-bold">{outcome.won ? t("🎉 Hoàn thành màn chơi!") : t("Hết mạng rồi, thử lại nhé!")}</p>

@@ -142,6 +142,118 @@ function FillDemo() {
   );
 }
 
-export function GameDemo({ kind }: { kind: "memory" | "classic" | "blank" }) {
-  return kind === "memory" ? <MemoryDemo /> : kind === "classic" ? <ClassicDemo /> : <FillDemo />;
+/* ---------- word bridge ---------- */
+const BR_WORDS = ["I", "eat", "an", "apple"];
+const BR_PLANKS = ["apple", "I", "an", "eat"];
+const BR_STEPS: { filled: number; bad?: string; hearts: number; green?: boolean; cap: string; tap?: string }[] = [
+  { filled: 0, hearts: 5, cap: "1. Đọc nghĩa tiếng Việt của câu: các ô trống là số từ cần xếp." },
+  { filled: 1, hearts: 5, tap: "I", cap: "2. Bấm đúng từ: từ vào ô, một nhịp cầu hiện ra và chú chim nhảy lên." },
+  { filled: 1, hearts: 4, bad: "apple", tap: "apple", cap: "Bấm sai từ: ván gỗ đỏ lên và rung, mất 1 tim, từ không vào ô." },
+  { filled: 2, hearts: 4, tap: "eat", cap: "Bấm tiếp từ đúng để dựng cầu…" },
+  { filled: 4, hearts: 4, cap: "…đến khi điền đủ các ô, rồi bấm Kiểm tra (hoặc Enter)." },
+  { filled: 4, hearts: 4, green: true, cap: "Cả cầu chuyển xanh, câu được đọc và chim sang bờ bên kia. Câu tiếp theo sẽ tự bắt đầu!" },
+];
+
+function BridgeDemo() {
+  const t = useT();
+  const step = useLoop(BR_STEPS.length, 1700);
+  const s = BR_STEPS[step] ?? BR_STEPS[0]!;
+  return (
+    <Shell caption={t(s.cap)} step={step} steps={BR_STEPS.length}>
+      <p className="text-center text-xs text-slate-500">❤️ {"❤️".repeat(Math.max(0, s.hearts - 1))}{"🤍".repeat(5 - s.hearts)}</p>
+      <p className="mb-2 text-center text-sm italic text-indigo-700 dark:text-indigo-300">“{t("Tôi ăn một quả táo.")}”</p>
+      <div className="flex justify-center gap-1.5">
+        {BR_WORDS.map((w, i) => <span key={i} className={`flex h-9 min-w-10 items-center justify-center rounded-lg border-2 px-1.5 text-sm font-semibold transition-all duration-300 ${i < s.filled ? (s.green ? "border-green-600 bg-green-100 text-green-800" : "border-indigo-500 bg-indigo-50 text-slate-900") : "border-dashed border-slate-300"}`}>{i < s.filled ? w : ""}</span>)}
+      </div>
+      <div className="relative mt-3 flex h-12 items-end justify-center gap-1 rounded-lg bg-sky-100 px-2 pb-1 dark:bg-sky-950">
+        {BR_WORDS.map((_, i) => <span key={i} className={`h-2.5 w-10 rounded-sm transition-all duration-300 ${i < s.filled ? (s.green ? "bg-green-500" : "bg-amber-700") : "scale-y-0 bg-amber-700"}`} />)}
+        <span className="absolute bottom-3 text-xl transition-all duration-500" style={{ left: s.green ? "88%" : `${8 + (s.filled / BR_WORDS.length) * 72}%` }}>🐦</span>
+      </div>
+      <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+        {BR_PLANKS.map((w) => {
+          const used = BR_WORDS.slice(0, s.filled).includes(w) && !(w === "apple" && s.filled < 4);
+          return <span key={w} className={`relative rounded-md border-b-4 px-3 py-1.5 text-sm font-bold transition ${s.bad === w ? "animate-shake border-red-800 bg-red-400 text-white" : "border-[#7c4a1d] bg-[#c98a4b] text-[#3b200b]"} ${used ? "opacity-0" : ""}`}>{w}{s.tap === w && <Tap />}</span>;
+        })}
+      </div>
+    </Shell>
+  );
+}
+
+/* ---------- vocabulary rain ---------- */
+const RAIN_STEPS: { y: number; typed: number; boom?: boolean; miss?: boolean; hearts: number; cap: string }[] = [
+  { y: 6, typed: 0, hearts: 3, cap: "1. Từ rơi xuống như mưa, kèm nghĩa tiếng Việt và các ô chữ." },
+  { y: 30, typed: 1, hearts: 3, cap: "2. Gõ đúng từng chữ cái: mỗi chữ đúng sẽ làm sáng một ô." },
+  { y: 48, typed: 2, hearts: 3, cap: "Tiếp tục gõ trước khi từ chạm đất…" },
+  { y: 56, typed: 3, boom: true, hearts: 3, cap: "3. Gõ xong: từ tan thành tia sáng, được cộng điểm và đọc lên. Gõ liên tiếp đúng sẽ có combo!" },
+  { y: 70, typed: 0, miss: true, hearts: 2, cap: "4. Để từ chạm đất: mất 1 mạng và hiện đáp án đúng để bạn ghi nhớ." },
+];
+
+function RainDemo() {
+  const t = useT();
+  const step = useLoop(RAIN_STEPS.length, 1800);
+  const s = RAIN_STEPS[step] ?? RAIN_STEPS[0]!;
+  const word = s.miss ? "dog" : "cat";
+  return (
+    <Shell caption={t(s.cap)} step={step} steps={RAIN_STEPS.length}>
+      <div className="relative h-40 overflow-hidden rounded-xl bg-gradient-to-b from-[#050d2b] to-[#143a7b] text-white">
+        <div className="absolute inset-x-0 top-1 flex justify-between px-2 text-[11px] font-bold"><span>⭐ {s.boom ? 10 : 0}</span><span>{"❤️".repeat(s.hearts)}{"🖤".repeat(3 - s.hearts)}</span></div>
+        <div className="absolute inset-x-0 bottom-0 h-5 bg-[#0b2a5b]" />
+        <span className="absolute bottom-4 left-3 text-2xl" aria-hidden="true">{s.miss ? "😟" : s.boom ? "😄" : "🙂"}</span>
+        {!s.boom && (
+          <div className="absolute left-1/2 w-32 -translate-x-1/2 rounded-xl border-2 border-sky-200/70 bg-white/15 p-1.5 text-center transition-all duration-700" style={{ top: `${s.y}%` }}>
+            <p className="text-xs font-semibold">{s.miss ? t("con chó") : t("con mèo")}</p>
+            <div className="mt-1 flex justify-center gap-1">{word.split("").map((c, i) => <span key={i} className={`flex h-6 w-6 items-center justify-center rounded text-sm font-bold ${i < s.typed ? "bg-yellow-300 text-slate-900" : "border border-white/60 bg-slate-900/50"}`}>{i < s.typed ? c.toUpperCase() : ""}</span>)}</div>
+          </div>
+        )}
+        {s.boom && <span className="absolute left-1/2 top-[45%] -translate-x-1/2 text-3xl" aria-hidden="true">✨ <b className="text-base text-yellow-300">+10</b></span>}
+        {s.miss && <span className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-lg bg-slate-900/90 px-3 py-1 text-sm font-bold text-yellow-300">dog</span>}
+      </div>
+    </Shell>
+  );
+}
+
+/* ---------- word guess (wordle) ---------- */
+const WG_ROWS: { word: string; colors: string[] }[] = [
+  { word: "PAPER", colors: ["y", "y", "g", "y", "x"] },
+  { word: "AMPLE", colors: ["g", "x", "g", "g", "g"] },
+  { word: "APPLE", colors: ["g", "g", "g", "g", "g"] },
+];
+const WG_STEPS: { rows: number; typed: number; caption: string }[] = [
+  { rows: 0, typed: 0, caption: "1. Đọc nghĩa (quả táo) và để ý số chữ cái: 5 chữ." },
+  { rows: 0, typed: 1, caption: "2. Gõ một từ đúng độ dài rồi nhấn Enter." },
+  { rows: 1, typed: 0, caption: "Xanh = đúng chữ đúng chỗ · Vàng = đúng chữ sai chỗ · Xám = không có trong từ." },
+  { rows: 2, typed: 0, caption: "Mỗi lượt thu hẹp đáp án dần…" },
+  { rows: 3, typed: 0, caption: "3. Giải được trong sáu lượt! Thua thì mất 1 mạng và được xem đáp án. Giải liên tiếp để tăng chuỗi 🔥" },
+];
+const WG_COLOR: Record<string, string> = { g: "#16a34a", y: "#eab308", x: "#6b7280" };
+
+function GuessDemo() {
+  const t = useT();
+  const step = useLoop(WG_STEPS.length, 2000);
+  const s = WG_STEPS[step] ?? WG_STEPS[0]!;
+  return (
+    <Shell caption={t(s.caption)} step={step} steps={WG_STEPS.length}>
+      <p className="mb-2 text-center text-sm font-semibold">🍎 {t("quả táo")} · <span className="text-slate-500">{t("{n} chữ cái", { n: 5 })}</span></p>
+      <div className="space-y-1.5">
+        {[0, 1, 2].map((r) => {
+          const row = WG_ROWS[r] as (typeof WG_ROWS)[number];
+          const shown = r < s.rows, typing = r === s.rows && s.typed > 0;
+          return (
+            <div key={`${r}-${s.rows}`} className="flex justify-center gap-1.5">
+              {row.word.split("").map((c, i) => (
+                <span key={i} className={`flex h-10 w-10 items-center justify-center rounded-md border-2 text-lg font-extrabold ${shown ? "tile-reveal text-white" : "border-slate-300 dark:border-slate-600"}`}
+                  style={shown ? ({ "--tile-bg": WG_COLOR[row.colors[i] as string], "--tile-from": "transparent", "--tile-from-border": "#94a3b8", animationDelay: `${i * 120}ms` } as React.CSSProperties) : undefined}>
+                  {shown || (typing && i < s.typed) ? c : ""}
+                </span>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+}
+
+export function GameDemo({ kind }: { kind: "memory" | "classic" | "blank" | "bridge" | "rain" | "guess" }) {
+  return kind === "memory" ? <MemoryDemo /> : kind === "classic" ? <ClassicDemo /> : kind === "blank" ? <FillDemo /> : kind === "bridge" ? <BridgeDemo /> : kind === "rain" ? <RainDemo /> : <GuessDemo />;
 }

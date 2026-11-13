@@ -6,7 +6,7 @@ export interface Card { id: string; word_id: string; status: string; word: Word 
 export interface Question { id: string; question: string; options: string[]; level: string; topic: string }
 export interface QuizResult { total: number; correct: number; accuracy: number; xp_awarded: number; results: { question_id: string; correct: boolean; your_answer: string; correct_answer: string; explanation: string }[] }
 export interface Pair { pair_id: string; en: string; vi: string }
-export interface LbRow { rank: number; user_id: string; username: string; xp: number; level: number }
+export interface LbRow { rank: number; user_id: string; username: string; xp: number; level: number; full_name?: string }
 export interface Brief { id: string; username: string; avatar_url: string }
 export interface Friend extends Brief { total_xp: number }
 export interface FriendRequest { id: string; user: Brief | null }

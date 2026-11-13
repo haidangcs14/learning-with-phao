@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { avatarSrc } from "@/components/avatar";
+import { GameDemo } from "@/components/games/demos";
 import { TopicPicker } from "@/components/games/topic-picker";
 import { Button, Card, ErrorBox, Spinner } from "@/components/ui";
 import { useSend } from "@/hooks/api";
@@ -153,6 +154,7 @@ export function WordBridge() {
           <p>🎯 {t("Xếp các từ thành câu đúng theo nghĩa tiếng Việt. Mỗi từ đúng dựng một nhịp cầu và avatar của bạn nhảy lên đó.")}</p>
           <p>❤️ {t("Chọn sai từ: mất 1 trong 5 tim. Hết tim: chú chim rơi xuống sông.")} · ⭐ {t("Mỗi từ đúng 10 điểm, câu không sai lần nào được thêm 50.")}</p>
         </Card>
+        <GameDemo kind="bridge" />
         <h2 className="font-semibold">{t("Chọn chủ đề")}</h2>
         <TopicPicker value={topic} onChange={setTopic} />
         <div className="flex flex-wrap items-center gap-3">

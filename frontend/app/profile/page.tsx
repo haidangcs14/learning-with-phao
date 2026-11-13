@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Avatar } from "@/components/avatar";
+import { LevelAvatar } from "@/components/avatar";
 import { Checklist } from "@/components/checklist";
 import { PasswordField } from "@/components/password-field";
 import { Protected } from "@/components/protected";
@@ -39,8 +39,7 @@ function Profile() {
     <Page title={t("Hồ sơ cá nhân")}>
       <Card className="flex flex-col items-center gap-4 sm:flex-row">
         <div className="flex flex-col items-center gap-2">
-          <Avatar user={user} size={96} />
-          {!isAdmin && xp.data && <span className="rounded-full bg-indigo-600 px-3 py-0.5 text-sm font-bold text-white">Lv.{xp.data.data.level}</span>}
+          <LevelAvatar user={user} level={isAdmin ? undefined : xp.data?.data.level} size={96} />
         </div>
         <div className="w-full flex-1 space-y-2">
           <p className="text-xl font-semibold">{user.full_name || user.username}</p>

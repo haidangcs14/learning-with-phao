@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Avatar } from "@/components/avatar";
+import { LevelAvatar } from "@/components/avatar";
+import { displayName } from "@/lib/level";
 import { useGet } from "@/hooks/api";
 import { apiFetch } from "@/lib/api";
 import { useT } from "@/lib/i18n";
@@ -20,7 +21,7 @@ const GROUPS = [
 ] as const;
 const ADMIN_LINKS = [["/admin", "Dashboard"], ["/admin/users", "Người dùng"], ["/admin/words", "Từ vựng"], ["/admin/questions", "Câu hỏi"], ["/admin/exams", "Bài kiểm tra"], ["/admin/videos", "Video bài nghe"]] as const;
 
-  const ghost = "rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800";
+const ghost = "rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800";
 const menuItem = (active: boolean) =>
   `flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-sm ${active ? "bg-indigo-50 font-medium text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"}`;
 const menuTitle = "px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-400";
@@ -144,11 +145,8 @@ export function Navbar() {
           {ready && (user ? (
             <Dropdown align="right" label={
               <span className="flex items-center gap-2">
-                <span className="flex flex-col items-center leading-none">
-                  <Avatar user={user} size={28} />
-                  {!isAdmin && level !== undefined && <span className="mt-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">Lv.{level}</span>}
-                </span>
-                <span className="hidden max-w-24 truncate lg:inline">{user.username}</span>
+                <LevelAvatar user={user} level={isAdmin ? undefined : level} size={30} />
+                <span className="hidden max-w-32 truncate lg:inline">{displayName(user)}</span>
               </span>}>
               {(close) => (
                 <>

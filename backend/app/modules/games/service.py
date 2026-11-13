@@ -15,8 +15,26 @@ GAMES += [
     {"id": "word_bridge", "name": "Word Bridge", "modes": ["default"], "description": "Xếp từ thành câu để xây cầu cho chú chim"},
     {"id": "vocab_rain", "name": "Vocabulary Rain", "modes": ["default"], "description": "Gõ từ tiếng Anh trước khi chúng rơi xuống đất"},
 ]
+GAMES.append({"id": "word_guess", "name": "Word Guess", "modes": ["default"], "description": "Đoán từ tiếng Anh theo nghĩa trong sáu lượt (kiểu Wordle)"})
+MAX_ATTEMPTS, GUESS_WORDS = 6, 15
 PAIRS, BLANKS, GAME_DAILY_CAP = 8, 8, 150
 BRIDGE_LEVELS, RAIN_WORDS = 10, 20
+
+
+def score_guess(answer: str, guess: str) -> list[str]:
+    """Wordle colours: correct (right letter, right place), present (right letter, wrong place), absent. Repeated letters are counted once each."""
+    result = ["absent"] * len(answer)
+    left: dict[str, int] = {}
+    for i, (a, g) in enumerate(zip(answer, guess, strict=True)):
+        if a == g:
+            result[i] = "correct"
+        else:
+            left[a] = left.get(a, 0) + 1
+    for i, g in enumerate(guess):
+        if result[i] == "absent" and left.get(g, 0) > 0:
+            result[i] = "present"
+            left[g] -= 1
+    return result
 
 
 class GameService:
@@ -29,8 +47,10 @@ class GameService:
             raise NotFoundError("GAME_NOT_FOUND", "Game not found")
 
     # ---------- start ----------
-    async def start(self, user_id: str, game_id: str, topic: str | None = None, count: int | None = None) -> dict:
+    async def start(self, user_id: str, game_id: str, topic: str | None = None, count: int | None = None, lives: int | None = None) -> dict:
         self.check(game_id)
+        if game_id == "word_guess":
+            return await self._start_guess(user_id, topic, lives)
         if game_id == "word_bridge":
             return await self._start_bridge(user_id, topic, count)
         if game_id == "vocab_rain":
@@ -67,6 +87,8 @@ class GameService:
 
     # ---------- results of the two new games (the score is recalculated / bounded here) ----------
     async def finish(self, user_id: str, game_id: str, d: dict) -> dict:
+        if game_id == "word_guess":
+            return await self._quit_guess(user_id, d["session_id"])
         if game_id not in ("word_bridge", "vocab_rain"):
             raise AppException(400, "NOT_SUPPORTED", "This game has no finish endpoint")
         session = await self.repo.close_session(d["session_id"], user_id, game_id, utcnow())
@@ -139,10 +161,10 @@ class GameService:
     async def _finalize(self, user_id, game, mode, score, correct, wrong, flips, duration) -> dict:
         previous = await self.repo.best(user_id, game, mode)
         xp = await self.xp.award(user_id, "game", min(correct * 3, 30), daily_cap=GAME_DAILY_CAP)
-        await self.repo.save_result({"user_id": user_id, "game": game, "mode": mode, "score": score,
-                                     "correct": correct, "wrong": wrong, "flips": flips,
-                                     "duration": round(duration), "created_at": utcnow()})
         record = score > 0 and (previous is None or score > previous["score"])
+        await self.repo.save_result({"user_id": user_id, "game": game, "mode": mode, "score": score,
+                                     "correct": correct, "wrong": wrong, "flips": flips, "record": record,
+                                     "duration": round(duration), "created_at": utcnow()})
         return {"score": score, "duration": round(duration), "flips": flips, "xp_awarded": xp, "is_record": record}
 
     # ---------- fill in the blank ----------
@@ -181,3 +203,72 @@ class GameService:
             b = await self.repo.best(user_id, game_id, m)
             out[m] = {"score": b["score"], "flips": b.get("flips"), "duration": b.get("duration")} if b else None
         return out
+
+    # ---------- Word Guess (Wordle on the vocabulary): the answers never leave the server ----------
+    async def _start_guess(self, user_id: str, topic: str | None, lives: int | None) -> dict:
+        words = [w for w in await self.repo.sample_topic_words(topic, GUESS_WORDS * 3, False) if w["word"].isascii() and w["word"].isalpha() and 3 <= len(w["word"]) <= 8]
+        words = words[:GUESS_WORDS]
+        if len(words) < 5:
+            raise AppException(409, "NOT_ENOUGH_WORDS", "This topic has too few single words for the game")
+        lives = min(max(lives or 3, 3), 5)
+        sid = await self.repo.create_session({
+            "user_id": user_id, "game": "word_guess", "answers": [w["word"].lower() for w in words], "lives": lives, "current": 0, "attempts": 0,
+            "total_attempts": 0, "solved": 0, "failed": 0, "streak": 0, "best_streak": 0, "score": 0, "topic": topic, "started_at": utcnow(), "finished": False})
+        hints = [{"length": len(w["word"]), "translation_vi": w["meanings"][0]["translation_vi"], "emoji": w.get("emoji", ""),
+                  "pos": w["meanings"][0].get("part_of_speech", ""), "phonetic": w.get("phonetic", "")} for w in words]
+        return {"session_id": sid, "lives": lives, "max_attempts": MAX_ATTEMPTS, "hints": hints}
+
+    async def _finish_guess(self, user_id: str, s: dict) -> dict:
+        duration = (utcnow() - as_utc(s["started_at"])).total_seconds()
+        if s["solved"] + s["failed"] == 0:
+            return {"score": 0, "duration": round(duration), "flips": 0, "xp_awarded": 0, "is_record": False}
+        return await self._finalize(user_id, "word_guess", "default", s["score"], s["solved"], s["failed"], s["total_attempts"], duration)
+
+    async def guess(self, user_id: str, d: dict) -> dict:
+        s = await self.repo.get_session(d["session_id"], user_id, "word_guess")
+        if not s or s["finished"]:
+            raise NotFoundError("SESSION_NOT_FOUND", "Session not found or already finished")
+        cur = s["current"]
+        if d["index"] != cur:
+            raise AppException(409, "WRONG_WORD", "This word is not the current one")
+        answer, word = s["answers"][cur], d["guess"].strip().lower()
+        if len(word) != len(answer) or not (word.isascii() and word.isalpha()):
+            raise AppException(400, "INVALID_GUESS", f"Enter a word with exactly {len(answer)} letters")
+        pattern = score_guess(answer, word)
+        used = s["attempts"] + 1
+        solved, failed = word == answer, word != answer and used >= MAX_ATTEMPTS
+        changes: dict = {"attempts": used, "total_attempts": s["total_attempts"] + 1}
+        points = 0
+        if solved:
+            streak = s["streak"] + 1
+            points = (MAX_ATTEMPTS + 1 - used) * 10 + min(streak, 5) * 5  # faster = more, streak adds a bonus
+            changes.update(current=cur + 1, attempts=0, solved=s["solved"] + 1, streak=streak, best_streak=max(s["best_streak"], streak), score=s["score"] + points)
+        elif failed:
+            changes.update(current=cur + 1, attempts=0, failed=s["failed"] + 1, streak=0, lives=s["lives"] - 1)  # a lost word costs a life
+        if not await self.repo.cas_session(d["session_id"], user_id, "word_guess", {"current": cur, "attempts": s["attempts"]}, changes):
+            raise AppException(409, "CONFLICT", "Please try again")
+        new = {**s, **changes}
+        ended = (solved or failed) and (new["lives"] <= 0 or new["current"] >= len(new["answers"]))
+        result = None
+        if ended and await self.repo.close_session(d["session_id"], user_id, "word_guess", utcnow()):
+            result = await self._finish_guess(user_id, new)
+        return {"pattern": pattern, "solved": solved, "failed": failed, "attempts": used, "answer": answer if solved or failed else None, "points": points,
+                "lives": new["lives"], "streak": new["streak"], "best_streak": new["best_streak"], "score": new["score"], "finished": ended, "result": result}
+
+    async def _quit_guess(self, user_id: str, session_id: str) -> dict:
+        s = await self.repo.close_session(session_id, user_id, "word_guess", utcnow())
+        if not s:
+            raise NotFoundError("SESSION_NOT_FOUND", "Session not found or already submitted")
+        return await self._finish_guess(user_id, s)
+
+    # ---------- all players ----------
+    async def activity(self, limit: int) -> list[dict]:
+        names = {g["id"]: g["name"] for g in GAMES}
+        return [{"user_id": r["user_id"], "name": r["full_name"] or r["username"], "avatar_url": r["avatar_url"], "username": r["username"], "game": r["game"],
+                 "game_name": names.get(r["game"], r["game"]), "score": r["score"], "correct": r.get("correct", 0), "record": bool(r.get("record")),
+                 "created_at": r["created_at"]} for r in await self.repo.recent(limit)]
+
+    async def ranking(self, game: str | None, limit: int) -> list[dict]:
+        if game and game not in {g["id"] for g in GAMES}:
+            raise NotFoundError("GAME_NOT_FOUND", "Game not found")
+        return [{**r, "name": r["full_name"] or r["username"]} for r in await self.repo.ranking(game, limit)]

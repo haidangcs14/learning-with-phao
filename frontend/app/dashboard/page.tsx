@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
-import { Avatar } from "@/components/avatar";
+import { LevelAvatar } from "@/components/avatar";
+import { displayName } from "@/lib/level";
 import { Protected } from "@/components/protected";
 import { Card, Page, Spinner } from "@/components/ui";
 import { useGet } from "@/hooks/api";
@@ -18,10 +19,10 @@ function Dashboard() {
   if (xp.isLoading || fc.isLoading) return <Spinner />;
   const bySource = xp.data?.data.by_source ?? {};
   return (
-    <Page title={t("Xin chào, {name}!", { name: user?.username ?? "" })}>
+    <Page title={t("Xin chào, {name}!", { name: user ? displayName(user) : "" })}>
       {xp.data && (
         <Card className="flex items-center gap-4">
-          {me && <Avatar user={me} size={56} />}
+          {me && <LevelAvatar user={me} level={xp.data.data.level} size={56} />}
           <div className="min-w-0 flex-1">
             <p className="font-semibold">Lv.{xp.data.data.level} <span className="text-sm font-normal text-slate-500">· {t("Tổng XP")}: {xp.data.data.total_xp}</span></p>
             <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${(xp.data.data.xp_into_level / xp.data.data.xp_for_next) * 100}%` }} /></div>

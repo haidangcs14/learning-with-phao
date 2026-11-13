@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 
 from app.common.responses import ApiResponse
@@ -24,6 +24,13 @@ class SubmitIn(BaseModel):
 class StartIn(BaseModel):
     topic: str | None = Field(None, max_length=50)
     count: int | None = Field(None, ge=3, le=20)
+    lives: int | None = Field(None, ge=3, le=5)
+
+
+class GuessIn(BaseModel):
+    session_id: str = Field(max_length=64)
+    index: int = Field(ge=0, le=100)
+    guess: str = Field(min_length=1, max_length=12)
 
 
 class FinishIn(BaseModel):
@@ -54,6 +61,17 @@ async def list_games():
     return ApiResponse(data=GAMES)
 
 
+@router.get("/activity", response_model=ApiResponse)
+async def activity(user: CurrentUser, service: Service, limit: int = Query(15, ge=1, le=50)):
+    """What everybody has been playing lately."""
+    return ApiResponse(data=await service.activity(limit))
+
+
+@router.get("/ranking", response_model=ApiResponse)
+async def ranking(user: CurrentUser, service: Service, game: str = Query("all", max_length=30), limit: int = Query(10, ge=1, le=50)):
+    return ApiResponse(data=await service.ranking(None if game == "all" else game, limit))
+
+
 @router.get("/summary", response_model=ApiResponse)
 async def summary(user: CurrentUser, service: Service):
     return ApiResponse(data=await service.summary(user["id"]))
@@ -61,7 +79,12 @@ async def summary(user: CurrentUser, service: Service):
 
 @router.post("/{game_id}/start", response_model=ApiResponse)
 async def start(game_id: str, user: CurrentUser, service: Service, data: StartIn | None = None):
-    return ApiResponse(data=await service.start(user["id"], game_id, data.topic if data else None, data.count if data else None))
+    return ApiResponse(data=await service.start(user["id"], game_id, data.topic if data else None, data.count if data else None, data.lives if data else None))
+
+
+@router.post("/word_guess/guess", response_model=ApiResponse)
+async def guess(data: GuessIn, user: CurrentUser, service: Service):
+    return ApiResponse(data=await service.guess(user["id"], data.model_dump()))
 
 
 @router.post("/{game_id}/finish", response_model=ApiResponse)

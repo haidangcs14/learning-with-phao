@@ -49,6 +49,8 @@ async def connect() -> None:
         ("video_lessons", [("visibility", 1), ("owner_id", 1), ("created_at", -1)], {}),
         ("video_progress", [("user_id", 1), ("lesson_id", 1)], {"unique": True}),
         ("video_reports", [("status", 1), ("lesson_id", 1), ("created_at", -1)], {}),
+        ("word_study", [("user_id", 1), ("word_id", 1)], {"unique": True}),
+        ("word_study", [("user_id", 1), ("topic", 1), ("learned", 1)], {}),
         ("import_previews", [("created_at", 1)], {"expireAfterSeconds": 1800}),
     ]
     for col, keys, opts in idx:

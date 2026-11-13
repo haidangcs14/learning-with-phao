@@ -59,13 +59,14 @@ class XpService:
         ])]
         oids = [o for o in (to_oid(r["_id"]) for r in rows) if o]
         users = {str(u["_id"]): u async for u in self.db["users"].find(
-            {"_id": {"$in": oids}}, {"username": 1, "avatar_url": 1, "role": 1})}
+            {"_id": {"$in": oids}}, {"username": 1, "full_name": 1, "avatar_url": 1, "role": 1})}
         rows = [r for r in rows if users.get(r["_id"], {}).get("role") != "admin"][:limit]  # admins don't play: not ranked
         totals = {r["_id"]: r["xp"] async for r in self.col.aggregate([
             {"$match": {"user_id": {"$in": [r["_id"] for r in rows]}}},
             {"$group": {"_id": "$user_id", "xp": {"$sum": "$amount"}}}])}
         return [{"rank": i + 1, "user_id": r["_id"], "xp": r["xp"], "level": level_of(totals.get(r["_id"], r["xp"])),
                  "username": users.get(r["_id"], {}).get("username", "unknown"),
+                 "full_name": users.get(r["_id"], {}).get("full_name", ""),
                  "avatar_url": users.get(r["_id"], {}).get("avatar_url", "")}
                 for i, r in enumerate(rows)]
 
