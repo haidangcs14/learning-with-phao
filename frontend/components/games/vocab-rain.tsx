@@ -269,7 +269,7 @@ export function VocabRain() {
   if (phase === "setup" || phase === "loading") {
     return (
       <div className="space-y-4">
-        <Card className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+        <Card className="space-y-1 text-sm text-muted-foreground">
           <p>🌧️ {t("Từ vựng rơi như những giọt mưa. Mỗi thẻ cho biết nghĩa tiếng Việt: hãy gõ từ tiếng Anh tương ứng trước khi nó chạm đất.")}</p>
           <p>⌨️ {t("Gõ đúng từng chữ cái để mở khóa các ô chữ. Gõ sai bị trừ điểm, sai 3 lần mất 1 mạng; để từ rơi xuống đất cũng mất 1 mạng.")}</p>
         </Card>
@@ -278,7 +278,7 @@ export function VocabRain() {
         <TopicPicker value={topic} onChange={(v) => { setTopic(v); setTopicLabel(v); }} />
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-sm font-medium">{t("Số mạng")}</span>
-          {[3, 4, 5].map((n) => <button key={n} onClick={() => setLives(n)} className={`rounded-lg border-2 px-3 py-1.5 text-sm font-semibold ${lives === n ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 dark:border-slate-700"}`}>{"❤️".repeat(n)}</button>)}
+          {[3, 4, 5].map((n) => <button key={n} onClick={() => setLives(n)} className={`rounded-btn border-2 px-3 py-1.5 text-sm font-semibold ${lives === n ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{"❤️".repeat(n)}</button>)}
           <Button onClick={begin} disabled={start.isPending}>{start.isPending ? <Spinner /> : `▶ ${t("Bắt đầu")}`}</Button>
         </div>
         {start.error && <ErrorBox error={start.error} />}
@@ -287,7 +287,7 @@ export function VocabRain() {
   }
 
   const s = g.current;
-  const btn = "rounded-lg bg-white/15 px-2.5 py-1 text-white backdrop-blur hover:bg-white/30";
+  const btn = "rounded-btn bg-white/15 px-2.5 py-1 text-white backdrop-blur hover:bg-white/30";
   return (
     <div className="space-y-3">
       <div ref={box} className="relative w-full overflow-hidden rounded-2xl bg-[#050d2b]" style={{ height: "min(72vh, 560px)" }} onClick={() => input.current?.focus()}>
@@ -310,12 +310,12 @@ export function VocabRain() {
         </div>
 
         {phase === "playing" && target && (
-          <button className="absolute bottom-3 right-3 rounded-full bg-indigo-600/90 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500" onClick={(e) => { e.stopPropagation(); speak(target.word); input.current?.focus(); }}>🔊 {t("Nghe từ")}</button>
+          <button className="absolute bottom-3 right-3 rounded-full bg-primary/90 px-4 py-2 text-sm font-semibold text-primary-foreground shadow hover:bg-primary-hover" onClick={(e) => { e.stopPropagation(); speak(target.word); input.current?.focus(); }}>🔊 {t("Nghe từ")}</button>
         )}
         {phase === "paused" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 text-white"><p className="text-3xl font-bold">⏸ {t("Tạm dừng")}</p><div className="flex gap-2"><Button onClick={resume}>{t("Tiếp tục")}</Button><Button variant="ghost" onClick={exit}>{t("Thoát")}</Button></div><p className="text-xs opacity-70">Esc</p></div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-overlay/60 text-white"><p className="text-3xl font-bold">⏸ {t("Tạm dừng")}</p><div className="flex gap-2"><Button onClick={resume}>{t("Tiếp tục")}</Button><Button variant="ghost" onClick={exit}>{t("Thoát")}</Button></div><p className="text-xs opacity-70">Esc</p></div>
         )}
-        {phase === "result" && outcome && <div className="absolute inset-0 bg-black/40" />}
+        {phase === "result" && outcome && <div className="absolute inset-0 bg-overlay/40" />}
       </div>
 
       {kb && phase === "playing" && <VirtualKeyboard extra onKey={(k) => { if (k.length === 1) typeChar(k); }} />}
@@ -324,20 +324,20 @@ export function VocabRain() {
           <p className="text-center text-2xl font-bold">{outcome.won ? t("🎉 Hoàn thành màn chơi!") : t("Hết mạng rồi, thử lại nhé!")}</p>
           <div className="grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
             {[[t("Điểm"), s.score], [t("Từ đúng"), `${s.completed}/${s.total}`], [t("Độ chính xác"), `${outcome.accuracy}%`], [t("Thời gian"), `${Math.floor(outcome.seconds / 60)}:${String(outcome.seconds % 60).padStart(2, "0")}`]].map(([l, v]) => (
-              <div key={String(l)} className="rounded-xl bg-slate-100 p-3 dark:bg-slate-800"><p className="text-xs text-slate-500">{l}</p><p className="text-xl font-bold">{v}</p></div>
+              <div key={String(l)} className="rounded-xl bg-surface-secondary p-3"><p className="text-xs text-muted-foreground">{l}</p><p className="text-xl font-bold">{v}</p></div>
             ))}
           </div>
-          <p className="text-center text-sm text-slate-500">{t("Combo cao nhất: {n}", { n: s.maxCombo })}{finish.data ? ` · +${finish.data.data.xp_awarded} XP${finish.data.data.is_record ? ` · 🏆 ${t("Kỷ lục mới!")}` : ""}` : ""}</p>
+          <p className="text-center text-sm text-muted-foreground">{t("Combo cao nhất: {n}", { n: s.maxCombo })}{finish.data ? ` · +${finish.data.data.xp_awarded} XP${finish.data.data.is_record ? ` · 🏆 ${t("Kỷ lục mới!")}` : ""}` : ""}</p>
           {finish.error && <ErrorBox error={finish.error} />}
           <div>
             <h3 className="mb-2 font-semibold">{t("Từ đã học")}</h3>
             <ul className="grid gap-2 sm:grid-cols-2">
               {s.learned.map(({ w, ok }) => (
-                <li key={w.id} className={`flex items-center gap-3 rounded-xl border-2 p-2 ${ok ? "border-green-500 bg-green-50 dark:bg-green-950/50" : "border-red-400 bg-red-50 dark:bg-red-950/50"}`}>
+                <li key={w.id} className={`flex items-center gap-3 rounded-xl border-2 p-2 ${ok ? "border-success bg-success-soft" : "border-error bg-error-soft"}`}>
                   <span className="text-2xl">{w.emoji}</span>
-                  <span className="min-w-0 flex-1"><b>{w.word}</b> <span className="text-xs text-slate-500">{w.phonetic}</span><span className="block truncate text-sm">{w.translation_vi}</span></span>
+                  <span className="min-w-0 flex-1"><b>{w.word}</b> <span className="text-xs text-muted-foreground">{w.phonetic}</span><span className="block truncate text-sm">{w.translation_vi}</span></span>
                   <span aria-label={ok ? t("Đúng") : t("Chưa thuộc")}>{ok ? "✓" : "✗"}</span>
-                  <button className="rounded-full bg-indigo-600 px-2 py-1 text-white" onClick={() => speak(w.word)} aria-label={t("Nghe")}>🔊</button>
+                  <button className="rounded-full bg-primary px-2 py-1 text-primary-foreground" onClick={() => speak(w.word)} aria-label={t("Nghe")}>🔊</button>
                 </li>
               ))}
             </ul>
@@ -345,7 +345,7 @@ export function VocabRain() {
           <div className="flex flex-wrap justify-center gap-2"><Button onClick={begin} disabled={start.isPending}>{t("Chơi lại")}</Button><Button variant="ghost" onClick={exit}>{t("Chọn chủ đề khác")}</Button></div>
         </Card>
       )}
-      {phase !== "result" && <p className="text-center text-xs text-slate-500">{t("Gõ trực tiếp từ bàn phím. Esc để tạm dừng.")}</p>}
+      {phase !== "result" && <p className="text-center text-xs text-muted-foreground">{t("Gõ trực tiếp từ bàn phím. Esc để tạm dừng.")}</p>}
     </div>
   );
 }

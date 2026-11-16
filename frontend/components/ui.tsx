@@ -1,139 +1,85 @@
 "use client";
 
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
 import type { ApiMeta } from "@/lib/api";
+import { ApiError } from "@/lib/api";
 import { useT } from "@/lib/i18n";
 
-export function Button({
-  variant = "primary",
-  className = "",
-  ...p
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "danger";
-}) {
-  const v = {
-    primary: "bg-indigo-600 text-white hover:bg-indigo-700",
-    danger: "bg-red-600 text-white hover:bg-red-700",
-    ghost:
-      "border border-slate-300 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800",
-  }[variant];
+/** Text fields: tokens only, so they follow the theme. Hover, focus and invalid states are visible without relying on colour alone. */
+export const inputCls =
+  "w-full rounded-btn border border-input bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground transition duration-150 ease-out hover:border-primary/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-error aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-error/30";
+
+const VARIANT = {
+  primary: "border border-transparent bg-primary text-primary-foreground hover:bg-primary-hover",
+  ghost: "border border-input bg-surface text-foreground hover:border-primary/50 hover:bg-surface-secondary",
+  danger: "border border-transparent bg-error text-error-foreground hover:bg-error/90",
+} as const;
+
+/** Buttons: 12px radius, 700 weight, 150ms transition. The global base styles lift them 1px on hover and press them 1px on click. */
+export function Button({ variant = "primary", className = "", ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: keyof typeof VARIANT }) {
   return (
     <button
-      {...p}
-      className={`rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${v} ${className}`}
+      {...props}
+      className={`inline-flex items-center justify-center gap-2 rounded-btn px-4 py-2 text-sm font-bold shadow-sm transition duration-150 ease-out hover:shadow-md active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none ${VARIANT[variant]} ${className}`}
     />
   );
 }
 
-export const inputCls =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
-
-export function Card({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+/** Card: 18px radius, hairline border, soft shadow and the "raised block" depth under it. `interactive` adds the hover lift. */
+export function Card({ className = "", interactive = false, ...props }: HTMLAttributes<HTMLDivElement> & { interactive?: boolean }) {
   return (
     <div
-      className={`rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60 ${className}`}
-    >
-      {children}
-    </div>
+      {...props}
+      className={`rounded-card border border-border bg-surface p-4 text-foreground shadow-raised transition duration-200 ${interactive ? "hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-raised-hover" : ""} ${className}`}
+    />
   );
 }
 
 export function Spinner() {
   const t = useT();
   return (
-    <p className="p-6 text-center text-slate-500 dark:text-slate-400">
-      {t("Đang tải...")}
-    </p>
+    <div className="flex justify-center p-8" role="status" aria-label={t("Đang tải...")}>
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-soft border-t-primary" />
+    </div>
   );
 }
 
 export function ErrorBox({ error }: { error: unknown }) {
   const t = useT();
-  const msg = error instanceof Error ? error.message : t("Đã có lỗi xảy ra");
-  return (
-    <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-      {msg}
-    </p>
-  );
+  const msg = error instanceof ApiError ? error.message : error instanceof Error ? error.message : t("Đã có lỗi xảy ra");
+  return <div role="alert" className="rounded-btn border border-error/40 bg-error-soft p-3 text-sm font-medium text-error-text">{msg}</div>;
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return (
-    <div className="p-6 text-center text-slate-500 dark:text-slate-400">
-      {children}
-    </div>
-  );
+  return <div className="rounded-card border-2 border-dashed border-border bg-surface/60 p-8 text-center text-muted-foreground">{children}</div>;
 }
 
-export function Page({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+export function Page({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <main className="mx-auto max-w-5xl space-y-4 px-4 py-6">
-      <h1 className="text-2xl font-bold sm:text-3xl">{title}</h1>
+    <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
+      <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
       {children}
     </main>
   );
 }
 
-export function Pager({
-  meta,
-  onPage,
-}: {
-  meta?: ApiMeta | null;
-  onPage: (p: number) => void;
-}) {
+export function Pager({ meta, onPage }: { meta?: ApiMeta | null; onPage: (p: number) => void }) {
   if (!meta || meta.total_pages <= 1) return null;
   return (
     <div className="mt-4 flex items-center justify-center gap-3">
-      <Button
-        variant="ghost"
-        disabled={meta.page <= 1}
-        onClick={() => onPage(meta.page - 1)}
-      >
-        ←
-      </Button>
-      <span className="text-sm">
-        {meta.page} / {meta.total_pages}
-      </span>
-      <Button
-        variant="ghost"
-        disabled={meta.page >= meta.total_pages}
-        onClick={() => onPage(meta.page + 1)}
-      >
-        →
-      </Button>
+      <Button variant="ghost" disabled={meta.page <= 1} onClick={() => onPage(meta.page - 1)} aria-label="←">←</Button>
+      <span className="text-sm font-medium text-muted-foreground">{meta.page} / {meta.total_pages}</span>
+      <Button variant="ghost" disabled={meta.page >= meta.total_pages} onClick={() => onPage(meta.page + 1)} aria-label="→">→</Button>
     </div>
   );
 }
 
-export function Tabs<T extends string>({
-  value,
-  options,
-  onChange,
-}: {
-  value: T;
-  options: readonly (readonly [T, string])[];
-  onChange: (v: T) => void;
-}) {
+export function Tabs<T extends string>({ value, options, onChange }: { value: T; options: readonly (readonly [T, string])[]; onChange: (v: T) => void }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {options.map(([k, label]) => (
-        <button
-          key={k}
-          onClick={() => onChange(k)}
-          className={`rounded-full px-4 py-1.5 text-sm transition ${value === k ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"}`}
-        >
+    <div className="flex flex-wrap gap-2" role="tablist">
+      {options.map(([v, label]) => (
+        <button key={v} role="tab" aria-selected={value === v} onClick={() => onChange(v)}
+          className={`rounded-btn border px-3.5 py-1.5 text-sm font-semibold transition duration-150 ${value === v ? "border-primary bg-primary text-primary-foreground shadow-sm" : "border-input bg-surface text-foreground hover:border-primary/50 hover:bg-primary-soft"}`}>
           {label}
         </button>
       ))}

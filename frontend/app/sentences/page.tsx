@@ -37,8 +37,8 @@ export default function SentencesPage() {
             <Card key={s.id} className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-semibold">{s.english}</p>
-                {lang === "vi" && <p className="text-sm text-slate-500 dark:text-slate-400">{s.vietnamese}</p>}
-                <p className="mt-1 text-xs text-slate-400">{s.topic} · {s.level}</p>
+                {lang === "vi" && <p className="text-sm text-muted-foreground">{s.vietnamese}</p>}
+                <p className="mt-1 text-xs text-muted-foreground">{s.topic} · {s.level}</p>
               </div>
               <Button variant="ghost" onClick={() => speak(s.english)} aria-label={t("Nghe")}>🔊</Button>
             </Card>

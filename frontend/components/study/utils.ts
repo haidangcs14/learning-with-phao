@@ -13,7 +13,7 @@ export function splitByWord(text: string, word: string): { text: string; hit: bo
 /** Compares answers ignoring case, spaces and hyphens. */
 export const norm = (s: string) => s.toLowerCase().replace(/[^a-z']/g, "");
 
-const TINTS = ["from-sky-100 to-emerald-100", "from-pink-100 to-amber-100", "from-violet-100 to-sky-100", "from-lime-100 to-teal-100", "from-orange-100 to-rose-100", "from-cyan-100 to-indigo-100"];
+const TINTS = ["from-secondary-soft to-primary-soft", "from-accent-soft to-primary-soft", "from-primary-soft to-secondary-soft", "from-success-soft to-secondary-soft", "from-accent-soft to-success-soft", "from-secondary-soft to-accent-soft"];
 export function tint(key: string): string {
   let h = 0;
   for (const c of key) h = (h * 31 + c.charCodeAt(0)) >>> 0;

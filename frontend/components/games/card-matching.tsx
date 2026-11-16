@@ -101,8 +101,8 @@ export function CardMatching() {
     const bad = selected === p.pair_id && wrongPick !== null;
     return (
       <button key={p.pair_id} disabled={done} onClick={() => pickClassic(side, p.pair_id)}
-        className={`rounded-lg border p-3 text-sm transition ${done ? "border-green-500 bg-green-50 text-green-800 opacity-60 dark:bg-green-950 dark:text-green-200"
-          : bad ? "animate-shake border-red-500 bg-red-50 dark:bg-red-950" : selected === p.pair_id ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "border-slate-300 hover:border-indigo-400 dark:border-slate-700"}`}>
+        className={`rounded-btn border p-3 text-sm transition ${done ? "border-success bg-success-soft text-success-text opacity-60"
+          : bad ? "animate-shake border-error bg-error-soft" : selected === p.pair_id ? "border-primary bg-primary-soft" : "border-border hover:border-primary"}`}>
         {side === "en" ? p.en : p.vi}
       </button>
     );
@@ -112,11 +112,11 @@ export function CardMatching() {
     <div className="space-y-4">
       <Tabs value={mode} onChange={(m) => { if (!playing) { setMode(m); setSession(null); submit.reset(); } }}
         options={[["memory", t("Lật thẻ ghi nhớ")], ["classic", t("Ghép cặp")]] as const} />
-      <p className="text-sm text-slate-500 dark:text-slate-400">
+      <p className="text-sm text-muted-foreground">
         {mode === "memory" ? t("Các thẻ được lật 4 giây để bạn ghi nhớ, sau đó úp xuống. Lật 2 thẻ để tìm cặp từ - nghĩa. Ít lượt lật hơn = điểm cao hơn.")
           : t("Chọn một từ tiếng Anh và nghĩa tiếng Việt tương ứng.")}
       </p>
-      <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+      <p className="rounded-btn bg-accent-soft px-3 py-2 text-sm text-accent-text">
         🏆 {b ? t("Điểm cao nhất: {score} · {flips} lượt lật", { score: b.score, flips: b.flips ?? "–" }) : t("Chưa có điểm cao nhất. Hãy chơi ngay!")}
       </p>
 
@@ -124,7 +124,7 @@ export function CardMatching() {
       {!playing && (
         <div className="space-y-2">
           {result && (
-            <div className="animate-pop rounded-xl border border-green-500 p-4">
+            <div className="animate-pop rounded-xl border border-success p-4">
               <p className="text-lg font-semibold">{result.is_record ? t("🎉 Kỷ lục mới!") : t("Hoàn thành!")}</p>
               <p>{t("Điểm: {score} · {flips} lượt lật · {sec}s · +{xp} XP", { score: result.score, flips: result.flips, sec: result.duration, xp: result.xp_awarded })}</p>
             </div>
@@ -135,7 +135,7 @@ export function CardMatching() {
 
       {playing && mode === "classic" && (
         <>
-          <p className="text-sm text-slate-500">{t("Đã ghép {n}/{total} · Sai {wrong}", { n: matched.length, total: en.length, wrong })}</p>
+          <p className="text-sm text-muted-foreground">{t("Đã ghép {n}/{total} · Sai {wrong}", { n: matched.length, total: en.length, wrong })}</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-2">{en.map((p) => classicCell(p, "en", selEn))}</div>
             <div className="grid gap-2">{vi.map((p) => classicCell(p, "vi", selVi))}</div>
@@ -145,7 +145,7 @@ export function CardMatching() {
 
       {playing && mode === "memory" && (
         <>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             {preview > 0 ? t("Ghi nhớ nhanh! Úp thẻ sau {n}s", { n: preview }) : t("Cặp đã tìm: {n}/{total} · Lượt lật: {turns}", { n: matched.length, total: pairs.length, turns })}
           </p>
           <div className="grid grid-cols-4 gap-2 sm:gap-3">
@@ -155,8 +155,8 @@ export function CardMatching() {
               return (
                 <button key={c.uid} onClick={() => pickMemory(c)} aria-label={faceUp ? c.text : "?"} className="flip-scene h-20 sm:h-24">
                   <div className={`flip-inner h-full w-full ${faceUp ? "is-flipped" : ""}`}>
-                    <div className="flip-face flex items-center justify-center rounded-lg bg-indigo-600 text-2xl font-bold text-white hover:bg-indigo-500">?</div>
-                    <div className={`flip-face flip-back flex items-center justify-center rounded-lg border-2 p-1 text-center text-xs font-medium sm:text-sm ${done ? "animate-pop border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-200" : "border-indigo-300 bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100"}`}>
+                    <div className="flip-face flex items-center justify-center rounded-btn bg-primary text-2xl font-bold text-primary-foreground hover:bg-primary-hover">?</div>
+                    <div className={`flip-face flip-back flex items-center justify-center rounded-btn border-2 p-1 text-center text-xs font-medium sm:text-sm ${done ? "animate-pop border-success bg-success-soft text-success-text" : "border-primary/40 bg-surface text-foreground"}`}>
                       {c.text}
                     </div>
                   </div>

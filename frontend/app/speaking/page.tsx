@@ -23,9 +23,9 @@ function Hints({ hints, compact = false }: { hints: string[]; compact?: boolean 
   const t = useT();
   if (hints.length === 0) return null;
   return (
-    <div className={`rounded-xl border border-indigo-200 bg-indigo-50 text-left dark:border-indigo-900 dark:bg-indigo-950/50 ${compact ? "p-3 text-sm" : "p-4"}`}>
-      <p className="mb-2 font-semibold text-indigo-900 dark:text-indigo-200">💡 {t("Gợi ý: bạn có thể trả lời các câu hỏi sau")}</p>
-      <ul className="list-disc space-y-1 pl-5 text-slate-800 dark:text-slate-200">{hints.map((h) => <li key={h}>{h}</li>)}</ul>
+    <div className={`rounded-xl border border-primary/40 bg-primary-soft text-left ${compact ? "p-3 text-sm" : "p-4"}`}>
+      <p className="mb-2 font-semibold text-primary-text">💡 {t("Gợi ý: bạn có thể trả lời các câu hỏi sau")}</p>
+      <ul className="list-disc space-y-1 pl-5 text-foreground">{hints.map((h) => <li key={h}>{h}</li>)}</ul>
     </div>
   );
 }
@@ -35,7 +35,7 @@ function Result({ s, audioUrl }: { s: SpeakingSession; audioUrl?: string | null 
   return (
     <Card className="space-y-4">
       <p className="font-semibold">{s.topic_title}</p>
-      {s.xp_awarded ? <p className="text-sm text-green-600">+{s.xp_awarded} XP</p> : null}
+      {s.xp_awarded ? <p className="text-sm text-success-text">+{s.xp_awarded} XP</p> : null}
       {audioUrl && <audio controls src={audioUrl} className="w-full" />}
       {s.metrics && (
         <div className="grid grid-cols-3 gap-2 text-center text-sm">
@@ -46,7 +46,7 @@ function Result({ s, audioUrl }: { s: SpeakingSession; audioUrl?: string | null 
       )}
       <div>
         <p className="text-sm font-medium">{t("Bản ghi chữ (transcript)")}</p>
-        <p className="text-sm text-slate-600 dark:text-slate-300">
+        <p className="text-sm text-muted-foreground">
           {s.transcript || (s.ai_status === "not_configured" ? t("Chưa có bản ghi chữ. Bật AI local (AI_PROVIDER=local) để tự động chuyển giọng nói thành chữ.") : t("Không có bản ghi chữ cho bài nói này."))}
         </p>
       </div>
@@ -167,18 +167,18 @@ function Speaking() {
   if (phase === "prep" || phase === "recording" || phase === "uploading") {
     return (
       <Card className="space-y-4 text-center">
-        <p className="text-sm text-slate-500">{t("Chủ đề:")} {topic?.title}</p>
+        <p className="text-sm text-muted-foreground">{t("Chủ đề:")} {topic?.title}</p>
         <p className="text-xl font-semibold">{topic?.prompt}</p>
         {phase === "prep" && <p className="text-4xl font-bold">{t("Chuẩn bị:")} 00:{String(Math.max(count, 0)).padStart(2, "0")}</p>}
         {phase === "recording" && (<>
           <AudioWave stream={stream} />
-          <p className="text-2xl font-bold text-red-600"><span className="mr-1 animate-pulse">●</span>{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</p>
+          <p className="text-2xl font-bold text-error-text"><span className="mr-1 animate-pulse">●</span>{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</p>
           <Button variant="danger" onClick={stop}>{t("Dừng và gửi")}</Button>
         </>)}
         {phase === "uploading" && (
           <div className="space-y-3 p-4">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
-            <p className="text-sm text-slate-500">{t("Đang phân tích bài nói... Lần đầu chạy AI local có thể mất vài chục giây.")}</p>
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary/40 border-t-indigo-600" />
+            <p className="text-sm text-muted-foreground">{t("Đang phân tích bài nói... Lần đầu chạy AI local có thể mất vài chục giây.")}</p>
           </div>
         )}
         {phase !== "uploading" && <Hints hints={topic?.hints ?? []} compact={phase === "recording"} />}
@@ -196,9 +196,9 @@ function Speaking() {
             <div className="grid gap-3 sm:grid-cols-2">
               {topics.data?.data.map((tp) => (
                 <Card key={tp.id} className="space-y-1">
-                  <p className="font-semibold">{tp.title} <span className="text-xs text-slate-500">({tp.level})</span></p>
-                  <p className="text-sm text-slate-500">{tp.prompt}</p>
-                  {tp.hints && <p className="text-xs text-indigo-600 dark:text-indigo-400">💡 {t("{n} câu hỏi gợi ý", { n: tp.hints.length })}</p>}
+                  <p className="font-semibold">{tp.title} <span className="text-xs text-muted-foreground">({tp.level})</span></p>
+                  <p className="text-sm text-muted-foreground">{tp.prompt}</p>
+                  {tp.hints && <p className="text-xs text-primary-text">💡 {t("{n} câu hỏi gợi ý", { n: tp.hints.length })}</p>}
                   <Button disabled={create.isPending} onClick={() => choose(tp)}>{t("Bắt đầu")}</Button>
                 </Card>
               ))}

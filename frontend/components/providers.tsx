@@ -39,7 +39,7 @@ export function Providers({ children }: { children: ReactNode }) {
     if (saved === "en" || saved === "vi") useLang.getState().setLang(saved as Lang);
   }, []);
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={client}><ConfirmProvider><RoleGuard /><GamificationWatcher />{children}</ConfirmProvider></QueryClientProvider>
     </ThemeProvider>
   );

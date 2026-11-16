@@ -18,7 +18,7 @@ function QuestionEditor({ q, onChange, onDelete }: { q: ExamQuestion; onChange: 
   const t = useT();
   const setOpt = (i: number, p: Partial<{ key: string; text: string }>) => onChange({ options: q.options.map((o, k) => (k === i ? { ...o, ...p } : o)) });
   return (
-    <div className="space-y-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+    <div className="space-y-2 rounded-btn border border-border p-3">
       <div className="flex flex-wrap items-center gap-2">
         <input type="number" min={1} className={`${inputCls} w-20`} value={q.no} onChange={(e) => onChange({ no: Number(e.target.value) })} aria-label={t("Số câu")} />
         <select className={`${inputCls} w-auto`} value={q.type} onChange={(e) => onChange({ type: e.target.value as "mc" | "fill" })}><option value="mc">{t("Trắc nghiệm")}</option><option value="fill">{t("Điền từ")}</option></select>
@@ -76,16 +76,16 @@ function Editor({ initial }: { initial: Manage }) {
     <Page title={t("Chỉnh sửa bài kiểm tra")}>
       <div className="flex flex-wrap items-center gap-2">
         <BackLink href="/admin/exams">{t("← Tất cả bài kiểm tra")}</BackLink>
-        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${published ? "bg-green-600 text-white" : "bg-slate-300 text-slate-800"}`}>{published ? t("Đã công khai") : t("Bản nháp")}</span>
-        <Link href={`/exams/${initial.id}`} className="text-sm text-indigo-600 underline">{t("Xem thử như học sinh")}</Link>
+        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${published ? "bg-success text-success-foreground" : "bg-border text-foreground"}`}>{published ? t("Đã công khai") : t("Bản nháp")}</span>
+        <Link href={`/exams/${initial.id}`} className="text-sm text-primary-text underline">{t("Xem thử như học sinh")}</Link>
         <span className="ml-auto flex gap-2">
           <Button disabled={save.isPending} onClick={() => save.mutate({ body: body() })}>{t("Lưu")}</Button>
           <Button variant="ghost" disabled={save.isPending} onClick={() => save.mutate({ body: body(published ? "draft" : "published") })}>{published ? t("Gỡ xuống") : t("Lưu và công khai")}</Button>
         </span>
       </div>
       {save.error && <ErrorBox error={save.error} />}
-      {save.isSuccess && <p className="text-sm text-green-600">✓ {t("Đã lưu.")}</p>}
-      {initial.warnings.length > 0 && <Card className="space-y-1 text-sm"><p className="font-semibold">⚠ {t("Cảnh báo khi đọc đề")}</p><ul className="list-disc pl-5 text-amber-800 dark:text-amber-300">{initial.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul></Card>}
+      {save.isSuccess && <p className="text-sm text-success-text">✓ {t("Đã lưu.")}</p>}
+      {initial.warnings.length > 0 && <Card className="space-y-1 text-sm"><p className="font-semibold">⚠ {t("Cảnh báo khi đọc đề")}</p><ul className="list-disc pl-5 text-accent-text">{initial.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul></Card>}
 
       <Card className="grid gap-3 sm:grid-cols-3">
         <label className="sm:col-span-3 text-sm">{t("Tiêu đề")}<input className={inputCls} value={d.title} onChange={(e) => setD({ ...d, title: e.target.value })} /></label>
@@ -93,7 +93,7 @@ function Editor({ initial }: { initial: Manage }) {
         <label className="text-sm">{t("Tổng điểm")}<input type="number" min={1} className={inputCls} value={d.total_score} onChange={(e) => setD({ ...d, total_score: Number(e.target.value) })} /></label>
         <div className="text-sm"><p>{t("File nghe")}</p>
           <div className="flex flex-wrap items-center gap-2">
-            {cur.audio ? <span>🎧 {(cur.audio.size / 1048576).toFixed(1)} MB</span> : <span className="text-slate-500">{t("Chưa có")}</span>}
+            {cur.audio ? <span>🎧 {(cur.audio.size / 1048576).toFixed(1)} MB</span> : <span className="text-muted-foreground">{t("Chưa có")}</span>}
             <input type="file" accept="audio/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const fd = new FormData(); fd.append("file", f); audio.mutate(fd); } }} />
             {cur.audio && <Button variant="ghost" onClick={() => rmAudio.mutate()}>{t("Xoá âm thanh")}</Button>}
           </div>
@@ -119,15 +119,15 @@ function Editor({ initial }: { initial: Manage }) {
 
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">{t("Kết quả của học sinh")}</h2>
-        {rows.isLoading ? <Spinner /> : (rows.data?.data.length ?? 0) === 0 ? <p className="text-sm text-slate-500">{t("Chưa có ai làm bài này.")}</p> : (
+        {rows.isLoading ? <Spinner /> : (rows.data?.data.length ?? 0) === 0 ? <p className="text-sm text-muted-foreground">{t("Chưa có ai làm bài này.")}</p> : (
           <table className="w-full text-left text-sm">
-            <thead className="text-slate-500"><tr><th className="p-2">{t("Học sinh")}</th><th>{t("Trạng thái")}</th><th>{t("Điểm")}</th><th>{t("Bắt đầu")}</th><th></th></tr></thead>
+            <thead className="text-muted-foreground"><tr><th className="p-2">{t("Học sinh")}</th><th>{t("Trạng thái")}</th><th>{t("Điểm")}</th><th>{t("Bắt đầu")}</th><th></th></tr></thead>
             <tbody>
               {rows.data?.data.map((r) => (
-                <tr key={r.id} className="border-t border-slate-200 dark:border-slate-800">
+                <tr key={r.id} className="border-t border-border">
                   <td className="p-2">{r.username}</td><td>{r.status === "submitted" ? t("Đã nộp") : t("Đang làm")}</td>
                   <td>{r.score !== null ? `${r.score}/${r.max_score}` : "–"}</td><td>{new Date(r.started_at).toLocaleString()}</td>
-                  <td>{r.status === "submitted" && <Link className="text-indigo-600 underline" href={`/exams/result/${r.id}`}>{t("Xem bài")}</Link>}</td>
+                  <td>{r.status === "submitted" && <Link className="text-primary-text underline" href={`/exams/result/${r.id}`}>{t("Xem bài")}</Link>}</td>
                 </tr>
               ))}
             </tbody>

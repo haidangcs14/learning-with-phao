@@ -23,15 +23,15 @@ export default function WordDetailPage() {
   return (
     <Page title={w.word}>
       <BackLink href="/vocabulary">{t("← Danh sách từ")}</BackLink>
-      <p className="text-lg text-slate-500">{w.phonetic} · {w.level}</p>
+      <p className="text-lg text-muted-foreground">{w.phonetic} · {w.level}</p>
       <WordVisual word={w} size="lg" />
       <WordActions id={w.id} word={w.word} isFav={ids.has(w.id)} />
       {w.meanings.map((m, i) => (
         <Card key={i} className="space-y-1">
-          <p className="text-sm font-semibold uppercase text-indigo-600">{m.part_of_speech}</p>
+          <p className="text-sm font-semibold uppercase text-primary-text">{m.part_of_speech}</p>
           <p>{m.definition}</p>
-          {lang === "vi" && <><p className="font-medium">{m.translation_vi}</p>{m.definition_vi && <p className="text-sm text-slate-600 dark:text-slate-300">{m.definition_vi}</p>}</>}
-          <ul className="list-disc pl-5 text-sm text-slate-500">{m.examples.map((e, k) => <li key={e}>{e}{lang === "vi" && m.examples_vi?.[k] ? <span className="block text-slate-400">{m.examples_vi[k]}</span> : null}</li>)}</ul>
+          {lang === "vi" && <><p className="font-medium">{m.translation_vi}</p>{m.definition_vi && <p className="text-sm text-muted-foreground">{m.definition_vi}</p>}</>}
+          <ul className="list-disc pl-5 text-sm text-muted-foreground">{m.examples.map((e, k) => <li key={e}>{e}{lang === "vi" && m.examples_vi?.[k] ? <span className="block text-muted-foreground">{m.examples_vi[k]}</span> : null}</li>)}</ul>
         </Card>
       ))}
       {w.topics.length > 0 && <p className="text-sm">{t("Chủ đề:")} {w.topics.join(", ")}</p>}

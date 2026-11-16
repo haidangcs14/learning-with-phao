@@ -6,6 +6,8 @@ import { useLang, type Lang } from "@/store/lang-store";
  * To add a string: wrap it with t("...") and add "vi text": "en text" here. Use {name} placeholders.
  */
 const EN: Record<string, string> = {
+  "Chọn Sáng, Tối hoặc để website theo cài đặt của thiết bị.": "Choose Light, Dark or let the website follow your device settings.",
+  "Đang theo hệ thống: giao diện {m}.": "Following your system: {m} theme.",
   "Đoán Từ": "Word Guess",
   "🔤 Đoán Từ": "🔤 Word Guess",
   "Wordle dựng trên chính vốn từ của bạn: đọc nghĩa, xem số chữ cái và ghép đúng từ trong sáu lượt. Xanh, vàng, xám sẽ thu hẹp dần đáp án.": "Wordle built on your own vocabulary: read the meaning, see the number of letters and find the word in six tries. Green, yellow and gray narrow the answer down.",

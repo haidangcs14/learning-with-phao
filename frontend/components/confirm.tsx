@@ -38,20 +38,20 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     <ConfirmContext.Provider value={ask}>
       {children}
       {o && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4" onClick={() => close(false)}>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-overlay/60 p-4" onClick={() => close(false)}>
           <div role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" onClick={(e) => e.stopPropagation()}
-            className="animate-modal w-full max-w-sm rounded-2xl bg-white p-5 text-slate-900 shadow-2xl dark:bg-slate-900 dark:text-slate-100">
+            className="animate-modal w-full max-w-sm rounded-2xl bg-surface p-5 text-foreground shadow-2xl">
             <div className="flex gap-3">
-              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold ${o.danger ? "bg-red-100 text-red-600 dark:bg-red-950" : "bg-indigo-100 text-indigo-600 dark:bg-indigo-950"}`}>{o.danger ? "!" : "?"}</span>
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold ${o.danger ? "bg-error-soft text-error-text" : "bg-primary-soft text-primary-text"}`}>{o.danger ? "!" : "?"}</span>
               <div>
                 <h2 id="confirm-title" className="font-semibold">{o.title}</h2>
-                {o.message && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{o.message}</p>}
+                {o.message && <p className="mt-1 text-sm text-muted-foreground">{o.message}</p>}
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-2">
-              <button onClick={() => close(false)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800">{o.cancelLabel ?? t("Huỷ bỏ")}</button>
+              <button onClick={() => close(false)} className="rounded-btn border border-border px-4 py-2 text-sm font-medium hover:bg-surface-secondary">{o.cancelLabel ?? t("Huỷ bỏ")}</button>
               <button ref={okButton} onClick={() => close(true)}
-                className={`rounded-lg px-4 py-2 text-sm font-medium text-white ${o.danger ? "bg-red-600 hover:bg-red-700" : "bg-indigo-600 hover:bg-indigo-700"}`}>{o.confirmLabel ?? t("Xác nhận")}</button>
+                className={`rounded-btn px-4 py-2 text-sm font-medium text-error-foreground ${o.danger ? "bg-error hover:bg-error" : "bg-primary hover:bg-primary-hover"}`}>{o.confirmLabel ?? t("Xác nhận")}</button>
             </div>
           </div>
         </div>

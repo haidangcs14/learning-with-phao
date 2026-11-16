@@ -14,11 +14,11 @@ export function ExamAudio({ examId }: { examId: string }) {
     apiBlob(`/exams/${examId}/audio`).then((b) => { if (!cancelled) { objectUrl = URL.createObjectURL(b); setUrl(objectUrl); } }).catch(() => { if (!cancelled) setFailed(true); });
     return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [examId]);
-  if (failed) return <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">{t("Không tải được file nghe.")}</p>;
+  if (failed) return <p className="rounded-btn bg-accent-soft p-3 text-sm text-accent-text">{t("Không tải được file nghe.")}</p>;
   return (
-    <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-900 dark:bg-indigo-950/40">
+    <div className="rounded-xl border border-primary/40 bg-primary-soft p-3">
       <p className="mb-1 text-sm font-semibold">🎧 {t("Phần nghe")}</p>
-      {url ? <audio controls src={url} className="w-full" /> : <p className="text-sm text-slate-500">{t("Đang tải âm thanh...")}</p>}
+      {url ? <audio controls src={url} className="w-full" /> : <p className="text-sm text-muted-foreground">{t("Đang tải âm thanh...")}</p>}
     </div>
   );
 }

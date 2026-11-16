@@ -63,18 +63,18 @@ function Runner({ attempt }: { attempt: Attempt }) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-4">
-      <div className="sticky top-14 z-20 -mx-4 mb-4 border-b border-slate-200 bg-white/95 px-4 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
+      <div className="sticky top-14 z-20 -mx-4 mb-4 border-b border-border bg-surface/95 px-4 py-2 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="truncate font-semibold">{exam.title}</p>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-500">{answered}/{numbers.length}</span>
-            <span className={`rounded-lg px-3 py-1 font-mono text-lg font-bold ${left <= 300 ? "animate-pulse bg-red-600 text-white" : "bg-slate-100 dark:bg-slate-800"}`} aria-label={t("Thời gian còn lại")}>⏱ {pad(Math.floor(left / 60))}:{pad(left % 60)}</span>
+            <span className="text-sm text-muted-foreground">{answered}/{numbers.length}</span>
+            <span className={`rounded-btn px-3 py-1 font-mono text-lg font-bold ${left <= 300 ? "animate-pulse bg-error text-error-foreground" : "bg-surface-secondary"}`} aria-label={t("Thời gian còn lại")}>⏱ {pad(Math.floor(left / 60))}:{pad(left % 60)}</span>
             <Button disabled={submit.isPending} onClick={confirmSubmit}>{t("Nộp bài")}</Button>
           </div>
         </div>
         <div className="mt-2 flex flex-wrap gap-1" aria-label={t("Danh sách câu hỏi")}>
           {numbers.map((n) => (
-            <a key={n} href={`#q-${n}`} className={`flex h-7 w-7 items-center justify-center rounded text-xs font-semibold ${(answers[String(n)] ?? "").trim() ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200"}`}>{n}</a>
+            <a key={n} href={`#q-${n}`} className={`flex h-7 w-7 items-center justify-center rounded text-xs font-semibold ${(answers[String(n)] ?? "").trim() ? "bg-primary text-primary-foreground" : "bg-border text-foreground"}`}>{n}</a>
           ))}
         </div>
       </div>
@@ -105,7 +105,7 @@ function Intro() {
           <li>📝 {t("{n} câu hỏi", { n: e.question_count })} · {t("{n} điểm", { n: e.total_score })}</li>
           {e.has_audio && <li>🎧 {t("Có phần nghe: hãy chuẩn bị tai nghe.")}</li>}
         </ul>
-        <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">{t("Đồng hồ chạy ngay khi bạn bấm bắt đầu và hết giờ bài sẽ tự động nộp. Câu trả lời được lưu tự động; nếu lỡ thoát ra, bạn có thể vào lại để làm tiếp.")}</p>
+        <p className="rounded-btn bg-accent-soft p-3 text-sm text-accent-text">{t("Đồng hồ chạy ngay khi bạn bấm bắt đầu và hết giờ bài sẽ tự động nộp. Câu trả lời được lưu tự động; nếu lỡ thoát ra, bạn có thể vào lại để làm tiếp.")}</p>
         {start.error && <ErrorBox error={start.error} />}
         <Button disabled={start.isPending} onClick={() => start.mutate(undefined, { onSuccess: (r) => setAttempt(r.data) })}>{t("Bắt đầu / Tiếp tục làm bài")}</Button>
       </Card>

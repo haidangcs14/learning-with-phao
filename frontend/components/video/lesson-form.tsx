@@ -29,7 +29,7 @@ export function LessonForm({ onCreated, redirect = true }: { onCreated?: () => v
     if (file.size > 1024 * 1024) { alert(t("File phụ đề tối đa 1MB.")); return; }
     void file.text().then((text) => setF((x) => ({ ...x, transcript: text })));
   }
-  const field = (msg: string) => (tried && msg ? <p className="mt-1 text-xs text-red-600">{msg}</p> : null);
+  const field = (msg: string) => (tried && msg ? <p className="mt-1 text-xs text-error-text">{msg}</p> : null);
 
   return (
     <Card className="space-y-3">
@@ -49,8 +49,8 @@ export function LessonForm({ onCreated, redirect = true }: { onCreated?: () => v
         <label className="text-sm sm:col-span-2">{t("Bản chép lời có mốc thời gian")}
           <textarea className={`${inputCls} font-mono text-xs`} rows={8} value={f.transcript} onChange={set("transcript")} aria-invalid={tried && !!problems.transcript}
             placeholder={`0:05 Hello everyone.\n0:09 Today we talk about daily routines.\n\n${t("(hoặc SRT / VTT)")}`} />{field(problems.transcript)}</label>
-        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 sm:col-span-2">
-          <label className="cursor-pointer rounded-lg border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+        <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground sm:col-span-2">
+          <label className="cursor-pointer rounded-btn border border-border px-3 py-1.5 font-medium text-foreground hover:bg-surface-secondary">
             {t("Chọn file .srt / .vtt / .txt")}<input type="file" accept=".srt,.vtt,.txt" hidden onChange={(e) => { readFile(e.target.files?.[0]); e.target.value = ""; }} /></label>
           <span>{t("Mẹo: trên YouTube chọn ⋯ → “Hiển thị bản chép lời”, hoặc dùng file phụ đề .srt/.vtt của video.")}</span>
         </div>

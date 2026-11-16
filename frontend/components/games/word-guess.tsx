@@ -26,12 +26,12 @@ const msg = (e: unknown) => (e instanceof ApiError ? e.message : e instanceof Er
 
 function Tile({ letter, state, animate, delay, small }: { letter: string; state: KeyStatus | "typing" | "empty"; animate?: boolean; delay?: number; small: boolean }) {
   const size = small ? "h-10 w-10 text-xl sm:h-12 sm:w-12" : "h-12 w-12 text-2xl sm:h-14 sm:w-14";
-  const base = `${size} flex items-center justify-center rounded-md border-2 font-extrabold uppercase`;
+  const base = `${size} flex items-center justify-center rounded-md border-2 font-bold uppercase`;
   if (state === "correct" || state === "present" || state === "absent") {
     if (animate) return <span className={`${base} tile-reveal`} style={{ "--tile-bg": COLOR[state], "--tile-from": "transparent", "--tile-from-border": "#94a3b8", animationDelay: `${(delay ?? 0) * 150}ms` } as React.CSSProperties}>{letter}</span>;
     return <span className={`${base} text-white`} style={{ backgroundColor: COLOR[state], borderColor: COLOR[state] }}>{letter}</span>;
   }
-  return <span className={`${base} ${state === "typing" ? "scale-105 border-slate-500 dark:border-slate-300" : "border-slate-300 dark:border-slate-600"}`}>{letter}</span>;
+  return <span className={`${base} ${state === "typing" ? "scale-105 border-border" : "border-border"}`}>{letter}</span>;
 }
 
 export function WordGuess() {
@@ -125,7 +125,7 @@ export function WordGuess() {
   if (phase === "setup") {
     return (
       <div className="space-y-4">
-        <Card className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+        <Card className="space-y-1 text-sm text-muted-foreground">
           <p>🔤 {t("Đoán Từ là Wordle dựng trên chính vốn từ của bạn: đọc nghĩa, xem số chữ cái, rồi ghép đúng từ tiếng Anh trong sáu lượt.")}</p>
           <p>🔥 {t("Giải liên tiếp để tăng chuỗi và điểm thưởng. Thua một từ thì mất 1 mạng và được xem đáp án.")}</p>
         </Card>
@@ -134,7 +134,7 @@ export function WordGuess() {
         <TopicPicker value={topic} onChange={setTopic} />
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-sm font-medium">{t("Số mạng")}</span>
-          {[3, 4, 5].map((n) => <button key={n} onClick={() => setLives0(n)} className={`rounded-lg border-2 px-3 py-1.5 text-sm font-semibold ${lives0 === n ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 dark:border-slate-700"}`}>{"❤️".repeat(n)}</button>)}
+          {[3, 4, 5].map((n) => <button key={n} onClick={() => setLives0(n)} className={`rounded-btn border-2 px-3 py-1.5 text-sm font-semibold ${lives0 === n ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{"❤️".repeat(n)}</button>)}
           <Button onClick={begin} disabled={start.isPending}>{start.isPending ? <Spinner /> : `▶ ${t("Bắt đầu")}`}</Button>
         </div>
         {start.error && <ErrorBox error={start.error} />}
@@ -147,18 +147,18 @@ export function WordGuess() {
     return (
       <Card className="space-y-4 text-center">
         <p className="text-5xl">{lives > 0 ? "🏆" : "💔"}</p>
-        <h2 className="text-2xl font-extrabold">{lives > 0 ? t("Bạn đã đoán hết các từ!") : t("Hết mạng rồi!")}</h2>
+        <h2 className="text-2xl font-bold">{lives > 0 ? t("Bạn đã đoán hết các từ!") : t("Hết mạng rồi!")}</h2>
         <div className="grid grid-cols-3 gap-3">
-          {[[t("Điểm"), final?.score ?? score], [t("Từ đúng"), `${solved}/${past.length}`], [t("Chuỗi dài nhất"), `🔥 ${best}`]].map(([l, v]) => <div key={String(l)} className="rounded-xl bg-slate-100 p-3 dark:bg-slate-800"><p className="text-xs text-slate-500">{l}</p><p className="text-xl font-bold">{v}</p></div>)}
+          {[[t("Điểm"), final?.score ?? score], [t("Từ đúng"), `${solved}/${past.length}`], [t("Chuỗi dài nhất"), `🔥 ${best}`]].map(([l, v]) => <div key={String(l)} className="rounded-xl bg-surface-secondary p-3"><p className="text-xs text-muted-foreground">{l}</p><p className="text-xl font-bold">{v}</p></div>)}
         </div>
-        {final && <p className="text-sm text-slate-600 dark:text-slate-300">+{final.xp_awarded} XP{final.is_record ? ` · 🏆 ${t("Kỷ lục mới!")}` : ""}</p>}
+        {final && <p className="text-sm text-muted-foreground">+{final.xp_awarded} XP{final.is_record ? ` · 🏆 ${t("Kỷ lục mới!")}` : ""}</p>}
         {quit.isPending && <Spinner />}
         <ul className="grid gap-2 text-left sm:grid-cols-2">
           {past.map((p, i) => (
-            <li key={i} className={`flex items-center gap-3 rounded-xl border-2 p-2 ${p.solved ? "border-green-500 bg-green-50 dark:bg-green-950/50" : "border-red-400 bg-red-50 dark:bg-red-950/50"}`}>
+            <li key={i} className={`flex items-center gap-3 rounded-xl border-2 p-2 ${p.solved ? "border-success bg-success-soft" : "border-error bg-error-soft"}`}>
               <span className="text-2xl">{p.emoji}</span><span className="min-w-0 flex-1"><b>{p.answer}</b><span className="block truncate text-sm">{p.meaning}</span></span>
               <span>{p.solved ? "✓" : "✗"}</span>
-              <button className="rounded-full bg-indigo-600 px-2 py-1 text-white" onClick={() => speak(p.answer)} aria-label={t("Nghe")}>🔊</button>
+              <button className="rounded-full bg-primary px-2 py-1 text-primary-foreground" onClick={() => speak(p.answer)} aria-label={t("Nghe")}>🔊</button>
             </li>
           ))}
         </ul>
@@ -171,19 +171,19 @@ export function WordGuess() {
   const done = status === "solved" || status === "failed";
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-100 px-3 py-2 text-sm font-semibold dark:bg-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-btn bg-surface-secondary px-3 py-2 text-sm font-semibold">
         <span>{t("Từ {a}/{b}", { a: index + 1, b: hints.length })}</span>
         <span aria-label={t("Số mạng")}>{Array.from({ length: Math.max(lives0, lives) }, (_, i) => <span key={i}>{i < lives ? "❤️" : "🖤"}</span>)}</span>
         <span title={t("Chuỗi")}><span className={streak > 0 ? "animate-flame inline-block" : "inline-block opacity-40"}>🔥</span> {streak}</span>
         <span>⭐ {score}</span>
-        <span className="flex items-center gap-1.5"><KeyboardToggle on={kb} onChange={setKb} /><button className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900" onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={t("Âm thanh")}>{sound ? "🔊" : "🔇"}</button></span>
+        <span className="flex items-center gap-1.5"><KeyboardToggle on={kb} onChange={setKb} /><button className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-surface" onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={t("Âm thanh")}>{sound ? "🔊" : "🔇"}</button></span>
       </div>
 
       {hint && (
         <Card className="flex flex-wrap items-center justify-center gap-4 text-center">
           <WordPicture word={{ word: answer ?? "", emoji: hint.emoji, image_url: "" }} size={88} />
-          <div><p className="text-2xl font-extrabold text-blue-500">{hint.translation_vi}</p>
-            <p className="text-sm text-slate-500">{t(POS[hint.pos] ?? "Khác")} · {t("{n} chữ cái", { n: hint.length })}{done && hint.phonetic ? ` · ${hint.phonetic}` : ""}</p></div>
+          <div><p className="text-2xl font-bold text-secondary-text">{hint.translation_vi}</p>
+            <p className="text-sm text-muted-foreground">{t(POS[hint.pos] ?? "Khác")} · {t("{n} chữ cái", { n: hint.length })}{done && hint.phonetic ? ` · ${hint.phonetic}` : ""}</p></div>
         </Card>
       )}
 
@@ -201,9 +201,9 @@ export function WordGuess() {
       </div>
 
       <p className="min-h-7 text-center text-sm font-semibold" role="status">
-        {note && <span className="text-red-600">{note}</span>}
-        {status === "solved" && <span className="text-green-600">🎉 {t("Chính xác!")} +{points}</span>}
-        {status === "failed" && <span className="text-red-600">{t("Đáp án")}: <b className="text-lg">{answer}</b> {hint?.phonetic}</span>}
+        {note && <span className="text-error-text">{note}</span>}
+        {status === "solved" && <span className="text-success-text">🎉 {t("Chính xác!")} +{points}</span>}
+        {status === "failed" && <span className="text-error-text">{t("Đáp án")}: <b className="text-lg">{answer}</b> {hint?.phonetic}</span>}
       </p>
       <div className="flex flex-wrap justify-center gap-2">
         {done && !phase.startsWith("o") && past.length < hints.length && lives > 0 && <Button onClick={next}>{t("Từ tiếp theo")} (Enter)</Button>}
@@ -211,7 +211,7 @@ export function WordGuess() {
         <Button variant="ghost" onClick={finishNow} disabled={quit.isPending}>{t("Kết thúc")}</Button>
       </div>
       {kb && <VirtualKeyboard status={keys} onKey={press} />}
-      <p className="text-center text-xs text-slate-500">{t("Gõ trên bàn phím hoặc bàn phím ảo. Enter để gửi, ⌫ để xóa.")}</p>
+      <p className="text-center text-xs text-muted-foreground">{t("Gõ trên bàn phím hoặc bàn phím ảo. Enter để gửi, ⌫ để xóa.")}</p>
     </div>
   );
 }

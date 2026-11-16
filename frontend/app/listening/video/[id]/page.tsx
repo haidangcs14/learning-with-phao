@@ -22,11 +22,11 @@ interface Lesson { id: string; youtube_id: string; title: string; level: string;
 const PASS = 60;
 const MODE_LABEL: Record<Mode, string> = { easy: "Easy", normal: "Normal", hard: "Hard" };
 const CELL: Record<string, string> = {
-  correct: "border-green-600 bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100",
-  wrong: "border-[#b5412a] bg-[#b5412a]/10 text-[#7a2615] dark:text-[#ef8a74]",
-  missing: "border-amber-500 bg-amber-100 text-amber-900 dark:bg-amber-900 dark:text-amber-100",
+  correct: "border-success bg-success-soft text-success-text",
+  wrong: "border-error bg-error/10 text-error-text ",
+  missing: "border-accent bg-accent-soft text-accent-text",
 };
-const btn = "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 transition hover:border-indigo-500 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-indigo-950";
+const btn = "rounded-btn border border-input bg-surface px-3 py-2 text-sm font-medium text-foreground transition hover:border-primary hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-40";
 const msg = (e: unknown) => (e instanceof ApiError ? e.message : e instanceof Error ? e.message : String(e));
 
 function Practice({ lesson }: { lesson: Lesson }) {
@@ -156,15 +156,15 @@ function Practice({ lesson }: { lesson: Lesson }) {
 
   const cols = !hideMedia && !hideScript ? "lg:grid-cols-[1fr_1.5fr_1fr]" : !hideMedia ? "lg:grid-cols-[1fr_1.5fr]" : !hideScript ? "lg:grid-cols-[1.5fr_1fr]" : "lg:grid-cols-1";
   const hintWord = hint !== null ? (words[hint] ?? "") : "";
-  const sel = "rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
+  const sel = "rounded-btn border border-input bg-surface px-2 py-1.5 text-sm text-foreground";
 
   return (
     <div className="mx-auto max-w-7xl space-y-4 px-4 py-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <nav aria-label="breadcrumb" className="flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-slate-500">
-          <Link href="/listening/video" className="hover:text-indigo-600">Topics</Link><span aria-hidden="true">›</span>
+        <nav aria-label="breadcrumb" className="flex min-w-0 flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+          <Link href="/listening/video" className="hover:text-primary-text">Topics</Link><span aria-hidden="true">›</span>
           <span>{lesson.category}</span><span aria-hidden="true">›</span>
-          <b className="truncate text-slate-900 dark:text-slate-100">{lesson.title}</b>
+          <b className="truncate text-foreground">{lesson.title}</b>
           <span className={`rounded px-2 py-0.5 text-xs font-semibold ${LEVEL_COLOR[lesson.level] ?? ""}`}>{lesson.level}</span>
         </nav>
         <div className="flex gap-2">
@@ -173,17 +173,17 @@ function Practice({ lesson }: { lesson: Lesson }) {
         </div>
       </div>
 
-      {notice && <p role="status" className={`rounded-lg px-3 py-2 text-sm font-medium ${notice.ok ? "bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100" : "bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100"}`}>{notice.text}</p>}
+      {notice && <p role="status" className={`rounded-btn px-3 py-2 text-sm font-medium ${notice.ok ? "bg-success-soft text-success-text" : "bg-error-soft text-error-text"}`}>{notice.text}</p>}
 
       <div className={`grid items-start gap-4 ${cols}`}>
         {/* ---------- left: video ---------- */}
-        <section className={`min-w-0 space-y-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900/60 ${hideMedia ? "hidden" : ""}`}>
+        <section className={`min-w-0 space-y-3 rounded-card border border-border bg-surface p-3 ${hideMedia ? "hidden" : ""} shadow-raised`}>
           <h2 className="text-sm font-bold uppercase tracking-wide">VIDEO</h2>
-          <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
+          <div className="relative aspect-video overflow-hidden rounded-btn bg-black">
             <div ref={yt.host} className="absolute inset-0 [&_iframe]:h-full [&_iframe]:w-full" />
             {yt.status !== "ready" && <p className="absolute inset-0 flex items-center justify-center p-4 text-center text-sm text-white">{yt.status === "loading" ? t("Đang tải trình phát...") : ""}</p>}
           </div>
-          {yt.status === "error" && <p role="alert" className="rounded-lg bg-red-100 p-2 text-sm text-red-900 dark:bg-red-900 dark:text-red-100">{t(yt.error)}</p>}
+          {yt.status === "error" && <p role="alert" className="rounded-btn bg-error-soft p-2 text-sm text-error-text">{t(yt.error)}</p>}
           <p className="text-center font-mono text-lg" aria-label={t("Thời gian")}>{mmss(yt.time)} / {mmss(yt.duration)}</p>
           <div className="grid grid-cols-2 gap-2">
             <Button disabled={!yt.ready} onClick={() => playSegment(current)}>{t("BẮT ĐẦU")}</Button>
@@ -192,11 +192,11 @@ function Practice({ lesson }: { lesson: Lesson }) {
         </section>
 
         {/* ---------- middle: practice ---------- */}
-        <section className="min-w-0 space-y-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900/60">
-          <div role="tablist" aria-label={t("Chế độ")} className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
+        <section className="min-w-0 space-y-3 rounded-card border border-border bg-surface p-3 shadow-raised">
+          <div role="tablist" aria-label={t("Chế độ")} className="grid grid-cols-3 gap-1 rounded-btn bg-surface-secondary p-1">
             {MODES.map((m) => (
               <button key={m} role="tab" aria-selected={mode === m} onClick={() => { setMode(m); setHint(null); }}
-                className={`rounded-md px-2 py-1.5 text-sm font-semibold transition ${mode === m ? "bg-indigo-600 text-white shadow" : "text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700"}`}>
+                className={`rounded-md px-2 py-1.5 text-sm font-semibold transition ${mode === m ? "bg-primary text-primary-foreground shadow" : "text-muted-foreground hover:bg-surface"}`}>
                 {MODE_LABEL[m]} <span className="text-xs font-normal opacity-80">{Math.round(settings.ratio[m] * 100)}%</span>
               </button>
             ))}
@@ -212,7 +212,7 @@ function Practice({ lesson }: { lesson: Lesson }) {
             </label>
             <button className={`${btn} ml-auto`} onClick={() => setDialog("settings")} aria-label={t("Cài đặt")}>⚙</button>
           </div>
-          <p className="text-sm text-slate-500">{t("Câu {a}/{b}", { a: current + 1, b: sentences.length })} · {mmss(sentence.start)}–{mmss(sentence.end)}</p>
+          <p className="text-sm text-muted-foreground">{t("Câu {a}/{b}", { a: current + 1, b: sentences.length })} · {mmss(sentence.start)}–{mmss(sentence.end)}</p>
 
           <textarea value={answers[no] ?? ""} rows={3} spellCheck={false} placeholder={t("Gõ câu trả lời của bạn ở đây...")}
             onChange={(e) => setAnswers((a) => ({ ...a, [no]: e.target.value.slice(0, 1000) }))}
@@ -223,10 +223,10 @@ function Practice({ lesson }: { lesson: Lesson }) {
             {words.map((w, i) => {
               const r = full?.words[i];
               const hidden = !r && !revealed.has(sentence.no) && masked.has(i);
-              const cls = r ? CELL[r.status] : hidden ? "cursor-pointer border-indigo-400 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-200" : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-900";
+              const cls = r ? CELL[r.status] : hidden ? "cursor-pointer border-primary bg-primary-soft text-primary-text hover:bg-primary-soft" : "border-border bg-surface";
               return (
                 <button key={i} type="button" disabled={!hidden} onClick={() => setHint(hint === i ? null : i)} aria-label={hidden ? t("Từ bị ẩn") : w}
-                  className={`min-w-10 rounded-lg border-2 px-2.5 py-1 text-center font-medium disabled:cursor-default ${cls} ${hint === i ? "ring-2 ring-indigo-500" : ""}`}>
+                  className={`min-w-10 rounded-btn border-2 px-2.5 py-1 text-center font-medium disabled:cursor-default ${cls} ${hint === i ? "ring-2 ring-primary" : ""}`}>
                   {hidden ? "*".repeat(Math.max(2, w.length)) : w}
                   {r?.status === "wrong" && r.typed && <span className="block text-[10px] font-normal line-through opacity-70">{r.typed}</span>}
                 </button>
@@ -234,14 +234,14 @@ function Practice({ lesson }: { lesson: Lesson }) {
             })}
           </div>
           {hint !== null && (settings.hints
-            ? <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm dark:bg-indigo-950">💡 {t("Gợi ý")}: <b className="font-mono tracking-widest">{hintWord.charAt(0)}{" _".repeat(Math.max(0, hintWord.length - 1))}</b> ({t("{n} chữ cái", { n: hintWord.length })})</p>
-            : <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">{t("Gợi ý đang tắt. Bật trong Cài đặt (⚙).")}</p>)}
+            ? <p className="rounded-btn bg-primary-soft px-3 py-2 text-sm">💡 {t("Gợi ý")}: <b className="font-mono tracking-widest">{hintWord.charAt(0)}{" _".repeat(Math.max(0, hintWord.length - 1))}</b> ({t("{n} chữ cái", { n: hintWord.length })})</p>
+            : <p className="rounded-btn bg-surface-secondary px-3 py-2 text-sm text-muted-foreground">{t("Gợi ý đang tắt. Bật trong Cài đặt (⚙).")}</p>)}
 
           {full ? (
-            <p className={`rounded-lg px-3 py-2 text-sm font-medium ${full.accuracy >= PASS ? "bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100" : "bg-amber-100 text-amber-900 dark:bg-amber-900 dark:text-amber-100"}`}>
+            <p className={`rounded-btn px-3 py-2 text-sm font-medium ${full.accuracy >= PASS ? "bg-success-soft text-success-text" : "bg-accent-soft text-accent-text"}`}>
               {full.accuracy}% — ✓ {full.correct} · ✗ {full.wrong} · {t("thiếu {n}", { n: full.missing })}{full.extra.length > 0 && ` · ${t("thừa")}: ${full.extra.join(", ")}`}</p>
           ) : results[no] ? (
-            <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800">{t("Kết quả đã lưu: {n}%. Bấm KIỂM TRA để xem chi tiết.", { n: results[no]?.accuracy ?? 0 })}</p>
+            <p className="rounded-btn bg-surface-secondary px-3 py-2 text-sm">{t("Kết quả đã lưu: {n}%. Bấm KIỂM TRA để xem chi tiết.", { n: results[no]?.accuracy ?? 0 })}</p>
           ) : null}
 
           <div className="flex flex-wrap gap-2">
@@ -252,24 +252,24 @@ function Practice({ lesson }: { lesson: Lesson }) {
         </section>
 
         {/* ---------- right: transcript ---------- */}
-        <section className={`min-w-0 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900/60 ${hideScript ? "hidden" : ""}`}>
+        <section className={`min-w-0 rounded-card border border-border bg-surface p-3 ${hideScript ? "hidden" : ""} shadow-raised`}>
           <div className="flex items-center justify-between"><h2 className="text-sm font-bold uppercase tracking-wide">{t("BẢN CHÉP")}</h2><b className="text-sm">{pct}%</b></div>
-          <div className="my-2 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-green-500 transition-all" style={{ width: `${pct}%` }} /></div>
+          <div className="my-2 h-2 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-success transition-all" style={{ width: `${pct}%` }} /></div>
           <ul ref={listRef} className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
             {sentences.map((s, i) => {
               const r = results[String(s.no)];
               const active = i === current;
               return (
-                <li key={s.no} data-no={s.no} className={`rounded-lg border-2 p-2 text-sm transition ${active ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "border-slate-200 hover:border-indigo-300 dark:border-slate-700"}`}>
+                <li key={s.no} data-no={s.no} className={`rounded-btn border-2 p-2 text-sm transition ${active ? "border-primary bg-primary-soft" : "border-border hover:border-primary/40"}`}>
                   <div className="flex items-center gap-2">
                     <button className="flex-1 text-left" onClick={() => { if (yt.playing) go(i, true); else go(i, false); }} aria-current={active ? "true" : undefined}>
-                      <span className="mr-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs font-bold dark:bg-slate-700">#{s.no}</span>{s.text}
+                      <span className="mr-2 rounded bg-border px-1.5 py-0.5 text-xs font-bold">#{s.no}</span>{s.text}
                     </button>
-                    {r && <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${r.accuracy >= PASS ? "bg-green-600 text-white" : "bg-amber-500 text-white"}`}>{r.accuracy}%</span>}
+                    {r && <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${r.accuracy >= PASS ? "bg-success text-success-foreground" : "bg-accent text-accent-foreground"}`}>{r.accuracy}%</span>}
                   </div>
                   <div className="mt-1 flex justify-end gap-1">
-                    {lesson.can_edit && <button className="rounded px-2 py-0.5 text-xs hover:bg-slate-200 dark:hover:bg-slate-700" onClick={() => open("edit", s)} aria-label={t("Chỉnh sửa câu {n}", { n: s.no })}>✏️ {t("Sửa")}</button>}
-                    <button className="rounded px-2 py-0.5 text-xs hover:bg-slate-200 dark:hover:bg-slate-700" onClick={() => open("report", s)} aria-label={t("Báo lỗi câu {n}", { n: s.no })}>⚑ {t("Báo lỗi")}</button>
+                    {lesson.can_edit && <button className="rounded px-2 py-0.5 text-xs hover:bg-border" onClick={() => open("edit", s)} aria-label={t("Chỉnh sửa câu {n}", { n: s.no })}>✏️ {t("Sửa")}</button>}
+                    <button className="rounded px-2 py-0.5 text-xs hover:bg-border" onClick={() => open("report", s)} aria-label={t("Báo lỗi câu {n}", { n: s.no })}>⚑ {t("Báo lỗi")}</button>
                   </div>
                 </li>
               );
@@ -302,19 +302,19 @@ function Practice({ lesson }: { lesson: Lesson }) {
             <label>{t("Bắt đầu (giây)")}<input className={inputCls} type="number" step="0.1" min="0" value={form.start} onChange={(e) => setForm({ ...form, start: e.target.value })} /></label>
             <label>{t("Kết thúc (giây)")}<input className={inputCls} type="number" step="0.1" min="0" value={form.end} onChange={(e) => setForm({ ...form, end: e.target.value })} /></label>
           </div>
-          {formError && <p role="alert" className="text-red-600">{formError}</p>}
+          {formError && <p role="alert" className="text-error-text">{formError}</p>}
           <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setDialog(null)}>{t("Huỷ bỏ")}</Button><Button disabled={edit.isPending} onClick={submitEdit}>{t("Lưu")}</Button></div>
         </div>
       </Dialog>
 
       <Dialog open={dialog === "report"} title={t("Báo lỗi câu #{n}", { n: target?.no ?? 0 })} onClose={() => setDialog(null)}>
         <div className="space-y-3 text-sm">
-          <p className="rounded bg-slate-100 p-2 italic dark:bg-slate-800">“{target?.text}”</p>
+          <p className="rounded bg-surface-secondary p-2 italic">“{target?.text}”</p>
           {([["wrong_text", "Sai nội dung (chép lời không đúng)"], ["wrong_time", "Sai thời gian (câu bị lệch so với video)"], ["other", "Lỗi khác"]] as const).map(([k, label]) => (
             <label key={k} className="flex items-center gap-2"><input type="radio" name="reason" checked={form.reason === k} onChange={() => setForm({ ...form, reason: k })} />{t(label)}</label>
           ))}
           <label className="block">{t("Ghi chú")}{form.reason === "other" ? " *" : ""}<textarea className={inputCls} rows={3} maxLength={500} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
-          {formError && <p role="alert" className="text-red-600">{formError}</p>}
+          {formError && <p role="alert" className="text-error-text">{formError}</p>}
           <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setDialog(null)}>{t("Huỷ bỏ")}</Button><Button disabled={report.isPending} onClick={submitReport}>{t("Gửi báo lỗi")}</Button></div>
         </div>
       </Dialog>

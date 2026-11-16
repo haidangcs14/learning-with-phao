@@ -87,7 +87,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   ];
   const allOk = rules.every((r) => r.ok);
   const bad = (field: string, ok: boolean) => show(field) && !ok;
-  const red = "border-[#b5412a] dark:border-[#ef8a74]";
+  const red = "border-error ";
 
   function social(provider: "google" | "facebook") {
     window.location.href = `${API_URL}/auth/${provider}/login`; // full-page redirect: the secrets stay on the server
@@ -121,15 +121,15 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     <AuthCard title={isLogin ? t("Đăng nhập") : t("Tạo tài khoản")} shake={shake} onShakeEnd={shakeDone}
       subtitle={isLogin ? t("Chào mừng bạn quay lại!") : t("Miễn phí và chỉ mất vài giây.")}>
       <div className="grid grid-cols-2 gap-3">
-        <button type="button" onClick={() => social("google")} className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800">
+        <button type="button" onClick={() => social("google")} className="flex items-center justify-center gap-2 rounded-btn border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-secondary">
           <GoogleIcon /> Google
         </button>
-        <button type="button" onClick={() => social("facebook")} className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800">
+        <button type="button" onClick={() => social("facebook")} className="flex items-center justify-center gap-2 rounded-btn border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-secondary">
           <FacebookIcon /> Facebook
         </button>
       </div>
-      <div className="my-5 flex items-center gap-3 text-xs uppercase text-slate-400">
-        <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />{t("hoặc")}<span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+      <div className="my-5 flex items-center gap-3 text-xs uppercase text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />{t("hoặc")}<span className="h-px flex-1 bg-border" />
       </div>
 
       <form onSubmit={submit} noValidate className="space-y-3">
@@ -148,22 +148,22 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         {isLogin && (
           <div className="flex items-center justify-between text-sm">
             <label className="flex cursor-pointer items-center gap-2">
-              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-indigo-600" />
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-primary" />
               {t("Ghi nhớ tài khoản")}
             </label>
-            <Link href="/forgot-password" className="text-indigo-600 hover:underline">{t("Quên mật khẩu?")}</Link>
+            <Link href="/forgot-password" className="text-primary-text hover:underline">{t("Quên mật khẩu?")}</Link>
           </div>
         )}
 
-        {message && <p role="alert" className="rounded-lg border border-[#b5412a]/40 bg-[#b5412a]/10 p-3 text-sm text-[#9a2f1b] dark:border-[#ef8a74]/40 dark:bg-[#ef8a74]/10 dark:text-[#ef8a74]">{message}</p>}
+        {message && <p role="alert" className="rounded-btn border border-error/40 bg-error/10 p-3 text-sm text-error-text ">{message}</p>}
         <Button type="submit" disabled={loading} className="w-full py-2.5">{loading ? t("Đang xử lý...") : isLogin ? t("Đăng nhập") : t("Đăng ký")}</Button>
       </form>
 
       <div className="mt-4"><Checklist title={t("Điều kiện")} rules={rules} /></div>
 
-      <p className="mt-5 text-center text-sm text-slate-500">
+      <p className="mt-5 text-center text-sm text-muted-foreground">
         {isLogin ? t("Chưa có tài khoản?") : t("Đã có tài khoản?")}{" "}
-        <Link className="font-medium text-indigo-600 hover:underline" href={isLogin ? "/register" : "/login"}>{isLogin ? t("Đăng ký") : t("Đăng nhập")}</Link>
+        <Link className="font-medium text-primary-text hover:underline" href={isLogin ? "/register" : "/login"}>{isLogin ? t("Đăng ký") : t("Đăng nhập")}</Link>
       </p>
     </AuthCard>
   );

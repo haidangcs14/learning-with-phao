@@ -2,14 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Theme tokens: the page colours come from CSS variables so text/background can never end up the same colour */
-:root { --bg: #ffffff; --fg: #0f172a; color-scheme: light; }
-.dark { --bg: #020617; --fg: #f1f5f9; color-scheme: dark; }
+/* =====================================================================
+   "Học cùng Phao" design tokens: Friendly · Modern · Gamified.
+   Colours are stored as "R G B" channels so Tailwind can add opacity (bg-primary/20).
+   Light is the main theme; .dark (set by next-themes for Dark and for System when the OS is dark) is designed separately.
+   ===================================================================== */
+:root {
+  --background: 240 253 250;          /* #F0FDFA */
+  --surface: 255 255 255;             /* #FFFFFF  cards */
+  --surface-secondary: 230 247 242;   /* inset areas, hovers, tracks */
+  --foreground: 19 78 74;             /* #134E4A */
+  --muted-foreground: 100 116 139;    /* #64748B */
+  --border: 204 235 227;              /* mint-tinted hairline (decorative edges) */
+  --input: 124 141 163;               /* edge of form controls: 3.4:1 on surface */
 
-body { background-color: var(--bg); color: var(--fg); }
-input, select, textarea { color: var(--fg); }
-option { background-color: var(--bg); color: var(--fg); } /* native <select> popups ignore Tailwind bg/text classes */
-input::placeholder, textarea::placeholder { color: #94a3b8; }
+  --primary: 16 185 129;              /* #10B981 */
+  --primary-hover: 5 150 105;         /* #059669 */
+  --primary-foreground: 255 255 255;
+  --primary-soft: 209 250 229;        /* tinted backgrounds */
+  --primary-text: 4 120 87;           /* mint for small text/links on light surfaces (AA contrast) */
+
+  --secondary: 6 182 212;             /* #06B6D4 cyan */
+  --secondary-hover: 8 145 178;
+  --secondary-foreground: 8 51 68;
+  --secondary-soft: 207 250 254;
+  --secondary-text: 14 116 144;
+
+  --accent: 251 191 36;               /* #FBBF24 */
+  --accent-foreground: 69 26 3;
+  --accent-soft: 254 243 199;
+  --accent-text: 146 64 14;
+
+  --success: 34 197 94;               /* #22C55E */
+  --success-foreground: 5 46 22;
+  --success-soft: 220 252 231;
+  --success-text: 21 128 61;
+
+  --error: 248 113 113;               /* #F87171 */
+  --error-foreground: 69 10 10;
+  --error-soft: 254 226 226;
+  --error-text: 185 28 28;
+
+  --ring: 16 185 129;                 /* keyboard focus */
+  --overlay: 19 78 74;                /* modal backdrops (used with an alpha) */
+  --depth: 188 226 216;               /* the "raised block" edge under cards */
+  --shadow-color: 19 78 74;
+  --shadow: 0 1px 2px rgb(var(--shadow-color) / 0.06), 0 8px 22px -12px rgb(var(--shadow-color) / 0.2);
+  --shadow-hover: 0 2px 4px rgb(var(--shadow-color) / 0.08), 0 16px 30px -12px rgb(var(--shadow-color) / 0.28);
+  --shadow-raised: var(--shadow), 0 4px 0 -1px rgb(var(--depth));
+  --shadow-raised-hover: var(--shadow-hover), 0 6px 0 -1px rgb(var(--depth));
+}
+
+.dark {
+  --background: 15 23 42;             /* #0F172A soft slate */
+  --surface: 30 41 59;                /* #1E293B */
+  --surface-secondary: 39 52 73;
+  --foreground: 248 250 252;          /* #F8FAFC */
+  --muted-foreground: 148 163 184;    /* #94A3B8 */
+  --border: 51 65 85;                 /* visible but quiet */
+  --input: 107 124 147;               /* 3.4:1 on the dark surface */
+
+  --primary: 16 185 129;              /* the brand colour stays */
+  --primary-hover: 52 211 153;        /* lighter on hover in the dark */
+  --primary-foreground: 2 44 34;      /* dark text keeps the contrast on mint */
+  --primary-soft: 20 57 51;
+  --primary-text: 52 211 153;
+
+  --secondary: 34 211 238;
+  --secondary-hover: 103 232 249;
+  --secondary-foreground: 8 51 68;
+  --secondary-soft: 21 62 75;
+  --secondary-text: 103 232 249;
+
+  --accent: 251 191 36;
+  --accent-foreground: 69 26 3;
+  --accent-soft: 66 52 22;
+  --accent-text: 252 211 77;
+
+  --success: 74 222 128;
+  --success-foreground: 5 46 22;
+  --success-soft: 22 62 40;
+  --success-text: 134 239 172;
+
+  --error: 248 113 113;
+  --error-foreground: 69 10 10;
+  --error-soft: 69 30 36;
+  --error-text: 252 165 165;
+
+  --ring: 52 211 153;
+  --overlay: 2 6 23;
+  --depth: 9 14 28;                   /* in the dark the depth comes from surface/border contrast, not heavy shadows */
+  --shadow-color: 0 0 0;
+  --shadow: 0 1px 2px rgb(var(--shadow-color) / 0.3);
+  --shadow-hover: 0 2px 4px rgb(var(--shadow-color) / 0.35), 0 10px 22px -12px rgb(var(--shadow-color) / 0.5);
+  --shadow-raised: var(--shadow), 0 3px 0 -1px rgb(var(--depth));
+  --shadow-raised-hover: var(--shadow-hover), 0 5px 0 -1px rgb(var(--depth));
+}
+
+@layer base {
+  html { font-family: var(--font-nunito), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust: 100%; }
+  body { background-color: rgb(var(--background)); color: rgb(var(--foreground)); font-weight: 400; line-height: 1.55; }
+  h1, h2 { font-weight: 700; }
+  h3, h4, h5 { font-weight: 600; }
+  label { font-weight: 500; }
+  button { font-weight: 600; }
+  b, strong { font-weight: 700; }
+  ::selection { background-color: rgb(var(--primary) / 0.28); }
+  input::placeholder, textarea::placeholder { color: rgb(var(--muted-foreground) / 0.85); }
+  input, select, textarea { color: rgb(var(--foreground)); }
+  option { background-color: rgb(var(--surface)); color: rgb(var(--foreground)); }
+  a { color: inherit; }
+
+  /* keyboard focus: always visible, never colour-only */
+  :focus-visible { outline: 2px solid rgb(var(--ring)); outline-offset: 2px; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible { outline-offset: 0; }
+
+  /* micro-interactions: buttons lift 1px on hover and sink 1px when pressed (the individual `translate` property
+     does not collide with Tailwind's `transform` utilities) */
+  button, [role="button"], .lift { transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, translate 0.15s ease, opacity 0.18s ease, filter 0.18s ease; }
+  button:not(:disabled):hover, .lift:hover { translate: 0 -1px; }
+  button:not(:disabled):active, .lift:active { translate: 0 1px; }
+  button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
+
+  * { scrollbar-width: thin; scrollbar-color: rgb(var(--muted-foreground) / 0.45) transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  button:not(:disabled):hover, button:not(:disabled):active, .lift:hover, .lift:active { translate: none; }
+}
 
 /* 3D flip card */
 .flip-scene { perspective: 1200px; }

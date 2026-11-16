@@ -9,8 +9,8 @@ export default function Page() {
   return (
     <>
       <div className="mx-auto max-w-5xl px-4 pt-6">
-        <Link href="/listening/video" className="flex items-center justify-between gap-3 rounded-xl border-2 border-indigo-200 bg-indigo-50 p-4 transition hover:border-indigo-500 dark:border-indigo-900 dark:bg-indigo-950/40">
-          <span><b>🎬 {t("Luyện nghe qua video YouTube")}</b><span className="block text-sm text-slate-600 dark:text-slate-300">{t("Gõ lại những gì bạn nghe được, chọn độ khó Easy / Normal / Hard.")}</span></span>
+        <Link href="/listening/video" className="lift flex items-center justify-between gap-3 rounded-xl border-2 border-primary/40 bg-primary-soft p-4 transition hover:border-primary">
+          <span><b>🎬 {t("Luyện nghe qua video YouTube")}</b><span className="block text-sm text-muted-foreground">{t("Gõ lại những gì bạn nghe được, chọn độ khó Easy / Normal / Hard.")}</span></span>
           <span aria-hidden="true" className="text-xl">→</span>
         </Link>
       </div>

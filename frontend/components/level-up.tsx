@@ -14,7 +14,7 @@ interface Seen { level: number; streak: number; day: string }
 interface Celebration { level: number; leveledUp: boolean; streak: number; xp: Xp }
 
 const localDay = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
-const COLORS = ["#f43f5e", "#f59e0b", "#10b981", "#3b82f6", "#a855f7", "#eab308"];
+const COLORS = ["rgb(var(--primary))", "rgb(var(--secondary))", "rgb(var(--accent))", "rgb(var(--success))", "rgb(var(--error))", "rgb(var(--primary-hover))"];
 
 function Confetti() {
   const pieces = useMemo(() => Array.from({ length: 40 }, (_, i) => ({ left: Math.random() * 100, delay: Math.random() * 0.8, color: COLORS[i % COLORS.length], w: 6 + Math.random() * 6 })), []);
@@ -53,24 +53,24 @@ export function GamificationWatcher() {
 
   if (!show || !user) return null;
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/65 p-4" onClick={() => setShow(null)}>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-overlay/65 p-4" onClick={() => setShow(null)}>
       <div role="dialog" aria-modal="true" aria-label={show.leveledUp ? t("Chúc mừng lên cấp!") : t("Giữ vững chuỗi ngày học!")} onClick={(e) => e.stopPropagation()}
-        className="animate-modal relative w-full max-w-sm overflow-hidden rounded-3xl bg-white p-6 text-center text-slate-900 shadow-2xl dark:bg-slate-900 dark:text-slate-100">
+        className="animate-modal relative w-full max-w-sm overflow-hidden rounded-3xl bg-surface p-6 text-center text-foreground shadow-2xl">
         <Confetti />
         <div className="relative space-y-3">
-          <p className="text-sm font-bold uppercase tracking-widest text-amber-500">{show.leveledUp ? t("Chúc mừng!") : t("Tuyệt vời!")}</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-accent-text">{show.leveledUp ? t("Chúc mừng!") : t("Tuyệt vời!")}</p>
           {show.leveledUp ? (
             <>
               <div className="flex justify-center py-2"><LevelAvatar user={user} level={show.level} size={104} /></div>
-              <h2 className="text-2xl font-extrabold">{t("Bạn đã lên cấp {n}!", { n: show.level })}</h2>
-              <p className="text-sm text-slate-600 dark:text-slate-300">{t("Tổng XP: {a} · còn {b} XP nữa để lên cấp {n}.", { a: show.xp.total_xp, b: show.xp.xp_for_next - show.xp.xp_into_level, n: show.level + 1 })}</p>
+              <h2 className="text-2xl font-bold">{t("Bạn đã lên cấp {n}!", { n: show.level })}</h2>
+              <p className="text-sm text-muted-foreground">{t("Tổng XP: {a} · còn {b} XP nữa để lên cấp {n}.", { a: show.xp.total_xp, b: show.xp.xp_for_next - show.xp.xp_into_level, n: show.level + 1 })}</p>
             </>
-          ) : <h2 className="text-2xl font-extrabold">{t("Giữ vững chuỗi ngày học!")}</h2>}
+          ) : <h2 className="text-2xl font-bold">{t("Giữ vững chuỗi ngày học!")}</h2>}
           {show.streak >= 2 && (
-            <div className="rounded-2xl bg-orange-50 p-3 dark:bg-orange-950/40">
+            <div className="rounded-2xl bg-accent-soft p-3">
               <p className="text-4xl"><span className="animate-flame inline-block">🔥</span></p>
-              <p className="font-bold text-orange-700 dark:text-orange-300">{t("Chuỗi {n} ngày liên tiếp", { n: show.streak })}</p>
-              <p className="text-xs text-slate-600 dark:text-slate-300">{t("Học mỗi ngày một chút để không đứt chuỗi nhé.")}</p>
+              <p className="font-bold text-accent-text">{t("Chuỗi {n} ngày liên tiếp", { n: show.streak })}</p>
+              <p className="text-xs text-muted-foreground">{t("Học mỗi ngày một chút để không đứt chuỗi nhé.")}</p>
             </div>
           )}
           <Button onClick={() => setShow(null)} className="w-full">{t("Tiếp tục")}</Button>

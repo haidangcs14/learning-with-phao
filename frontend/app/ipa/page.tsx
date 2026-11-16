@@ -22,16 +22,16 @@ export default function IpaPage() {
 
   return (
     <Page title={t("Bảng phiên âm IPA")}>
-      <p className="text-slate-500 dark:text-slate-400">{t("Bấm vào một âm để xem cách phát âm, từ ví dụ và video.")}</p>
+      <p className="text-muted-foreground">{t("Bấm vào một âm để xem cách phát âm, từ ví dụ và video.")}</p>
       {SECTIONS.map(([type, label]) => (
         <section key={type}>
           <h2 className="mb-3 mt-4 text-xl font-semibold">{t(label)}</h2>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
             {items.map((p, i) => p.type === type && (
               <button key={p.id} onClick={() => { setActive(i); speak(p.example_words[0] ?? p.symbol); }}
-                className="rounded-xl border border-slate-200 bg-white p-3 text-center transition hover:-translate-y-0.5 hover:border-indigo-500 hover:shadow dark:border-slate-800 dark:bg-slate-900/60">
+                className="rounded-card border border-border bg-surface p-3 text-center transition hover:-translate-y-0.5 hover:border-primary hover:shadow shadow-raised">
                 <div className="text-2xl font-semibold">/{p.symbol}/</div>
-                <div className="mt-1 text-xs text-slate-500">{p.example_words[0]}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{p.example_words[0]}</div>
               </button>
             ))}
           </div>

@@ -1,12 +1,12 @@
 export interface Tier { ring: string; badge: string }
 
-/** The look of the level frame grows with the level. */
+/** The look of the level frame grows with the level (only design tokens, so it follows the theme). */
 export function levelTier(level: number): Tier {
-  if (level >= 35) return { ring: "ring-rose-400", badge: "border-rose-200 bg-gradient-to-r from-rose-500 to-orange-400 text-white" };
-  if (level >= 20) return { ring: "ring-amber-400", badge: "border-amber-200 bg-gradient-to-r from-amber-500 to-yellow-400 text-amber-950" };
-  if (level >= 10) return { ring: "ring-violet-400", badge: "border-violet-200 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white" };
-  if (level >= 5) return { ring: "ring-emerald-400", badge: "border-emerald-200 bg-gradient-to-r from-emerald-600 to-teal-500 text-white" };
-  return { ring: "ring-indigo-300", badge: "border-indigo-200 bg-gradient-to-r from-indigo-600 to-blue-500 text-white" };
+  if (level >= 35) return { ring: "ring-error", badge: "border-error/40 bg-gradient-to-r from-error to-accent text-error-foreground" };
+  if (level >= 20) return { ring: "ring-accent", badge: "border-accent/40 bg-gradient-to-r from-accent to-primary text-accent-foreground" };
+  if (level >= 10) return { ring: "ring-accent", badge: "border-accent/40 bg-accent text-accent-foreground" };
+  if (level >= 5) return { ring: "ring-secondary", badge: "border-secondary/40 bg-secondary text-secondary-foreground" };
+  return { ring: "ring-primary/50", badge: "border-primary/40 bg-primary text-primary-foreground" };
 }
 
 /** The user's full name; the username only when no name was entered. */

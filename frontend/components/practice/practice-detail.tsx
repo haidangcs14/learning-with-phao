@@ -42,7 +42,7 @@ export function PracticeDetail({ kind, slug }: { kind: Kind; slug: string }) {
       <BackLink href={`/${kind}`}>{kind === "reading" ? t("← Tất cả bài đọc") : t("← Tất cả bài nghe")}</BackLink>
       <div>
         <h1 className="text-2xl font-bold sm:text-3xl">{d.title}</h1>
-        <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+        <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
           <span className={`rounded px-2 py-0.5 text-xs font-semibold ${LEVEL_COLOR[d.level] ?? ""}`}>{d.level}</span>{d.topic} · {t("{w} từ", { w: d.word_count })}
         </p>
       </div>
@@ -50,13 +50,13 @@ export function PracticeDetail({ kind, slug }: { kind: Kind; slug: string }) {
       {kind === "listening" && d.script && (
         <section className="space-y-2">
           <TtsPlayer lines={d.script} showText={showScript || !!result} />
-          {!result && <button className="text-sm text-indigo-600 underline" onClick={() => setShowScript(!showScript)}>{showScript ? t("Ẩn bản ghi") : t("Hiện bản ghi (transcript)")}</button>}
+          {!result && <button className="text-sm text-primary-text underline" onClick={() => setShowScript(!showScript)}>{showScript ? t("Ẩn bản ghi") : t("Hiện bản ghi (transcript)")}</button>}
         </section>
       )}
 
       {kind === "reading" && (
         <>
-          <article className="space-y-3 rounded-xl border border-slate-200 bg-white p-5 text-lg leading-relaxed dark:border-slate-800 dark:bg-slate-900/60">
+          <article className="space-y-3 rounded-card border border-border bg-surface p-5 text-lg leading-relaxed shadow-raised">
             {d.text?.map((p, i) => <p key={i}>{p}</p>)}
           </article>
           {d.vocabulary.length > 0 && (
@@ -65,7 +65,7 @@ export function PracticeDetail({ kind, slug }: { kind: Kind; slug: string }) {
               <div className="flex flex-wrap gap-2">
                 {d.vocabulary.map((v) => (
                   <button key={v.word} onClick={() => speak(v.word)} title={t("Nghe")}
-                    className="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-900 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-200">
+                    className="rounded-full bg-primary-soft px-3 py-1 text-sm text-primary-text hover:bg-primary-soft">
                     🔊 <b>{v.word}</b>{lang === "vi" && <> — {v.vi}</>}
                   </button>
                 ))}
@@ -80,27 +80,27 @@ export function PracticeDetail({ kind, slug }: { kind: Kind; slug: string }) {
         {result && (
           <Card className="flex flex-wrap items-center gap-3">
             <span className="text-2xl font-bold">{t("{c}/{n} đúng ({p}%)", { c: result.correct, n: result.total, p: Math.round((result.correct / result.total) * 100) })}</span>
-            <span className="rounded-full bg-green-600 px-3 py-1 text-sm font-semibold text-white">✓ {result.correct}</span>
-            <span className="rounded-full bg-red-600 px-3 py-1 text-sm font-semibold text-white">✗ {result.total - result.correct}</span>
+            <span className="rounded-full bg-success px-3 py-1 text-sm font-semibold text-success-foreground">✓ {result.correct}</span>
+            <span className="rounded-full bg-error px-3 py-1 text-sm font-semibold text-error-foreground">✗ {result.total - result.correct}</span>
             {result.xp_awarded > 0 && <span className="text-sm">+{result.xp_awarded} XP</span>}
           </Card>
         )}
         {d.questions.map((qn, i) => {
           const r = result?.results[i];
           return (
-            <div key={i} className={`rounded-xl border-2 p-4 ${!r ? "border-slate-200 dark:border-slate-800" : r.correct ? "border-green-500 bg-green-50 dark:bg-green-950/60" : "border-red-500 bg-red-50 dark:bg-red-950/60"}`}>
+            <div key={i} className={`rounded-xl border-2 p-4 ${!r ? "border-border" : r.correct ? "border-success bg-success-soft" : "border-error bg-error-soft"}`}>
               <p className="font-medium">{i + 1}. {qn.q}</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {qn.options.map((o, oi) => {
                   const chosen = picked[i] === oi;
                   const isAnswer = r && oi === r.answer;
                   const isWrongPick = r && chosen && !r.correct;
-                  const cls = !r ? (chosen ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "border-slate-300 hover:border-indigo-400 dark:border-slate-700")
-                    : isAnswer ? "border-green-600 bg-green-100 font-semibold text-green-900 dark:bg-green-900 dark:text-green-100"
-                    : isWrongPick ? "animate-shake border-red-600 bg-red-100 font-semibold text-red-900 dark:bg-red-900 dark:text-red-100"
-                    : "border-slate-200 opacity-60 dark:border-slate-700";
+                  const cls = !r ? (chosen ? "border-primary bg-primary-soft" : "border-border hover:border-primary")
+                    : isAnswer ? "border-success bg-success-soft font-semibold text-success-text"
+                    : isWrongPick ? "animate-shake border-error bg-error-soft font-semibold text-error-text"
+                    : "border-border opacity-60";
                   return (
-                    <button key={oi} disabled={!!result} onClick={() => setPicked({ ...picked, [i]: oi })} className={`flex justify-between rounded-lg border-2 px-3 py-2 text-left text-sm transition ${cls}`}>
+                    <button key={oi} disabled={!!result} onClick={() => setPicked({ ...picked, [i]: oi })} className={`flex justify-between rounded-btn border-2 px-3 py-2 text-left text-sm transition ${cls}`}>
                       <span>{o}</span><span>{isAnswer ? "✓" : isWrongPick ? "✗" : ""}</span>
                     </button>
                   );
@@ -112,7 +112,7 @@ export function PracticeDetail({ kind, slug }: { kind: Kind; slug: string }) {
         {submit.error && <ErrorBox error={submit.error} />}
         {result ? <Button onClick={retry}>{t("Làm lại")}</Button>
           : user ? <Button disabled={!allAnswered || submit.isPending} onClick={send}>{t("Nộp bài")}</Button>
-          : <p className="text-sm text-slate-500">{t("Vui lòng")} <Link href="/login" className="text-indigo-600 underline">{t("đăng nhập")}</Link> {t("để nộp bài và lưu điểm.")}</p>}
+          : <p className="text-sm text-muted-foreground">{t("Vui lòng")} <Link href="/login" className="text-primary-text underline">{t("đăng nhập")}</Link> {t("để nộp bài và lưu điểm.")}</p>}
       </section>
     </main>
   );

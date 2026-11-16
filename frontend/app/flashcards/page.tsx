@@ -61,25 +61,25 @@ function Flashcards() {
   const m = w.meanings[0];
   return (
     <div className="mx-auto max-w-md space-y-4">
-      <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-        <div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${(i / cards.length) * 100}%` }} />
+      <div className="h-2 overflow-hidden rounded-full bg-border">
+        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(i / cards.length) * 100}%` }} />
       </div>
-      <p className="text-center text-sm text-slate-500">{t("Thẻ {i} / {n}", { i: i + 1, n: cards.length })}</p>
+      <p className="text-center text-sm text-muted-foreground">{t("Thẻ {i} / {n}", { i: i + 1, n: cards.length })}</p>
       <FlipCard flipped={flipped} onFlip={() => setFlipped(!flipped)} label={t("Bấm để lật thẻ")}
         front={<>
           <WordVisual word={w} size="md" />
           <p className="text-4xl font-bold">{w.word}</p>
-          <p className="text-slate-500">{w.phonetic}</p>
-          <button className="mt-2 rounded-full border border-slate-300 px-3 py-1 text-sm hover:bg-slate-100 dark:border-slate-600 dark:hover:bg-slate-800"
+          <p className="text-muted-foreground">{w.phonetic}</p>
+          <button className="mt-2 rounded-full border border-border px-3 py-1 text-sm hover:bg-surface-secondary"
             onClick={(e) => { e.stopPropagation(); speak(w.word); }}>🔊 {t("Nghe")}</button>
-          <p className="mt-2 text-xs text-slate-400">{t("Bấm để lật thẻ")} · Space</p>
+          <p className="mt-2 text-xs text-muted-foreground">{t("Bấm để lật thẻ")} · Space</p>
         </>}
         back={<>
           <p className="text-2xl font-semibold">{lang === "en" ? m?.definition : m?.translation_vi}</p>
           {lang === "vi" && m?.definition_vi ? <p className="text-sm">{m.definition_vi}</p> : null}
-          {lang === "vi" && <p className="text-xs text-slate-500">{m?.definition}</p>}
-          <p className="text-sm italic text-slate-600 dark:text-slate-300">{m?.examples[0]}</p>
-          {lang === "vi" && m?.examples_vi?.[0] ? <p className="text-sm italic text-slate-500">{m.examples_vi[0]}</p> : null}
+          {lang === "vi" && <p className="text-xs text-muted-foreground">{m?.definition}</p>}
+          <p className="text-sm italic text-muted-foreground">{m?.examples[0]}</p>
+          {lang === "vi" && m?.examples_vi?.[0] ? <p className="text-sm italic text-muted-foreground">{m.examples_vi[0]}</p> : null}
         </>} />
       {review.error && <ErrorBox error={review.error} />}
       <div className={`grid grid-cols-4 gap-2 transition-opacity ${flipped ? "opacity-100" : "pointer-events-none opacity-30"}`}>

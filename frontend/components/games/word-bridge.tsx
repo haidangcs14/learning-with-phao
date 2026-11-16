@@ -150,7 +150,7 @@ export function WordBridge() {
   if (phase === "setup") {
     return (
       <div className="space-y-4">
-        <Card className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+        <Card className="space-y-2 text-sm text-muted-foreground">
           <p>🎯 {t("Xếp các từ thành câu đúng theo nghĩa tiếng Việt. Mỗi từ đúng dựng một nhịp cầu và avatar của bạn nhảy lên đó.")}</p>
           <p>❤️ {t("Chọn sai từ: mất 1 trong 5 tim. Hết tim: chú chim rơi xuống sông.")} · ⭐ {t("Mỗi từ đúng 10 điểm, câu không sai lần nào được thêm 50.")}</p>
         </Card>
@@ -159,7 +159,7 @@ export function WordBridge() {
         <TopicPicker value={topic} onChange={setTopic} />
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm font-medium">{t("Số câu")}
-            <select className="ml-2 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100" value={count} onChange={(e) => setCount(Number(e.target.value))}>{[5, 8, 10, 12, 15].map((n) => <option key={n}>{n}</option>)}</select></label>
+            <select className="ml-2 rounded-btn border border-input bg-surface px-2 py-1.5 text-foreground" value={count} onChange={(e) => setCount(Number(e.target.value))}>{[5, 8, 10, 12, 15].map((n) => <option key={n}>{n}</option>)}</select></label>
           <Button onClick={begin} disabled={start.isPending}>{start.isPending ? <Spinner /> : `▶ ${t("Bắt đầu")}`}</Button>
         </div>
         {start.error && <ErrorBox error={start.error} />}
@@ -169,24 +169,24 @@ export function WordBridge() {
 
   const done = slots.filter((s) => s !== null).length;
   const over = phase === "lost" || phase === "won";
-  const wood = "relative rounded-lg border-b-4 border-[#7c4a1d] bg-[repeating-linear-gradient(90deg,#c98a4b,#c98a4b_14px,#b87a3f_14px,#b87a3f_16px)] px-4 py-2.5 text-lg font-bold text-[#3b200b] shadow transition active:translate-y-0.5 disabled:opacity-0";
+  const wood = "relative rounded-btn border-b-4 border-[#7c4a1d] bg-[repeating-linear-gradient(90deg,#c98a4b,#c98a4b_14px,#b87a3f_14px,#b87a3f_16px)] px-4 py-2.5 text-lg font-bold text-[#3b200b] shadow transition active:translate-y-0.5 disabled:opacity-0";
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-100 px-3 py-2 text-sm font-semibold dark:bg-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-btn bg-surface-secondary px-3 py-2 text-sm font-semibold">
         <span>{t("Màn {a}/{b}", { a: Math.min(idx + 1, levels.length), b: levels.length })}</span>
         <span aria-label={t("Số tim còn lại")}>{Array.from({ length: HEARTS }, (_, i) => <span key={i}>{i < hearts ? "❤️" : "🤍"}</span>)}</span>
         <span>⭐ {score}</span>
-        <button className="rounded-lg border border-slate-300 px-2 py-0.5 dark:border-slate-600" onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={t("Âm thanh")}>{sound ? "🔊" : "🔇"}</button>
+        <button className="rounded-btn border border-border px-2 py-0.5" onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={t("Âm thanh")}>{sound ? "🔊" : "🔇"}</button>
       </div>
 
       {level && (
         <Card className="space-y-3 text-center">
           <div className="flex flex-wrap items-center justify-center gap-3">
             <span className="text-4xl">{level.emoji}</span>
-            <div className="text-left"><p className="text-2xl font-bold">{level.word} <span className="text-base font-normal text-slate-500">{level.phonetic}</span></p><p className="text-slate-600 dark:text-slate-300">{level.translation_vi}</p></div>
-            <button className="rounded-full bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700" onClick={() => speak(level.word)} aria-label={t("Nghe")}>🔊</button>
+            <div className="text-left"><p className="text-2xl font-bold">{level.word} <span className="text-base font-normal text-muted-foreground">{level.phonetic}</span></p><p className="text-muted-foreground">{level.translation_vi}</p></div>
+            <button className="rounded-full bg-primary px-3 py-2 text-primary-foreground hover:bg-primary-hover" onClick={() => speak(level.word)} aria-label={t("Nghe")}>🔊</button>
           </div>
-          <p className="text-lg font-medium italic text-indigo-700 dark:text-indigo-300">“{level.sentence_vi}”</p>
+          <p className="text-lg font-medium italic text-primary-text">“{level.sentence_vi}”</p>
           <ol className="flex flex-wrap justify-center gap-2" aria-label={t("Các ô trống")}>
             {tokens.map((w, i) => {
               const id = slots[i];
@@ -195,7 +195,7 @@ export function WordBridge() {
               return (
                 <li key={i}>
                   <button disabled={!filled} onClick={() => giveBack(i)} aria-label={filled ? w : t("Ô trống {n}", { n: i + 1 })}
-                    className={`min-h-11 min-w-16 rounded-lg border-2 px-3 py-1.5 text-lg font-semibold transition ${filled ? (ok ? "border-green-600 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100" : "border-indigo-500 bg-indigo-50 dark:bg-indigo-950") : i === done ? "animate-pulse border-dashed border-indigo-400" : "border-dashed border-slate-300 dark:border-slate-600"}`}>
+                    className={`min-h-11 min-w-16 rounded-btn border-2 px-3 py-1.5 text-lg font-semibold transition ${filled ? (ok ? "border-success bg-success-soft text-success-text" : "border-primary bg-primary-soft") : i === done ? "animate-pulse border-dashed border-primary" : "border-dashed border-border"}`}>
                     {filled ? w : ""}
                   </button>
                 </li>
@@ -205,16 +205,16 @@ export function WordBridge() {
         </Card>
       )}
 
-      <div className="relative h-60 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-400 to-sky-100 sm:h-72">
+      <div className="relative h-60 overflow-hidden rounded-2xl bg-gradient-to-b from-secondary to-secondary-soft sm:h-72">
         <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-label={t("Cầu và chú chim")} />
         {sceneFailed && (
           <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-1" aria-hidden="true">
             <span className="text-3xl" style={{ marginLeft: `${(done / Math.max(1, tokens.length)) * 80}%`, transition: "margin .4s" }}>🐦</span>
           </div>
         )}
-        {phase === "success" && level && <p className="absolute inset-x-3 top-3 rounded-xl bg-green-600/95 px-3 py-2 text-center text-lg font-bold text-white shadow">✓ {level.sentence}</p>}
-        {phase === "lost" && level && <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 p-4 text-center text-white"><p className="text-xl font-bold">💧 {t("Chim rơi xuống sông!")}</p><p>{t("Đáp án đúng")}:</p><p className="text-lg font-semibold text-green-300">{level.sentence}</p></div>}
-        {phase === "won" && <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/45 p-4 text-center text-white"><p className="text-4xl">🏆</p><p className="text-2xl font-bold">{t("Bạn đã qua hết các màn!")}</p></div>}
+        {phase === "success" && level && <p className="absolute inset-x-3 top-3 rounded-btn bg-success/95 px-3 py-2 text-center text-lg font-bold text-success-foreground shadow">✓ {level.sentence}</p>}
+        {phase === "lost" && level && <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-overlay/50 p-4 text-center text-white"><p className="text-xl font-bold">💧 {t("Chim rơi xuống sông!")}</p><p>{t("Đáp án đúng")}:</p><p className="text-lg font-semibold text-green-300">{level.sentence}</p></div>}
+        {phase === "won" && <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-overlay/45 p-4 text-center text-white"><p className="text-4xl">🏆</p><p className="text-2xl font-bold">{t("Bạn đã qua hết các màn!")}</p></div>}
       </div>
 
       {over ? (
@@ -222,19 +222,19 @@ export function WordBridge() {
           <p className="text-xl font-bold">{phase === "won" ? t("🎉 Chiến thắng!") : t("Thử lại nhé!")}</p>
           <p>{t("Điểm")}: <b>{score}</b> · {t("{n} câu hoàn thành", { n: stats.current.completed })} · {t("Không sai: {n}", { n: stats.current.perfect })}</p>
           {finish.isPending && <Spinner />}
-          {finish.data && <p className="text-sm text-slate-600 dark:text-slate-300">+{finish.data.data.xp_awarded} XP{finish.data.data.is_record ? ` · 🏆 ${t("Kỷ lục mới!")}` : ""}</p>}
+          {finish.data && <p className="text-sm text-muted-foreground">+{finish.data.data.xp_awarded} XP{finish.data.data.is_record ? ` · 🏆 ${t("Kỷ lục mới!")}` : ""}</p>}
           {finish.error && <ErrorBox error={finish.error} />}
           <div className="flex flex-wrap justify-center gap-2"><Button onClick={begin} disabled={start.isPending}>{t("Chơi lại")}</Button><Button variant="ghost" onClick={() => { scene.current?.dispose(); scene.current = null; setSceneReady(false); setPhase("setup"); }}>{t("Chọn chủ đề khác")}</Button></div>
         </Card>
       ) : (
         <>
           <div className="flex flex-wrap justify-center gap-2 rounded-2xl bg-[#6b4423]/10 p-3" aria-label={t("Các ván gỗ")}>
-            {planks.map((p) => <button key={p.id} disabled={p.used || phase !== "playing"} onClick={() => pick(p)} className={`${wood} ${p.bad ? "animate-shake !border-red-800 !bg-red-400 !bg-none !text-white" : ""}`}>{p.word}</button>)}
+            {planks.map((p) => <button key={p.id} disabled={p.used || phase !== "playing"} onClick={() => pick(p)} className={`${wood} ${p.bad ? "animate-shake !border-error !bg-error !bg-none !text-error-foreground" : ""}`}>{p.word}</button>)}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2">
             <Button variant="ghost" onClick={() => giveBack(0)} disabled={done === 0 || phase === "success"}>{t("Xóa hết")}</Button>
             <Button onClick={check} disabled={phase !== "filled"}>{t("Kiểm tra")}</Button>
-            <span className="text-xs text-slate-500">{phase === "success" ? t("Tự chuyển câu sau vài giây. Nhấn Enter để sang ngay.") : t("Điền đủ ô rồi nhấn Kiểm tra hoặc Enter.")}</span>
+            <span className="text-xs text-muted-foreground">{phase === "success" ? t("Tự chuyển câu sau vài giây. Nhấn Enter để sang ngay.") : t("Điền đủ ô rồi nhấn Kiểm tra hoặc Enter.")}</span>
           </div>
         </>
       )}

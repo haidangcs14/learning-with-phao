@@ -5,6 +5,7 @@ import { LevelAvatar } from "@/components/avatar";
 import { Checklist } from "@/components/checklist";
 import { PasswordField } from "@/components/password-field";
 import { Protected } from "@/components/protected";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button, Card, ErrorBox, Page, inputCls } from "@/components/ui";
 import { useGet, useSend } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
@@ -43,11 +44,11 @@ function Profile() {
         </div>
         <div className="w-full flex-1 space-y-2">
           <p className="text-xl font-semibold">{user.full_name || user.username}</p>
-          <p className="text-sm text-slate-500">@{user.username} · {user.email}</p>
+          <p className="text-sm text-muted-foreground">@{user.username} · {user.email}</p>
           {!isAdmin && xp.data && (
             <div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${pct}%` }} /></div>
-              <p className="mt-1 text-xs text-slate-500">{t("{a}/{b} XP đến cấp tiếp theo", { a: xp.data.data.xp_into_level, b: xp.data.data.xp_for_next })} · {t("Tổng XP")}: {xp.data.data.total_xp}</p>
+              <div className="h-2 overflow-hidden rounded-full bg-border"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} /></div>
+              <p className="mt-1 text-xs text-muted-foreground">{t("{a}/{b} XP đến cấp tiếp theo", { a: xp.data.data.xp_into_level, b: xp.data.data.xp_for_next })} · {t("Tổng XP")}: {xp.data.data.total_xp}</p>
             </div>
           )}
           <div className="flex flex-wrap gap-2">
@@ -56,7 +57,7 @@ function Profile() {
             <Button variant="ghost" disabled={upload.isPending} onClick={() => file.current?.click()}>{t("Đổi ảnh đại diện")}</Button>
             {user.avatar_url && <Button variant="ghost" disabled={remove.isPending} onClick={() => remove.mutate(undefined, { onSuccess: (r) => setUser(r.data) })}>{t("Xoá ảnh")}</Button>}
           </div>
-          <p className="text-xs text-slate-500">{t("Ảnh PNG, JPEG hoặc WebP, tối đa 2MB.")}</p>
+          <p className="text-xs text-muted-foreground">{t("Ảnh PNG, JPEG hoặc WebP, tối đa 2MB.")}</p>
           {(upload.error || remove.error) && <ErrorBox error={upload.error ?? remove.error} />}
         </div>
       </Card>
@@ -68,9 +69,15 @@ function Profile() {
           <label className="text-sm">{t("Tên người dùng")}<input className={inputCls} value={form.username} pattern="[A-Za-z0-9_]{3,30}" required onChange={(e) => setForm({ ...form, username: e.target.value })} /></label>
           <label className="text-sm sm:col-span-2">{t("Email (không thể thay đổi)")}<input className={`${inputCls} opacity-60`} value={user.email} disabled /></label>
           {save.error && <div className="sm:col-span-2"><ErrorBox error={save.error} /></div>}
-          {saved && <p className="text-sm text-green-600 sm:col-span-2">✓ {t("Đã lưu thay đổi.")}</p>}
+          {saved && <p className="text-sm text-success-text sm:col-span-2">✓ {t("Đã lưu thay đổi.")}</p>}
           <Button type="submit" disabled={save.isPending} className="sm:col-span-2 sm:w-fit">{t("Lưu thay đổi")}</Button>
         </form>
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 font-semibold">{t("Giao diện")}</h2>
+        <p className="mb-3 text-sm text-muted-foreground">{t("Chọn Sáng, Tối hoặc để website theo cài đặt của thiết bị.")}</p>
+        <ThemeSwitcher />
       </Card>
 
       <Card>
@@ -85,7 +92,7 @@ function Profile() {
           <PasswordField value={pw.confirm} onChange={(v) => setPw({ ...pw, confirm: v })} placeholder={t("Nhập lại mật khẩu")} autoComplete="new-password" invalid={(pwTried || pw.confirm.length > 0) && !matchOk} />
           <Checklist title={t("Điều kiện")} rules={rules} />
           {change.error && <ErrorBox error={change.error} />}
-          {change.isSuccess && <p className="text-sm text-green-600">✓ {t("Đã đổi mật khẩu. Các thiết bị khác sẽ cần đăng nhập lại.")}</p>}
+          {change.isSuccess && <p className="text-sm text-success-text">✓ {t("Đã đổi mật khẩu. Các thiết bị khác sẽ cần đăng nhập lại.")}</p>}
           <Button type="submit" disabled={change.isPending}>{t("Đổi mật khẩu")}</Button>
         </form>
       </Card>

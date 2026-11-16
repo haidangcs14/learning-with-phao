@@ -28,11 +28,11 @@ function WordRow({ w, isFav }: { w: Word; isFav: boolean }) {
   const lang = useLang((s) => s.lang);
   const m = w.meanings[0];
   return (
-    <li className="flex items-center gap-3 rounded-2xl border-2 border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+    <li className="flex items-center gap-3 rounded-card border-2 border-border bg-surface p-2.5 shadow-raised">
       <WordPicture word={w} size={48} />
       <div className="min-w-0 flex-1">
-        <Link href={`/vocabulary/${w.id}`} className="font-bold hover:text-indigo-600">{w.word}</Link> <span className="text-xs text-slate-500">{w.phonetic}</span>
-        <p className="truncate text-sm text-slate-600 dark:text-slate-300">{lang === "vi" ? m?.translation_vi : m?.definition}</p>
+        <Link href={`/vocabulary/${w.id}`} className="font-bold hover:text-primary-text">{w.word}</Link> <span className="text-xs text-muted-foreground">{w.phonetic}</span>
+        <p className="truncate text-sm text-muted-foreground">{lang === "vi" ? m?.translation_vi : m?.definition}</p>
       </div>
       <WordActions id={w.id} word={w.word} isFav={isFav} />
     </li>
@@ -44,7 +44,7 @@ function FavoritesPanel() {
   const { favs, ids } = useFavoriteIds();
   if (favs.isLoading) return <Spinner />;
   const list = favs.data?.data.map((f) => f.item).filter((w): w is Word => !!w) ?? [];
-  if (list.length === 0) return <p className="rounded-3xl border-2 border-dashed border-slate-300 p-8 text-center text-slate-500">{t("Chưa có từ yêu thích. Hãy bấm ♥ ở một từ để lưu lại.")}</p>;
+  if (list.length === 0) return <p className="rounded-3xl border-2 border-dashed border-border p-8 text-center text-muted-foreground">{t("Chưa có từ yêu thích. Hãy bấm ♥ ở một từ để lưu lại.")}</p>;
   return <ul className="space-y-2">{list.map((w) => <WordRow key={w.id} w={w} isFav={ids.has(w.id)} />)}</ul>;
 }
 
@@ -54,10 +54,10 @@ function FlashcardPanel({ topic, words }: { topic: string; words: Word[] }) {
   const addAll = useSend<{ added: number }, { topic: string }>("POST", "/flashcards/topic", ["/flashcards"]);
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-indigo-50 p-3 dark:bg-indigo-950/40">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-primary-soft p-3">
         <p className="text-sm">{t("Thêm từ vào bộ flashcard để ôn tập theo lịch lặp lại ngắt quãng.")}</p>
         <span className="flex items-center gap-2">
-          {addAll.isSuccess && <span className="text-sm text-green-700 dark:text-green-400">✓ {t("Đã thêm {n} từ vào flashcard", { n: addAll.data.data.added })}</span>}
+          {addAll.isSuccess && <span className="text-sm text-success-text">✓ {t("Đã thêm {n} từ vào flashcard", { n: addAll.data.data.added })}</span>}
           <Button disabled={addAll.isPending || !topic} onClick={() => addAll.mutate({ topic })}>{t("+ Thêm cả chủ đề vào Flashcard")}</Button>
         </span>
       </div>
@@ -126,18 +126,18 @@ function Study() {
   const total = all.reduce((s, x) => s + x.count, 0);
   const label = topicInfo(active, lang).label;
   const pct = list.length ? (learned.size / list.length) * 100 : 0;
-  const pill = (on: boolean) => `rounded-xl px-3 py-1.5 text-sm font-semibold transition duration-200 ${on ? "bg-[#1e1b4b] text-white shadow" : "text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700"}`;
+  const pill = (on: boolean) => `rounded-btn px-3 py-1.5 text-sm font-semibold transition duration-200 ${on ? "bg-primary text-primary-foreground shadow" : "text-muted-foreground hover:bg-surface"}`;
 
   return (
     <div className="mx-auto max-w-7xl space-y-5 px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-extrabold sm:text-3xl">{t("{n} từ vựng thông dụng", { n: total })}</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">{t("{n} từ vựng thông dụng", { n: total })}</h1>
         <div className="flex items-center gap-2">
-          <nav className="flex flex-wrap gap-1 rounded-2xl bg-slate-100 p-1 dark:bg-slate-800" aria-label={t("Chế độ học")}>
+          <nav className="flex flex-wrap gap-1 rounded-2xl bg-surface-secondary p-1" aria-label={t("Chế độ học")}>
             {TABS.map(([k, name]) => <button key={k} onClick={() => setMode(k)} aria-pressed={mode === k} className={pill(mode === k)}>{t(name)}</button>)}
           </nav>
           <KeyboardToggle on={kb} onChange={setKb} />
-          <button onClick={() => setDialog("settings")} aria-label={t("Cài đặt")} title={t("Cài đặt")} className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-slate-300 bg-white text-lg hover:border-indigo-400 dark:border-slate-700 dark:bg-slate-900">⚙</button>
+          <button onClick={() => setDialog("settings")} aria-label={t("Cài đặt")} title={t("Cài đặt")} className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-surface text-lg hover:border-primary">⚙</button>
         </div>
       </header>
 
@@ -147,21 +147,21 @@ function Study() {
           <section className="min-w-0 space-y-4">
             {(mode === "guess" || mode === "quiz") && (
               <div>
-                <div className="flex items-center justify-between text-sm font-extrabold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                <div className="flex items-center justify-between text-sm font-bold uppercase tracking-wide text-muted-foreground">
                   <span>{t("TIẾN ĐỘ")} - {label.toUpperCase()}</span><span>{learned.size} / {list.length} {t("THẺ")}</span>
                 </div>
-                <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
-                  <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${pct}%` }} />
+                <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+                  <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
                 </div>
               </div>
             )}
-            {notice && <p role="status" className="rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-900 dark:bg-green-900 dark:text-green-100">{notice}</p>}
+            {notice && <p role="status" className="rounded-btn bg-success-soft px-3 py-2 text-sm font-medium text-success-text">{notice}</p>}
 
             {words.isLoading ? <Spinner /> : (mode === "guess" || mode === "quiz") && finished ? (
-              <div className="rounded-3xl border-2 border-slate-200 bg-white p-8 text-center shadow-[0_8px_0_-2px_rgba(148,163,184,0.45)] dark:border-slate-700 dark:bg-slate-900">
+              <div className="rounded-card border-2 border-border bg-surface p-8 text-center shadow-raised">
                 <p className="text-5xl">🏆</p>
-                <h2 className="mt-2 text-2xl font-extrabold">{t("Bạn đã học hết chủ đề này!")}</h2>
-                <p className="mt-1 text-slate-500">{t("{a}/{b} thẻ đã thuộc", { a: learned.size, b: list.length })}</p>
+                <h2 className="mt-2 text-2xl font-bold">{t("Bạn đã học hết chủ đề này!")}</h2>
+                <p className="mt-1 text-muted-foreground">{t("{a}/{b} thẻ đã thuộc", { a: learned.size, b: list.length })}</p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2">
                   <Button onClick={() => { setReview(true); setIdx(0); setFinished(false); }}>{t("Ôn lại từ đầu")}</Button>
                   <Button variant="ghost" onClick={() => { const i = all.findIndex((x) => x.topic === active); pick(all[(i + 1) % all.length]?.topic ?? active); }}>{t("Chủ đề tiếp theo")}</Button>
@@ -174,7 +174,7 @@ function Study() {
             ) : mode === "favorites" ? <FavoritesPanel /> : mode === "flashcard" ? <FlashcardPanel topic={active} words={list} /> : null}
 
             {(mode === "guess" || mode === "quiz") && !finished && (
-              <p className="text-center text-xs font-medium text-slate-500">{t("Nhóm học {a}/{b} • Tổng cộng {c} thẻ trong bộ thẻ", { a: Math.max(1, all.findIndex((x) => x.topic === active) + 1), b: all.length, c: total })}</p>
+              <p className="text-center text-xs font-medium text-muted-foreground">{t("Nhóm học {a}/{b} • Tổng cộng {c} thẻ trong bộ thẻ", { a: Math.max(1, all.findIndex((x) => x.topic === active) + 1), b: all.length, c: total })}</p>
             )}
           </section>
         </div>
@@ -190,7 +190,7 @@ function Study() {
       </Dialog>
       <Dialog open={dialog === "report" && !!word} title={t("Báo lỗi từ này")} onClose={() => setDialog(null)}>
         <div className="space-y-3 text-sm">
-          <p className="rounded bg-slate-100 p-2 dark:bg-slate-800"><b>{word?.word}</b> · {word?.meanings[0]?.translation_vi}</p>
+          <p className="rounded bg-surface-secondary p-2"><b>{word?.word}</b> · {word?.meanings[0]?.translation_vi}</p>
           {REASONS.map(([k, name]) => <label key={k} className="flex items-center gap-2"><input type="radio" name="reason" checked={reason === k} onChange={() => setReason(k)} />{t(name)}</label>)}
           <textarea className={inputCls} rows={3} maxLength={300} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("Ghi chú (không bắt buộc)")} />
           {report.error && <ErrorBox error={report.error} />}

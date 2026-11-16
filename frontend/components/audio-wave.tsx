@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { tokenColor } from "@/lib/theme";
 
 /** Live waveform of the microphone stream (Web Audio AnalyserNode drawn on a canvas). */
 export function AudioWave({ stream }: { stream: MediaStream | null }) {
@@ -33,7 +34,7 @@ export function AudioWave({ stream }: { stream: MediaStream | null }) {
       const bars = Math.max(16, Math.floor(w / 9));
       const step = w / bars;
       const grad = g.createLinearGradient(0, 0, w, 0);
-      grad.addColorStop(0, "#6366f1"); grad.addColorStop(1, "#ec4899");
+      grad.addColorStop(0, tokenColor("--primary")); grad.addColorStop(1, tokenColor("--secondary"));
       g.fillStyle = grad;
       for (let i = 0; i < bars; i++) {
         const v = (data[Math.floor((i / bars) * data.length * 0.8)] ?? 0) / 255; // voice lives in the lower bins

@@ -29,7 +29,7 @@ export default function AdminQuestions() {
   return (
     <Page title={t("Câu hỏi quiz")}>
       <Card className="space-y-3">
-        <p className="text-sm text-slate-500">{t("Tải lên CSV / JSON / XLSX (tối đa 2MB). Cột CSV: question, type, level, topic, option_a..option_d, answer (A-D). Dữ liệu chỉ được ghi sau khi bạn xác nhận.")}</p>
+        <p className="text-sm text-muted-foreground">{t("Tải lên CSV / JSON / XLSX (tối đa 2MB). Cột CSV: question, type, level, topic, option_a..option_d, answer (A-D). Dữ liệu chỉ được ghi sau khi bạn xác nhận.")}</p>
         <div className="flex flex-wrap items-center gap-2">
           <input type="file" accept=".csv,.json,.xlsx" onChange={(e) => { setFile(e.target.files?.[0] ?? null); setPrev(null); }} />
           <Button disabled={!file || preview.isPending} onClick={upload}>{t("Xem trước")}</Button>
@@ -38,7 +38,7 @@ export default function AdminQuestions() {
         {prev && (
           <div className="space-y-2 text-sm">
             <p>{t("Hợp lệ: {v} · Lỗi: {e}", { v: prev.valid_count, e: prev.error_count })}</p>
-            {prev.errors.map((e) => <p key={e.row} className="text-red-600">{t("Dòng {r}: {msg}", { r: e.row, msg: e.error })}</p>)}
+            {prev.errors.map((e) => <p key={e.row} className="text-error-text">{t("Dòng {r}: {msg}", { r: e.row, msg: e.error })}</p>)}
             <ul className="list-disc pl-5">{prev.preview.map((p, i) => <li key={i}>[{p.level}] {p.question} → {p.correct_answer}</li>)}</ul>
             {prev.import_id && (
               <Button disabled={confirmImport.isPending} onClick={() => confirmImport.mutate({ import_id: prev.import_id as string }, { onSuccess: () => { setPrev(null); setFile(null); } })}>
@@ -47,12 +47,12 @@ export default function AdminQuestions() {
             )}
           </div>
         )}
-        {confirmImport.isSuccess && <p className="text-green-600">{t("Đã nhập {n} câu hỏi.", { n: confirmImport.data.data.inserted })}</p>}
+        {confirmImport.isSuccess && <p className="text-success-text">{t("Đã nhập {n} câu hỏi.", { n: confirmImport.data.data.inserted })}</p>}
         {confirmImport.error && <ErrorBox error={confirmImport.error} />}
       </Card>
       {del.error && <ErrorBox error={del.error} />}
       {list.isLoading ? <Spinner /> : (
-        <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+        <ul className="divide-y divide-border">
           {list.data?.data.map((q) => (
             <li key={q.id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <span>[{q.level}] {q.question} → <b>{q.correct_answer}</b></span>

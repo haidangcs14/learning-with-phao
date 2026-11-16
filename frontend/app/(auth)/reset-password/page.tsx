@@ -50,15 +50,15 @@ export default function ResetPasswordPage() {
     <AuthCard title={t("Đặt lại mật khẩu")} subtitle={t("Chọn mật khẩu mới cho tài khoản của bạn.")} shake={shake} onShakeEnd={shakeDone}>
       {done ? (
         <div className="space-y-3 text-center">
-          <p className="rounded-lg bg-green-50 p-3 text-sm text-green-800 dark:bg-green-950 dark:text-green-200">{t("Đã đổi mật khẩu. Bạn có thể đăng nhập bằng mật khẩu mới.")}</p>
-          <Link href="/login" className="inline-block rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700">{t("Đăng nhập")}</Link>
+          <p className="rounded-btn bg-success-soft p-3 text-sm text-success-text">{t("Đã đổi mật khẩu. Bạn có thể đăng nhập bằng mật khẩu mới.")}</p>
+          <Link href="/login" className="lift inline-block rounded-btn bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover">{t("Đăng nhập")}</Link>
         </div>
       ) : (
         <form onSubmit={submit} noValidate className="space-y-3">
           <PasswordField value={pw} onChange={setPw} placeholder={t("Mật khẩu mới")} autoComplete="new-password" invalid={touchedPw && !(lenOk && letterOk && digitOk)} />
           <PasswordField value={confirm} onChange={setConfirm} placeholder={t("Nhập lại mật khẩu")} autoComplete="new-password" invalid={(attempted || confirm.length > 0) && !matchOk} />
           {message && (
-            <p role="alert" className="rounded-lg bg-[#b5412a]/10 p-3 text-sm text-[#9a2f1b] dark:text-[#ef8a74]">
+            <p role="alert" className="rounded-btn bg-error/10 p-3 text-sm text-error-text ">
               {message} <Link className="underline" href="/forgot-password">{t("Gửi lại liên kết")}</Link>
             </p>
           )}

@@ -66,10 +66,10 @@ export function TtsPlayer({ lines, showText }: { lines: Line[]; showText: boolea
     if (state !== "idle") speakFrom(Math.max(current, 0), r, a); // keep listening from the current line with the new settings
   }
 
-  if (!supported) return <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">{t("Trình duyệt của bạn không hỗ trợ đọc văn bản thành giọng nói. Hãy dùng Chrome, Edge hoặc Safari.")}</p>;
-  const select = "rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
+  if (!supported) return <p className="rounded-btn bg-accent-soft p-3 text-sm text-accent-text">{t("Trình duyệt của bạn không hỗ trợ đọc văn bản thành giọng nói. Hãy dùng Chrome, Edge hoặc Safari.")}</p>;
+  const select = "rounded-btn border border-input bg-surface px-2 py-1.5 text-sm text-foreground";
   return (
-    <div className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+    <div className="space-y-3 rounded-xl border border-border p-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={toggle}>{state === "playing" ? t("⏸ Tạm dừng") : state === "paused" ? t("▶ Tiếp tục") : t("▶ Nghe")}</Button>
         <Button variant="ghost" onClick={stop} disabled={state === "idle"}>⏹</Button>
@@ -80,13 +80,13 @@ export function TtsPlayer({ lines, showText }: { lines: Line[]; showText: boolea
           <select className={select} value={accent} onChange={(e) => change(rate, e.target.value)}><option value="en-GB">UK</option><option value="en-US">US</option></select>
         </label>
       </div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-        <div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${lines.length ? ((current + 1) / lines.length) * 100 : 0}%` }} />
+      <div className="h-1.5 overflow-hidden rounded-full bg-border">
+        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${lines.length ? ((current + 1) / lines.length) * 100 : 0}%` }} />
       </div>
       {showText && (
         <ul className="space-y-2 text-sm">
           {lines.map((l, i) => (
-            <li key={i} className={`rounded-lg px-3 py-2 ${i === current ? "bg-indigo-100 dark:bg-indigo-950" : ""}`}>
+            <li key={i} className={`rounded-btn px-3 py-2 ${i === current ? "bg-primary-soft" : ""}`}>
               {l.speaker && <b className="mr-1">{l.speaker}:</b>}{l.text}
             </li>
           ))}

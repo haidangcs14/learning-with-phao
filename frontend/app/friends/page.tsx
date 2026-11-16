@@ -19,7 +19,7 @@ function Compare({ id }: { id: string }) {
   const { me, friend } = q.data.data;
   return (
     <table className="mt-2 w-full text-sm">
-      <thead><tr className="text-left text-slate-500"><th></th><th>{me.username} ({t("bạn")})</th><th>{friend.username}</th></tr></thead>
+      <thead><tr className="text-left text-muted-foreground"><th></th><th>{me.username} ({t("bạn")})</th><th>{friend.username}</th></tr></thead>
       <tbody>
         {(["daily", "weekly", "monthly", "all"] as const).map((p) => (
           <tr key={p}><td>{t(PERIOD_LABEL[p])}</td><td>{me[p]}</td><td>{friend[p]}</td></tr>
@@ -52,7 +52,7 @@ function Friends() {
           {friends.data?.data.map((f) => (
             <Card key={f.id}>
               <div className="flex items-center justify-between">
-                <span className="font-medium">{f.username} <span className="text-sm text-slate-500">· {f.total_xp} XP</span></span>
+                <span className="font-medium">{f.username} <span className="text-sm text-muted-foreground">· {f.total_xp} XP</span></span>
                 <span className="flex gap-2">
                   <Button variant="ghost" onClick={() => setOpen(open === f.id ? null : f.id)}>{t("So sánh")}</Button>
                   <Button variant="danger" onClick={async () => { if (await ask({ title: t("Xoá {name}?", { name: f.username }), message: t("Bạn sẽ không còn thấy nhau trong danh sách bạn bè."), confirmLabel: t("Xoá"), danger: true })) remove.mutate(f.id); }}>{t("Xoá")}</Button>
@@ -92,7 +92,7 @@ function Friends() {
             <Card key={u.id} className="flex items-center justify-between">
               <span>{u.username}</span>
               {u.relation === "none" ? <Button disabled={send.isPending} onClick={() => send.mutate(u.id, { onSuccess: () => found.refetch() })}>{t("Kết bạn")}</Button>
-                : <span className="text-sm text-slate-500">{relation[u.relation]}</span>}
+                : <span className="text-sm text-muted-foreground">{relation[u.relation]}</span>}
             </Card>
           ))}
           {send.error && <ErrorBox error={send.error} />}

@@ -28,13 +28,13 @@ export default function AdminVideos() {
 
       <Card className="space-y-2">
         <h2 className="font-semibold">{t("Báo lỗi đang chờ xử lý")} ({reports.data?.data.length ?? 0})</h2>
-        {reports.isLoading ? <Spinner /> : (reports.data?.data.length ?? 0) === 0 ? <p className="text-sm text-slate-500">{t("Không có báo lỗi nào.")}</p> : (
+        {reports.isLoading ? <Spinner /> : (reports.data?.data.length ?? 0) === 0 ? <p className="text-sm text-muted-foreground">{t("Không có báo lỗi nào.")}</p> : (
           <ul className="space-y-2 text-sm">
             {reports.data?.data.map((r) => (
-              <li key={r.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 p-2 dark:border-slate-700">
-                <span className="flex-1"><b>{r.lesson_title}</b> · #{r.no} · <span className="rounded bg-amber-100 px-1.5 text-amber-900">{t(REASON[r.reason] ?? r.reason)}</span> · {r.reporter_name}
-                  {r.note && <span className="block text-slate-500">“{r.note}”</span>}</span>
-                <Link href={`/listening/video/${r.lesson_id}`} className="text-indigo-600 underline">{t("Mở bài")}</Link>
+              <li key={r.id} className="flex flex-wrap items-center gap-2 rounded-btn border border-border p-2">
+                <span className="flex-1"><b>{r.lesson_title}</b> · #{r.no} · <span className="rounded bg-accent-soft px-1.5 text-accent-text">{t(REASON[r.reason] ?? r.reason)}</span> · {r.reporter_name}
+                  {r.note && <span className="block text-muted-foreground">“{r.note}”</span>}</span>
+                <Link href={`/listening/video/${r.lesson_id}`} className="text-primary-text underline">{t("Mở bài")}</Link>
                 <Button variant="ghost" disabled={resolve.isPending} onClick={() => resolve.mutate(r.id)}>{t("Đã xử lý")}</Button>
               </li>
             ))}
@@ -45,14 +45,14 @@ export default function AdminVideos() {
       {lessons.isLoading ? <Spinner /> : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-slate-500"><tr><th className="p-2">{t("Tiêu đề")}</th><th>{t("Trình độ")}</th><th>{t("Danh mục")}</th><th>{t("Chủ bài")}</th><th>{t("Hiển thị")}</th><th>{t("Câu")}</th><th>{t("Báo lỗi")}</th><th></th></tr></thead>
+            <thead className="text-muted-foreground"><tr><th className="p-2">{t("Tiêu đề")}</th><th>{t("Trình độ")}</th><th>{t("Danh mục")}</th><th>{t("Chủ bài")}</th><th>{t("Hiển thị")}</th><th>{t("Câu")}</th><th>{t("Báo lỗi")}</th><th></th></tr></thead>
             <tbody>
               {lessons.data?.data.map((l) => (
-                <tr key={l.id} className="border-t border-slate-200 dark:border-slate-800">
-                  <td className="p-2 font-medium"><Link href={`/listening/video/${l.id}`} className="hover:text-indigo-600">{l.title}</Link></td>
+                <tr key={l.id} className="border-t border-border">
+                  <td className="p-2 font-medium"><Link href={`/listening/video/${l.id}`} className="hover:text-primary-text">{l.title}</Link></td>
                   <td>{l.level}</td><td>{l.category}</td><td>{l.owner_name}</td>
                   <td>{l.visibility === "public" ? t("Công khai") : t("Riêng tư")}</td><td>{l.sentence_count}</td>
-                  <td>{l.open_reports > 0 ? <b className="text-amber-600">{l.open_reports}</b> : 0}</td>
+                  <td>{l.open_reports > 0 ? <b className="text-accent-text">{l.open_reports}</b> : 0}</td>
                   <td><Button variant="danger" onClick={async () => { if (await ask({ title: t("Xoá {name}?", { name: l.title }), message: t("Bài nghe và tiến độ của mọi người dùng sẽ bị xoá."), confirmLabel: t("Xoá"), danger: true })) del.mutate(l.id); }}>{t("Xoá")}</Button></td>
                 </tr>
               ))}

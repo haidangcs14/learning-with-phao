@@ -8,7 +8,7 @@ export function VideoEmbed({ id, title }: { id: string; title: string }) {
   const t = useT();
   const [play, setPlay] = useState(false);
   return (
-    <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
+    <div className="relative aspect-video overflow-hidden rounded-btn bg-black">
       {play ? (
         <iframe className="absolute inset-0 h-full w-full" title={title} allowFullScreen
           src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
@@ -17,7 +17,7 @@ export function VideoEmbed({ id, title }: { id: string; title: string }) {
         <button className="group absolute inset-0 flex items-center justify-center" onClick={() => setPlay(true)} aria-label={t("Phát video")}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80" />
-          <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-2xl text-white transition group-hover:scale-110">▶</span>
+          <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-error text-2xl text-error-foreground transition group-hover:scale-110">▶</span>
         </button>
       )}
     </div>

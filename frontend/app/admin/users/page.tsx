@@ -12,7 +12,7 @@ import type { User } from "@/types";
 
 type Row = User & { xp: number; level: number; created_at?: string };
 const SIZES = [[20, "20"], [50, "50"], [100, "100"], [500, "Tất cả"]] as const;
-const sel = "rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
+const sel = "rounded-btn border border-input bg-surface px-2 py-1.5 text-sm text-foreground";
 
 export default function AdminUsers() {
   const t = useT();
@@ -37,22 +37,22 @@ export default function AdminUsers() {
           {SIZES.map(([n, label]) => <option key={n} value={n}>{label === "Tất cả" ? t("Tất cả") : label}</option>)}
         </select>
         <Button type="submit">{t("Tìm")}</Button>
-        {users.data?.meta && <span className="ml-auto text-sm text-slate-500">{t("Tổng: {n} người dùng", { n: users.data.meta.total })}</span>}
+        {users.data?.meta && <span className="ml-auto text-sm text-muted-foreground">{t("Tổng: {n} người dùng", { n: users.data.meta.total })}</span>}
       </form>
       {(patch.error || del.error) && <ErrorBox error={patch.error ?? del.error} />}
       {users.isLoading ? <Spinner /> : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-slate-500"><tr><th className="p-2">{t("Người dùng")}</th><th>Email</th><th>{t("Vai trò")}</th><th>{t("Cấp độ")}</th><th>{t("Ngày tham gia")}</th><th>{t("Trạng thái")}</th><th></th></tr></thead>
+            <thead className="text-muted-foreground"><tr><th className="p-2">{t("Người dùng")}</th><th>Email</th><th>{t("Vai trò")}</th><th>{t("Cấp độ")}</th><th>{t("Ngày tham gia")}</th><th>{t("Trạng thái")}</th><th></th></tr></thead>
             <tbody>
               {users.data?.data.map((u) => {
                 const self = u.id === me?.id;
                 return (
-                  <tr key={u.id} className="border-t border-slate-200 dark:border-slate-800">
-                    <td className="p-2"><span className="flex items-center gap-2"><Avatar user={u} size={28} /><span><b>{u.username}</b>{u.full_name && <span className="block text-xs text-slate-500">{u.full_name}</span>}</span></span></td>
+                  <tr key={u.id} className="border-t border-border">
+                    <td className="p-2"><span className="flex items-center gap-2"><Avatar user={u} size={28} /><span><b>{u.username}</b>{u.full_name && <span className="block text-xs text-muted-foreground">{u.full_name}</span>}</span></span></td>
                     <td>{u.email}</td>
                     <td><select disabled={self} className={sel} value={u.role} onChange={(e) => patch.mutate({ id: u.id, role: e.target.value })}><option>user</option><option>admin</option></select></td>
-                    <td>{u.role === "admin" ? "–" : <span><b>Lv.{u.level}</b> <span className="text-xs text-slate-500">· {u.xp} XP</span></span>}</td>
+                    <td>{u.role === "admin" ? "–" : <span><b>Lv.{u.level}</b> <span className="text-xs text-muted-foreground">· {u.xp} XP</span></span>}</td>
                     <td className="whitespace-nowrap">{u.created_at ? new Date(u.created_at).toLocaleDateString() : "–"}</td>
                     <td><Button variant="ghost" disabled={self} onClick={() => patch.mutate({ id: u.id, is_active: !u.is_active })}>{u.is_active ? t("Hoạt động") : t("Đã khoá")}</Button></td>
                     <td><Button variant="danger" disabled={self}

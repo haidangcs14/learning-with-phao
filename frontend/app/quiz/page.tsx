@@ -20,7 +20,7 @@ const KINDS: { id: Kind; icon: string; name: string; desc: string }[] = [
   { id: "definition_to_word", icon: "📖", name: "Tìm từ theo định nghĩa", desc: "Cho định nghĩa tiếng Anh, chọn từ đúng." },
 ];
 const DEFAULT: Setup = { kind: "bank", level: "", topic: "", count: 10, seconds: 0 };
-const pill = (on: boolean) => `rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition ${on ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 hover:border-indigo-400 dark:border-slate-700"}`;
+const pill = (on: boolean) => `rounded-btn border-2 px-3 py-1.5 text-sm font-medium transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`;
 
 function Quiz() {
   const t = useT();
@@ -83,29 +83,29 @@ function Quiz() {
         <Card>
           <p className="text-2xl font-bold">{t("{c}/{n} đúng ({p}%)", { c: result.correct, n: result.total, p: result.accuracy })}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-            <span className="rounded-full bg-green-600 px-3 py-1 font-semibold text-white">✓ {result.correct}</span>
-            <span className="rounded-full bg-red-600 px-3 py-1 font-semibold text-white">✗ {wrongCount}</span>
+            <span className="rounded-full bg-success px-3 py-1 font-semibold text-success-foreground">✓ {result.correct}</span>
+            <span className="rounded-full bg-error px-3 py-1 font-semibold text-error-foreground">✗ {wrongCount}</span>
             <span>+{result.xp_awarded} XP</span>
           </div>
         </Card>
         {result.results.map((r) => {
           const item = questions.find((x) => x.id === r.question_id);
           return (
-            <div key={r.question_id} className={`rounded-xl border-2 p-4 ${r.correct ? "border-green-500 bg-green-50 dark:bg-green-950/60" : "border-red-500 bg-red-50 dark:bg-red-950/60"}`}>
+            <div key={r.question_id} className={`rounded-xl border-2 p-4 ${r.correct ? "border-success bg-success-soft" : "border-error bg-error-soft"}`}>
               <div className="flex items-start justify-between gap-3">
                 <p className="font-medium">{item?.question}</p>
-                <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold text-white ${r.correct ? "bg-green-600" : "bg-red-600"}`}>{r.correct ? t("Đúng") : r.your_answer ? t("Sai") : t("Hết giờ")}</span>
+                <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold text-success-foreground ${r.correct ? "bg-success" : "bg-error"}`}>{r.correct ? t("Đúng") : r.your_answer ? t("Sai") : t("Hết giờ")}</span>
               </div>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                 {(item?.options ?? [r.correct_answer]).map((o) => {
                   const isAnswer = o === r.correct_answer;
                   const isWrongPick = o === r.your_answer && !r.correct;
-                  const cls = isAnswer ? "border-green-600 bg-green-100 font-semibold text-green-900 dark:bg-green-900 dark:text-green-100"
-                    : isWrongPick ? "border-red-600 bg-red-100 font-semibold text-red-900 dark:bg-red-900 dark:text-red-100" : "border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300";
-                  return <li key={o} className={`flex justify-between rounded-lg border px-3 py-2 text-sm ${cls}`}><span>{o}</span><span>{isAnswer ? "✓" : isWrongPick ? "✗" : ""}</span></li>;
+                  const cls = isAnswer ? "border-success bg-success-soft font-semibold text-success-text"
+                    : isWrongPick ? "border-error bg-error-soft font-semibold text-error-text" : "border-border text-muted-foreground";
+                  return <li key={o} className={`flex justify-between rounded-btn border px-3 py-2 text-sm ${cls}`}><span>{o}</span><span>{isAnswer ? "✓" : isWrongPick ? "✗" : ""}</span></li>;
                 })}
               </ul>
-              {r.explanation && <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{r.explanation}</p>}
+              {r.explanation && <p className="mt-2 text-sm text-muted-foreground">{r.explanation}</p>}
             </div>
           );
         })}
@@ -117,18 +117,18 @@ function Quiz() {
   if (q) {
     return (
       <Card className="space-y-4">
-        <div className="flex items-center justify-between gap-3 text-sm text-slate-500">
+        <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
           <span>{t("Câu {i} / {n}", { i: idx + 1, n: questions.length })}</span>
-          {setup.seconds > 0 && <b className={`rounded-full px-3 py-1 font-mono ${left <= 5 ? "animate-pulse bg-red-600 text-white" : "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100"}`}>⏱ {left}s</b>}
+          {setup.seconds > 0 && <b className={`rounded-full px-3 py-1 font-mono ${left <= 5 ? "animate-pulse bg-error text-error-foreground" : "bg-surface-secondary text-foreground"}`}>⏱ {left}s</b>}
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800" role="progressbar" aria-valuenow={idx} aria-valuemax={questions.length}><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${(idx / questions.length) * 100}%` }} /></div>
-        {setup.seconds > 0 && <div className="h-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"><div className="h-full rounded-full bg-amber-500 transition-all duration-1000 ease-linear" style={{ width: `${(left / setup.seconds) * 100}%` }} /></div>}
+        <div className="h-2 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={idx} aria-valuemax={questions.length}><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(idx / questions.length) * 100}%` }} /></div>
+        {setup.seconds > 0 && <div className="h-1 overflow-hidden rounded-full bg-border"><div className="h-full rounded-full bg-accent transition-all duration-1000 ease-linear" style={{ width: `${(left / setup.seconds) * 100}%` }} /></div>}
         <p className="text-lg font-semibold">{q.question}</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {q.options.map((o, i) => (
             <button key={o} disabled={submit.isPending} onClick={() => answer(q, o)}
-              className="flex items-center gap-3 rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-left font-medium transition hover:border-indigo-500 hover:bg-indigo-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-indigo-950">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm font-bold dark:bg-slate-800">{i + 1}</span>{o}
+              className="flex items-center gap-3 rounded-btn border-2 border-input bg-surface px-4 py-3 text-left font-medium transition hover:border-primary hover:bg-primary-soft disabled:opacity-50">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-btn bg-surface-secondary text-sm font-bold">{i + 1}</span>{o}
             </button>
           ))}
         </div>
@@ -147,8 +147,8 @@ function Quiz() {
         <div className="grid gap-2 sm:grid-cols-2">
           {KINDS.map((k) => (
             <button key={k.id} role="radio" aria-checked={setup.kind === k.id} onClick={() => set("kind", k.id)}
-              className={`flex items-start gap-3 rounded-xl border-2 p-3 text-left transition ${setup.kind === k.id ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "border-slate-200 hover:border-indigo-400 dark:border-slate-800"}`}>
-              <span className="text-2xl">{k.icon}</span><span><b className="block">{t(k.name)}</b><span className="text-sm text-slate-500 dark:text-slate-400">{t(k.desc)}</span></span>
+              className={`flex items-start gap-3 rounded-xl border-2 p-3 text-left transition ${setup.kind === k.id ? "border-primary bg-primary-soft" : "border-border hover:border-primary"}`}>
+              <span className="text-2xl">{k.icon}</span><span><b className="block">{t(k.name)}</b><span className="text-sm text-muted-foreground">{t(k.desc)}</span></span>
             </button>
           ))}
         </div>
@@ -168,9 +168,9 @@ function Quiz() {
       </section>
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={begin} disabled={loading}>{loading ? <Spinner /> : t("Bắt đầu ({n} câu)", { n: setup.count })}</Button>
-        <span className="text-sm text-slate-500">{t("Mẹo: nhấn phím 1-4 để chọn đáp án nhanh.")}</span>
+        <span className="text-sm text-muted-foreground">{t("Mẹo: nhấn phím 1-4 để chọn đáp án nhanh.")}</span>
       </div>
-      {bank.isSuccess && questions.length === 0 && <p className="text-slate-500">{t("Chưa có câu hỏi phù hợp.")}</p>}
+      {bank.isSuccess && questions.length === 0 && <p className="text-muted-foreground">{t("Chưa có câu hỏi phù hợp.")}</p>}
       {(bank.error || generate.error) && <ErrorBox error={bank.error ?? generate.error} />}
     </div>
   );

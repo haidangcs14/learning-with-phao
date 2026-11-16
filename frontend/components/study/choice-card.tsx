@@ -39,31 +39,31 @@ export function ChoiceCard({ word, pool, settings, onAnswer, onNext }: { word: W
   if (!m) return null;
 
   return (
-    <div className="rounded-3xl border-2 border-slate-200 bg-white p-5 text-center shadow-[0_8px_0_-2px_rgba(148,163,184,0.45)] sm:p-7 dark:border-slate-700 dark:bg-slate-900">
+    <div className="rounded-card border-2 border-border bg-surface p-5 text-center shadow-raised sm:p-7">
       <div className="flex justify-center"><WordPicture word={word} /></div>
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-        <h2 className={`font-extrabold text-blue-500 ${lang === "vi" ? "text-3xl" : "text-xl"}`}>{lang === "vi" ? m.translation_vi : m.definition}</h2>
-        <span className="rounded-md border border-slate-300 bg-white px-2 py-0.5 text-xs font-semibold dark:border-slate-600 dark:bg-slate-800">{t(POS[m.part_of_speech] ?? "Khác")}</span>
+        <h2 className={`font-bold text-secondary-text ${lang === "vi" ? "text-3xl" : "text-xl"}`}>{lang === "vi" ? m.translation_vi : m.definition}</h2>
+        <span className="rounded-md border border-border bg-surface px-2 py-0.5 text-xs font-semibold">{t(POS[m.part_of_speech] ?? "Khác")}</span>
       </div>
-      {lang === "vi" && m.definition_vi && <p className="mx-auto mt-2 max-w-xl text-slate-600 dark:text-slate-300">{m.definition_vi}</p>}
-      <p className="mt-3 text-sm text-slate-500">{t("Chọn từ tiếng Anh đúng:")}</p>
+      {lang === "vi" && m.definition_vi && <p className="mx-auto mt-2 max-w-xl text-muted-foreground">{m.definition_vi}</p>}
+      <p className="mt-3 text-sm text-muted-foreground">{t("Chọn từ tiếng Anh đúng:")}</p>
       <div className="mx-auto mt-2 grid max-w-xl gap-3 sm:grid-cols-2">
         {options.map((o, i) => {
           const right = answered && o === word.word, bad = answered && o === picked && o !== word.word;
           return (
             <button key={o} onClick={() => void choose(o)} disabled={answered && !right && !bad}
-              className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-lg font-semibold transition duration-200 ${right ? "border-green-600 bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100" : bad ? "animate-shake border-red-600 bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100" : "border-slate-300 bg-white hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-blue-950"} ${answered && !right && !bad ? "opacity-40" : ""}`}>
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-sm dark:bg-slate-800">{i + 1}</span>{o}
+              className={`flex items-center gap-3 rounded-btn border-2 px-4 py-3 text-left text-lg font-semibold transition duration-200 ${right ? "border-success bg-success-soft text-success-text" : bad ? "animate-shake border-error bg-error-soft text-error-text" : "border-border bg-surface hover:-translate-y-0.5 hover:border-secondary hover:bg-secondary-soft"} ${answered && !right && !bad ? "opacity-40" : ""}`}>
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-btn bg-surface-secondary text-sm">{i + 1}</span>{o}
             </button>
           );
         })}
       </div>
       <p className="mt-3 min-h-6 text-sm font-semibold" role="status">
-        {answered && picked === word.word && <span className="text-green-600">🎉 {t("Chính xác!")}{xp > 0 ? ` +${xp} XP` : ""}</span>}
-        {answered && picked !== word.word && <span className="text-red-600">{t("Đáp án đúng")}: <b>{word.word}</b> {word.phonetic}</span>}
+        {answered && picked === word.word && <span className="text-success-text">🎉 {t("Chính xác!")}{xp > 0 ? ` +${xp} XP` : ""}</span>}
+        {answered && picked !== word.word && <span className="text-error-text">{t("Đáp án đúng")}: <b>{word.word}</b> {word.phonetic}</span>}
       </p>
-      {answered && <button onClick={onNext} className="mt-1 rounded-xl border-b-4 border-emerald-700 bg-emerald-500 px-6 py-3 text-sm font-extrabold uppercase text-white shadow transition hover:-translate-y-0.5 hover:bg-emerald-600 active:translate-y-0.5">{t("TỪ TIẾP THEO")}</button>}
-      {!answered && <p className="text-xs text-slate-400">{t("Mẹo: nhấn phím 1-4 để chọn đáp án nhanh.")}</p>}
+      {answered && <button onClick={onNext} className="mt-1 rounded-btn border-b-4 border-primary bg-primary px-6 py-3 text-sm font-bold uppercase text-primary-foreground shadow transition hover:-translate-y-0.5 hover:bg-primary-hover active:translate-y-0.5">{t("TỪ TIẾP THEO")}</button>}
+      {!answered && <p className="text-xs text-muted-foreground">{t("Mẹo: nhấn phím 1-4 để chọn đáp án nhanh.")}</p>}
     </div>
   );
 }

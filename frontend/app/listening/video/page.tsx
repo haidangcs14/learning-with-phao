@@ -37,7 +37,7 @@ function VideoList() {
         <Button onClick={() => setAdding(!adding)}>{adding ? t("Đóng") : t("+ Thêm video")}</Button>
       </div>
       {adding && <LessonForm />}
-      <p className="text-slate-500 dark:text-slate-400">{t("Nghe video YouTube, gõ lại những gì bạn nghe được và nhận điểm theo từng câu. Bài của bạn là riêng tư; bài do giáo viên thêm hiển thị cho mọi người.")}</p>
+      <p className="text-muted-foreground">{t("Nghe video YouTube, gõ lại những gì bạn nghe được và nhận điểm theo từng câu. Bài của bạn là riêng tư; bài do giáo viên thêm hiển thị cho mọi người.")}</p>
       <div className="flex flex-wrap gap-2">
         <Tabs value={level} onChange={(v) => { setLevel(v); setPage(1); }} options={LEVELS.map((l) => [l, l || t("Tất cả")] as const)} />
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); setQ(input); setPage(1); }}>
@@ -56,14 +56,14 @@ function VideoList() {
               <div className="space-y-2 p-3">
                 <div className="flex items-center gap-2 text-xs">
                   <span className={`rounded px-2 py-0.5 font-semibold ${LEVEL_COLOR[r.level] ?? ""}`}>{r.level}</span>
-                  <span className="text-slate-500">{r.category} · {t("{n} câu", { n: r.sentence_count })}</span>
-                  <span className="ml-auto rounded-full bg-slate-200 px-2 py-0.5 dark:bg-slate-700">{r.mine ? t("Của tôi") : t("Công khai")}</span>
+                  <span className="text-muted-foreground">{r.category} · {t("{n} câu", { n: r.sentence_count })}</span>
+                  <span className="ml-auto rounded-full bg-border px-2 py-0.5">{r.mine ? t("Của tôi") : t("Công khai")}</span>
                 </div>
-                <Link href={`/listening/video/${r.id}`} className="block font-semibold hover:text-indigo-600">{r.title}</Link>
-                <div className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"><div className="h-full rounded-full bg-green-500" style={{ width: `${r.completion}%` }} /></div>
-                <div className="flex items-center justify-between text-xs text-slate-500">
+                <Link href={`/listening/video/${r.id}`} className="block font-semibold hover:text-primary-text">{r.title}</Link>
+                <div className="h-1.5 overflow-hidden rounded-full bg-border"><div className="h-full rounded-full bg-success" style={{ width: `${r.completion}%` }} /></div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{t("Hoàn thành {n}%", { n: r.completion })}</span>
-                  {r.mine && <button className="text-red-600 hover:underline" onClick={async () => { if (await ask({ title: t("Xoá {name}?", { name: r.title }), message: t("Bài nghe và tiến độ của bạn sẽ bị xoá."), confirmLabel: t("Xoá"), danger: true })) del.mutate(r.id); }}>{t("Xoá")}</button>}
+                  {r.mine && <button className="text-error-text hover:underline" onClick={async () => { if (await ask({ title: t("Xoá {name}?", { name: r.title }), message: t("Bài nghe và tiến độ của bạn sẽ bị xoá."), confirmLabel: t("Xoá"), danger: true })) del.mutate(r.id); }}>{t("Xoá")}</button>}
                 </div>
               </div>
             </Card>

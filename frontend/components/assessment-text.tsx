@@ -40,11 +40,11 @@ export function AssessmentText({ a, kind }: { a: Assessment; kind: "speaking" | 
   const t = useT();
   const names = (keys: string[]) => keys.map((k) => t(CRITERIA[k] ?? k).toLowerCase()).join(", ");
   return (
-    <div className="space-y-2 rounded-xl border border-indigo-200 bg-indigo-50/60 p-4 text-sm dark:border-indigo-900 dark:bg-indigo-950/30">
+    <div className="space-y-2 rounded-xl border border-primary/40 bg-primary-soft/60 p-4 text-sm">
       <p className="font-semibold">{t("Nhận xét tổng quan")}</p>
       <p>{t(BAND[kind][a.band])}</p>
-      {a.strengths.length > 0 && <p className="text-green-800 dark:text-green-300">✓ {t("Điểm mạnh: {list}.", { list: names(a.strengths) })}</p>}
-      {a.improve.length > 0 && <p className="text-[#9a2f1b] dark:text-[#ef8a74]">! {t("Cần cải thiện: {list}.", { list: names(a.improve) })}</p>}
+      {a.strengths.length > 0 && <p className="text-success-text">✓ {t("Điểm mạnh: {list}.", { list: names(a.strengths) })}</p>}
+      {a.improve.length > 0 && <p className="text-error-text ">! {t("Cần cải thiện: {list}.", { list: names(a.improve) })}</p>}
       {a.tips.length > 0 && (
         <div><p className="font-medium">{t("Gợi ý luyện tập")}</p>
           <ul className="list-disc space-y-0.5 pl-5">{a.tips.map((x) => <li key={x}>{TIPS[x] ? t(TIPS[x] as string) : x}</li>)}</ul></div>

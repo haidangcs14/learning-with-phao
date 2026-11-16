@@ -46,7 +46,7 @@ export default function AdminWords() {
       </Card>
       {del.error && <ErrorBox error={del.error} />}
       {words.isLoading ? <Spinner /> : (
-        <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+        <ul className="divide-y divide-border">
           {words.data?.data.map((w) => (
             <li key={w.id} className="flex items-center justify-between py-2 text-sm">
               <span><b>{w.word}</b> {w.phonetic} · {w.level} · {w.meanings[0]?.translation_vi}</span>

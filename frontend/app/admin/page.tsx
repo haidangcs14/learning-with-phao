@@ -23,7 +23,7 @@ export default function AdminDashboard() {
   return (
     <Page title="Admin Dashboard">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {items.map(([l, v]) => <Card key={l}><p className="text-sm text-slate-500">{t(l)}</p><p className="text-2xl font-bold">{v}</p></Card>)}
+        {items.map(([l, v]) => <Card key={l}><p className="text-sm text-muted-foreground">{t(l)}</p><p className="text-2xl font-bold">{v}</p></Card>)}
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel wide title={t("Hoạt động 14 ngày gần nhất")}>

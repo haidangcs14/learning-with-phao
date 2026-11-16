@@ -31,29 +31,29 @@ function Exercises({ items }: { items: Exercise[] }) {
         const p = picked[i];
         const done = p !== undefined;
         return (
-          <div key={i} className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
+          <div key={i} className="rounded-btn border border-border p-3">
             <p className="font-medium">{i + 1}. {e.question}</p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               {e.options.map((o) => {
                 const isAnswer = o === e.answer;
                 const isWrong = p === o && !isAnswer;
-                const cls = !done ? "border-slate-300 hover:border-indigo-400 dark:border-slate-700"
-                  : isAnswer ? "border-green-600 bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100"
-                  : isWrong ? "animate-shake border-red-600 bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100"
-                  : "border-slate-200 opacity-50 dark:border-slate-800";
+                const cls = !done ? "border-border hover:border-primary"
+                  : isAnswer ? "border-success bg-success-soft text-success-text"
+                  : isWrong ? "animate-shake border-error bg-error-soft text-error-text"
+                  : "border-border opacity-50";
                 return (
-                  <button key={o} disabled={done} onClick={() => setPicked({ ...picked, [i]: o })} className={`rounded-lg border-2 px-3 py-2 text-left text-sm transition ${cls}`}>
+                  <button key={o} disabled={done} onClick={() => setPicked({ ...picked, [i]: o })} className={`rounded-btn border-2 px-3 py-2 text-left text-sm transition ${cls}`}>
                     {o} {done && isAnswer && "✓"} {isWrong && "✗"}
                   </button>
                 );
               })}
             </div>
-            {done && <p className={`mt-2 text-sm ${p === e.answer ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}`}>
+            {done && <p className={`mt-2 text-sm ${p === e.answer ? "text-success-text" : "text-error-text"}`}>
               {p === e.answer ? t("Chính xác!") : t("Đáp án đúng: {a}", { a: e.answer })} — {e.explanation}</p>}
           </div>
         );
       })}
-      {Object.keys(picked).length > 0 && <button className="text-sm text-indigo-600 underline" onClick={() => setPicked({})}>{t("Làm lại")}</button>}
+      {Object.keys(picked).length > 0 && <button className="text-sm text-primary-text underline" onClick={() => setPicked({})}>{t("Làm lại")}</button>}
     </div>
   );
 }
@@ -77,13 +77,13 @@ export default function GrammarDetailPage() {
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-4 py-8">
       <BackLink href="/grammar">{t("← Tất cả bài học")}</BackLink>
-      <h1 className="text-3xl font-bold">{l.title} <span className="text-base text-slate-500">({l.level})</span></h1>
-      <p className="text-slate-600 dark:text-slate-400">{l.description}</p>
+      <h1 className="text-3xl font-bold">{l.title} <span className="text-base text-muted-foreground">({l.level})</span></h1>
+      <p className="text-muted-foreground">{l.description}</p>
 
       {Object.keys(l.formula).length > 0 && (
         <section>
           <h2 className={h2}>{t("Công thức")}</h2>
-          <dl className="space-y-1 rounded-xl bg-slate-100 p-4 font-mono text-sm dark:bg-slate-900">
+          <dl className="space-y-1 rounded-xl bg-surface-secondary p-4 font-mono text-sm">
             {Object.entries(l.formula).map(([k, v]) => <div key={k}><dt className="inline font-semibold">{t(k)}: </dt><dd className="inline">{v}</dd></div>)}
           </dl>
         </section>
@@ -91,24 +91,24 @@ export default function GrammarDetailPage() {
       <section><h2 className={h2}>{t("Cách dùng")}</h2><ul className="list-disc space-y-1 pl-5">{l.usage.map((u) => <li key={u}>{u}</li>)}</ul></section>
       {l.signals.length > 0 && (
         <section><h2 className={h2}>{t("Dấu hiệu nhận biết")}</h2>
-          <div className="flex flex-wrap gap-2">{l.signals.map((s) => <span key={s} className="rounded-full bg-indigo-100 px-3 py-1 text-sm text-indigo-800">{s}</span>)}</div></section>
+          <div className="flex flex-wrap gap-2">{l.signals.map((s) => <span key={s} className="rounded-full bg-primary-soft px-3 py-1 text-sm text-primary-text">{s}</span>)}</div></section>
       )}
       <section><h2 className={h2}>{t("Ví dụ")}</h2>
-        <ul className="space-y-2">{l.examples.map((e) => <li key={e.en}><p className="font-medium">{e.en}</p>{lang === "vi" && <p className="text-sm text-slate-500">{e.vi}</p>}</li>)}</ul></section>
+        <ul className="space-y-2">{l.examples.map((e) => <li key={e.en}><p className="font-medium">{e.en}</p>{lang === "vi" && <p className="text-sm text-muted-foreground">{e.vi}</p>}</li>)}</ul></section>
       {l.notes && l.notes.length > 0 && (
         <section><h2 className={h2}>{t("Lưu ý & quy tắc")}</h2><ul className="list-disc space-y-1 pl-5">{l.notes.map((n) => <li key={n}>{n}</li>)}</ul></section>
       )}
       {l.compare && l.compare.length > 0 && (
         <section><h2 className={h2}>{t("So sánh với thì khác")}</h2>
-          <ul className="space-y-2">{l.compare.map((c) => <li key={c} className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">{c}</li>)}</ul></section>
+          <ul className="space-y-2">{l.compare.map((c) => <li key={c} className="rounded-btn bg-accent-soft p-3 text-sm text-accent-text">{c}</li>)}</ul></section>
       )}
       <section><h2 className={h2}>{t("Lỗi thường gặp")}</h2>
         <ul className="space-y-2">{l.common_mistakes.map((m) => (
-          <li key={m.wrong} className="rounded-lg border border-slate-200 p-3 text-sm dark:border-slate-800">
-            <p className="text-red-600 line-through">{m.wrong}</p><p className="text-green-700 dark:text-green-400">{m.right}</p></li>))}</ul></section>
+          <li key={m.wrong} className="rounded-btn border border-border p-3 text-sm">
+            <p className="text-error-text line-through">{m.wrong}</p><p className="text-success-text">{m.right}</p></li>))}</ul></section>
       {l.exercises && l.exercises.length > 0 && <section><h2 className={h2}>{t("Luyện tập")}</h2><Exercises items={l.exercises} /></section>}
       {l.video && <section><h2 className={h2}>{t("Video hướng dẫn")}</h2><VideoEmbed id={l.video} title={l.title} /></section>}
-      {l.source && <p className="text-xs text-slate-500"><a className="text-indigo-600 underline" target="_blank" rel="noreferrer" href={l.source}>{t("Tham khảo thêm: ZIM Academy")}</a></p>}
+      {l.source && <p className="text-xs text-muted-foreground"><a className="text-primary-text underline" target="_blank" rel="noreferrer" href={l.source}>{t("Tham khảo thêm: ZIM Academy")}</a></p>}
     </main>
   );
 }

@@ -12,7 +12,7 @@ export interface Phoneme {
 }
 
 const TYPE_LABEL = { vowel: "Nguyên âm", diphthong: "Nguyên âm đôi", consonant: "Phụ âm" } as const;
-const btn = "flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800";
+const btn = "flex h-9 w-9 items-center justify-center rounded-full border border-border hover:bg-surface-secondary";
 
 export function IpaModal({ items, index, onClose, onIndex }:
   { items: Phoneme[]; index: number; onClose: () => void; onIndex: (i: number) => void }) {
@@ -41,14 +41,14 @@ export function IpaModal({ items, index, onClose, onIndex }:
   const search = `https://www.youtube.com/results?search_query=${encodeURIComponent(`how to pronounce /${p.symbol}/ english sound`)}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-overlay/60 sm:items-center sm:p-4" onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label={`/${p.symbol}/`} onClick={(e) => e.stopPropagation()}
-        className="animate-modal max-h-[92vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-t-2xl bg-white p-5 text-slate-900 shadow-2xl sm:rounded-2xl dark:bg-slate-900 dark:text-slate-100">
+        className="animate-modal max-h-[92vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-t-2xl bg-surface p-5 text-foreground shadow-2xl sm:rounded-2xl">
         <div className="flex items-center justify-between">
           <button className={btn} onClick={() => onIndex((index - 1 + n) % n)} aria-label={t("Âm trước")}>←</button>
           <div className="text-center">
-            <p className="text-5xl font-bold text-indigo-600 dark:text-indigo-400">/{p.symbol}/</p>
-            <p className="mt-1 text-xs text-slate-500">{index + 1} / {n}</p>
+            <p className="text-5xl font-bold text-primary-text">/{p.symbol}/</p>
+            <p className="mt-1 text-xs text-muted-foreground">{index + 1} / {n}</p>
           </div>
           <div className="flex gap-2">
             <button className={btn} onClick={() => onIndex((index + 1) % n)} aria-label={t("Âm sau")}>→</button>
@@ -57,15 +57,15 @@ export function IpaModal({ items, index, onClose, onIndex }:
         </div>
 
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="rounded-full bg-indigo-100 px-3 py-1 text-indigo-800">{t(TYPE_LABEL[p.type])}</span>
-          {CATEGORY[p.category] && <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-slate-800 dark:text-slate-200">{t(CATEGORY[p.category] as string)}</span>}
-          {p.voiced === "true" && <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">{t("Hữu thanh (rung dây thanh)")}</span>}
-          {p.voiced === "false" && <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-800">{t("Vô thanh (không rung)")}</span>}
+          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary-text">{t(TYPE_LABEL[p.type])}</span>
+          {CATEGORY[p.category] && <span className="rounded-full bg-surface-secondary px-3 py-1 text-foreground">{t(CATEGORY[p.category] as string)}</span>}
+          {p.voiced === "true" && <span className="rounded-full bg-primary-soft px-3 py-1 text-primary-text">{t("Hữu thanh (rung dây thanh)")}</span>}
+          {p.voiced === "false" && <span className="rounded-full bg-accent-soft px-3 py-1 text-accent-text">{t("Vô thanh (không rung)")}</span>}
         </div>
 
-        {lang === "vi" && <p className="text-sm text-slate-600 dark:text-slate-300">{p.description}</p>}
+        {lang === "vi" && <p className="text-sm text-muted-foreground">{p.description}</p>}
         {tip && (
-          <div className="rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-800/60">
+          <div className="rounded-btn bg-surface-secondary p-3 text-sm">
             <p className="mb-1 font-semibold">{t("Cách phát âm")}</p>
             <p>{tip[lang]}</p>
           </div>
@@ -76,7 +76,7 @@ export function IpaModal({ items, index, onClose, onIndex }:
           <div className="flex flex-wrap gap-2">
             {p.example_words.map((w) => (
               <button key={w} onClick={() => speak(w)}
-                className="rounded-full bg-indigo-50 px-3 py-1.5 text-sm text-indigo-800 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-200">
+                className="rounded-full bg-primary-soft px-3 py-1.5 text-sm text-primary-text hover:bg-primary-soft">
                 🔊 {w}
               </button>
             ))}
@@ -85,7 +85,7 @@ export function IpaModal({ items, index, onClose, onIndex }:
 
         <div>
           <p className="mb-2 text-sm font-semibold">{t("Video hướng dẫn")}</p>
-          <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
+          <div className="relative aspect-video overflow-hidden rounded-btn bg-black">
             {play ? (
               <iframe className="absolute inset-0 h-full w-full" title={`IPA ${p.type}`} allowFullScreen
                 src={`https://www.youtube-nocookie.com/embed/${video}?autoplay=1&rel=0`}
@@ -94,14 +94,14 @@ export function IpaModal({ items, index, onClose, onIndex }:
               <button className="group absolute inset-0 flex items-center justify-center" onClick={() => setPlay(true)} aria-label={t("Phát video")}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`https://i.ytimg.com/vi/${video}/hqdefault.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80" />
-                <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-2xl text-white transition group-hover:scale-110">▶</span>
+                <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-error text-2xl text-error-foreground transition group-hover:scale-110">▶</span>
               </button>
             )}
           </div>
-          <p className="mt-2 text-xs text-slate-500">{t("Video chung cho nhóm âm này.")}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{t("Video chung cho nhóm âm này.")}</p>
           <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-            <a className="text-indigo-600 underline" target="_blank" rel="noreferrer" href={search}>{t("Tìm video riêng cho âm /{s}/", { s: p.symbol })}</a>
-            <a className="text-indigo-600 underline" target="_blank" rel="noreferrer" href={SOURCE_URL}>{t("Nguồn tham khảo: ZIM Academy")}</a>
+            <a className="text-primary-text underline" target="_blank" rel="noreferrer" href={search}>{t("Tìm video riêng cho âm /{s}/", { s: p.symbol })}</a>
+            <a className="text-primary-text underline" target="_blank" rel="noreferrer" href={SOURCE_URL}>{t("Nguồn tham khảo: ZIM Academy")}</a>
           </div>
         </div>
       </div>

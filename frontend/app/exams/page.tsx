@@ -19,9 +19,9 @@ function Exams() {
       {items.map((e) => (
         <Card key={e.id} className="space-y-2">
           <h2 className="text-lg font-semibold">{e.title}</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">⏱ {t("{n} phút", { n: e.duration_minutes })} · {t("{n} câu hỏi", { n: e.question_count })} · {t("{n} điểm", { n: e.total_score })}{e.has_audio ? " · 🎧" : ""}</p>
-          {e.my ? <p className="text-sm"><span className="rounded-full bg-green-600 px-2 py-0.5 text-xs font-semibold text-white">{t("Điểm cao nhất")}: {e.my.best}/{e.my.max}</span> <span className="text-slate-500">· {t("{n} lần làm", { n: e.my.count })}</span></p> : null}
-          <Link href={`/exams/${e.id}`} className="inline-block rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">{e.my ? t("Làm lại") : t("Vào làm bài")}</Link>
+          <p className="text-sm text-muted-foreground">⏱ {t("{n} phút", { n: e.duration_minutes })} · {t("{n} câu hỏi", { n: e.question_count })} · {t("{n} điểm", { n: e.total_score })}{e.has_audio ? " · 🎧" : ""}</p>
+          {e.my ? <p className="text-sm"><span className="rounded-full bg-success px-2 py-0.5 text-xs font-semibold text-success-foreground">{t("Điểm cao nhất")}: {e.my.best}/{e.my.max}</span> <span className="text-muted-foreground">· {t("{n} lần làm", { n: e.my.count })}</span></p> : null}
+          <Link href={`/exams/${e.id}`} className="lift inline-block rounded-btn bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover">{e.my ? t("Làm lại") : t("Vào làm bài")}</Link>
         </Card>
       ))}
     </div>

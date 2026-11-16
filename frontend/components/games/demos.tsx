@@ -15,11 +15,11 @@ function useLoop(steps: number, ms: number): number {
 function Shell({ caption, step, steps, children }: { caption: string; step: number; steps: number; children: ReactNode }) {
   const t = useT();
   return (
-    <div className="rounded-xl border border-dashed border-indigo-300 bg-indigo-50/60 p-4 dark:border-indigo-800 dark:bg-indigo-950/30" aria-label={t("Cách chơi")}>
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">▶ {t("Cách chơi (demo)")}</p>
+    <div className="rounded-xl border border-dashed border-primary/40 bg-primary-soft/60 p-4" aria-label={t("Cách chơi")}>
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-primary-text">▶ {t("Cách chơi (demo)")}</p>
       <div className="mx-auto max-w-xs">{children}</div>
-      <p className="mt-3 min-h-10 text-center text-sm text-slate-700 dark:text-slate-200" aria-live="polite">{caption}</p>
-      <div className="mt-1 flex justify-center gap-1">{Array.from({ length: steps }, (_, i) => <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === step ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-600"}`} />)}</div>
+      <p className="mt-3 min-h-10 text-center text-sm text-foreground" aria-live="polite">{caption}</p>
+      <div className="mt-1 flex justify-center gap-1">{Array.from({ length: steps }, (_, i) => <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === step ? "bg-primary" : "bg-border"}`} />)}</div>
     </div>
   );
 }
@@ -54,8 +54,8 @@ function MemoryDemo() {
           return (
             <div key={c.id} className="flip-scene relative h-14">
               <div className={`flip-inner h-full w-full ${up ? "is-flipped" : ""}`}>
-                <div className="flip-face flex items-center justify-center rounded-lg bg-indigo-600 text-xl font-bold text-white">?</div>
-                <div className={`flip-face flip-back flex items-center justify-center rounded-lg border-2 text-sm font-medium transition-colors ${done ? "border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-200" : bad ? "animate-shake border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-200" : "border-indigo-300 bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100"}`}>{c.text}</div>
+                <div className="flip-face flex items-center justify-center rounded-btn bg-primary text-xl font-bold text-primary-foreground">?</div>
+                <div className={`flip-face flip-back flex items-center justify-center rounded-btn border-2 text-sm font-medium transition-colors ${done ? "border-success bg-success-soft text-success-text" : bad ? "animate-shake border-error bg-error-soft text-error-text" : "border-primary/40 bg-surface text-foreground"}`}>{c.text}</div>
               </div>
               {s.tap === c.id && <Tap />}
             </div>
@@ -86,10 +86,10 @@ function ClassicDemo() {
   const cell = (id: string, text: string, side: "en" | "vi") => {
     const done = s.matched.includes(id);
     const picked = (side === "en" ? s.en : s.vi) === id;
-    const cls = done ? "border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-200"
-      : picked && s.bad ? "animate-shake border-red-500 bg-red-50 text-red-900 dark:bg-red-950 dark:text-red-200"
-      : picked ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "border-slate-300 dark:border-slate-700";
-    return <div key={`${side}${id}`} className={`relative rounded-lg border-2 p-2 text-center text-sm transition-colors ${cls}`}>{text}{picked && !done && <Tap />}</div>;
+    const cls = done ? "border-success bg-success-soft text-success-text"
+      : picked && s.bad ? "animate-shake border-error bg-error-soft text-error-text"
+      : picked ? "border-primary bg-primary-soft" : "border-border";
+    return <div key={`${side}${id}`} className={`relative rounded-btn border-2 p-2 text-center text-sm transition-colors ${cls}`}>{text}{picked && !done && <Tap />}</div>;
   };
   return (
     <Shell caption={t(s.cap)} step={step} steps={CLS_STEPS.length}>
@@ -121,21 +121,21 @@ function FillDemo() {
   const s = FILL_STEPS[step] ?? FILL_STEPS[0]!;
   const q = BLANKS[s.q] ?? BLANKS[0]!;
   const ok = s.reveal ? s.chosen === q.answer : undefined;
-  const tone = ok === undefined ? "border-indigo-400 bg-indigo-50 dark:bg-indigo-950" : ok ? "border-green-500 bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100" : "border-red-500 bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100";
+  const tone = ok === undefined ? "border-primary bg-primary-soft" : ok ? "border-success bg-success-soft text-success-text" : "border-error bg-error-soft text-error-text";
   return (
     <Shell caption={t(s.cap)} step={step} steps={FILL_STEPS.length}>
       <p className="text-center text-base">
         {q.before}{" "}
-        <span key={`${s.q}-${s.chosen ?? ""}-${s.reveal ?? ""}`} className={`inline-block min-w-14 rounded-md border-2 px-2 ${s.chosen ? `animate-pop ${tone}` : "border-dashed border-slate-400"}`}>{s.chosen ?? "\u00A0"}</span>{" "}
+        <span key={`${s.q}-${s.chosen ?? ""}-${s.reveal ?? ""}`} className={`inline-block min-w-14 rounded-md border-2 px-2 ${s.chosen ? `animate-pop ${tone}` : "border-dashed border-border"}`}>{s.chosen ?? "\u00A0"}</span>{" "}
         {q.after}
       </p>
       <div className="mt-3 grid grid-cols-3 gap-2">
         {q.options.map((o) => {
           const isAnswer = s.reveal && o === q.answer;
           const wrong = s.reveal && o === s.chosen && o !== q.answer;
-          const cls = isAnswer ? "border-green-600 bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100" : wrong ? "animate-shake border-red-600 bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100"
-            : s.chosen === o ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950" : "border-slate-300 dark:border-slate-700";
-          return <div key={o} className={`relative rounded-lg border-2 py-1.5 text-center text-sm transition-colors ${cls}`}>{o}{s.chosen === o && !s.reveal && <Tap />}</div>;
+          const cls = isAnswer ? "border-success bg-success-soft text-success-text" : wrong ? "animate-shake border-error bg-error-soft text-error-text"
+            : s.chosen === o ? "border-primary bg-primary-soft" : "border-border";
+          return <div key={o} className={`relative rounded-btn border-2 py-1.5 text-center text-sm transition-colors ${cls}`}>{o}{s.chosen === o && !s.reveal && <Tap />}</div>;
         })}
       </div>
     </Shell>
@@ -160,19 +160,19 @@ function BridgeDemo() {
   const s = BR_STEPS[step] ?? BR_STEPS[0]!;
   return (
     <Shell caption={t(s.cap)} step={step} steps={BR_STEPS.length}>
-      <p className="text-center text-xs text-slate-500">❤️ {"❤️".repeat(Math.max(0, s.hearts - 1))}{"🤍".repeat(5 - s.hearts)}</p>
-      <p className="mb-2 text-center text-sm italic text-indigo-700 dark:text-indigo-300">“{t("Tôi ăn một quả táo.")}”</p>
+      <p className="text-center text-xs text-muted-foreground">❤️ {"❤️".repeat(Math.max(0, s.hearts - 1))}{"🤍".repeat(5 - s.hearts)}</p>
+      <p className="mb-2 text-center text-sm italic text-primary-text">“{t("Tôi ăn một quả táo.")}”</p>
       <div className="flex justify-center gap-1.5">
-        {BR_WORDS.map((w, i) => <span key={i} className={`flex h-9 min-w-10 items-center justify-center rounded-lg border-2 px-1.5 text-sm font-semibold transition-all duration-300 ${i < s.filled ? (s.green ? "border-green-600 bg-green-100 text-green-800" : "border-indigo-500 bg-indigo-50 text-slate-900") : "border-dashed border-slate-300"}`}>{i < s.filled ? w : ""}</span>)}
+        {BR_WORDS.map((w, i) => <span key={i} className={`flex h-9 min-w-10 items-center justify-center rounded-btn border-2 px-1.5 text-sm font-semibold transition-all duration-300 ${i < s.filled ? (s.green ? "border-success bg-success-soft text-success-text" : "border-primary bg-primary-soft text-foreground") : "border-dashed border-border"}`}>{i < s.filled ? w : ""}</span>)}
       </div>
-      <div className="relative mt-3 flex h-12 items-end justify-center gap-1 rounded-lg bg-sky-100 px-2 pb-1 dark:bg-sky-950">
-        {BR_WORDS.map((_, i) => <span key={i} className={`h-2.5 w-10 rounded-sm transition-all duration-300 ${i < s.filled ? (s.green ? "bg-green-500" : "bg-amber-700") : "scale-y-0 bg-amber-700"}`} />)}
+      <div className="relative mt-3 flex h-12 items-end justify-center gap-1 rounded-btn bg-secondary-soft px-2 pb-1">
+        {BR_WORDS.map((_, i) => <span key={i} className={`h-2.5 w-10 rounded-sm transition-all duration-300 ${i < s.filled ? (s.green ? "bg-success" : "bg-accent") : "scale-y-0 bg-accent"}`} />)}
         <span className="absolute bottom-3 text-xl transition-all duration-500" style={{ left: s.green ? "88%" : `${8 + (s.filled / BR_WORDS.length) * 72}%` }}>🐦</span>
       </div>
       <div className="mt-3 flex flex-wrap justify-center gap-1.5">
         {BR_PLANKS.map((w) => {
           const used = BR_WORDS.slice(0, s.filled).includes(w) && !(w === "apple" && s.filled < 4);
-          return <span key={w} className={`relative rounded-md border-b-4 px-3 py-1.5 text-sm font-bold transition ${s.bad === w ? "animate-shake border-red-800 bg-red-400 text-white" : "border-[#7c4a1d] bg-[#c98a4b] text-[#3b200b]"} ${used ? "opacity-0" : ""}`}>{w}{s.tap === w && <Tap />}</span>;
+          return <span key={w} className={`relative rounded-md border-b-4 px-3 py-1.5 text-sm font-bold transition ${s.bad === w ? "animate-shake border-error bg-error text-error-foreground" : "border-[#7c4a1d] bg-[#c98a4b] text-[#3b200b]"} ${used ? "opacity-0" : ""}`}>{w}{s.tap === w && <Tap />}</span>;
         })}
       </div>
     </Shell>
@@ -200,13 +200,13 @@ function RainDemo() {
         <div className="absolute inset-x-0 bottom-0 h-5 bg-[#0b2a5b]" />
         <span className="absolute bottom-4 left-3 text-2xl" aria-hidden="true">{s.miss ? "😟" : s.boom ? "😄" : "🙂"}</span>
         {!s.boom && (
-          <div className="absolute left-1/2 w-32 -translate-x-1/2 rounded-xl border-2 border-sky-200/70 bg-white/15 p-1.5 text-center transition-all duration-700" style={{ top: `${s.y}%` }}>
+          <div className="absolute left-1/2 w-32 -translate-x-1/2 rounded-xl border-2 border-secondary/70 bg-white/15 p-1.5 text-center transition-all duration-700" style={{ top: `${s.y}%` }}>
             <p className="text-xs font-semibold">{s.miss ? t("con chó") : t("con mèo")}</p>
-            <div className="mt-1 flex justify-center gap-1">{word.split("").map((c, i) => <span key={i} className={`flex h-6 w-6 items-center justify-center rounded text-sm font-bold ${i < s.typed ? "bg-yellow-300 text-slate-900" : "border border-white/60 bg-slate-900/50"}`}>{i < s.typed ? c.toUpperCase() : ""}</span>)}</div>
+            <div className="mt-1 flex justify-center gap-1">{word.split("").map((c, i) => <span key={i} className={`flex h-6 w-6 items-center justify-center rounded text-sm font-bold ${i < s.typed ? "bg-accent text-accent-foreground" : "border border-surface/60 bg-slate-900/50"}`}>{i < s.typed ? c.toUpperCase() : ""}</span>)}</div>
           </div>
         )}
         {s.boom && <span className="absolute left-1/2 top-[45%] -translate-x-1/2 text-3xl" aria-hidden="true">✨ <b className="text-base text-yellow-300">+10</b></span>}
-        {s.miss && <span className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-lg bg-slate-900/90 px-3 py-1 text-sm font-bold text-yellow-300">dog</span>}
+        {s.miss && <span className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-btn bg-slate-900/90 px-3 py-1 text-sm font-bold text-yellow-300">dog</span>}
       </div>
     </Shell>
   );
@@ -233,7 +233,7 @@ function GuessDemo() {
   const s = WG_STEPS[step] ?? WG_STEPS[0]!;
   return (
     <Shell caption={t(s.caption)} step={step} steps={WG_STEPS.length}>
-      <p className="mb-2 text-center text-sm font-semibold">🍎 {t("quả táo")} · <span className="text-slate-500">{t("{n} chữ cái", { n: 5 })}</span></p>
+      <p className="mb-2 text-center text-sm font-semibold">🍎 {t("quả táo")} · <span className="text-muted-foreground">{t("{n} chữ cái", { n: 5 })}</span></p>
       <div className="space-y-1.5">
         {[0, 1, 2].map((r) => {
           const row = WG_ROWS[r] as (typeof WG_ROWS)[number];
@@ -241,7 +241,7 @@ function GuessDemo() {
           return (
             <div key={`${r}-${s.rows}`} className="flex justify-center gap-1.5">
               {row.word.split("").map((c, i) => (
-                <span key={i} className={`flex h-10 w-10 items-center justify-center rounded-md border-2 text-lg font-extrabold ${shown ? "tile-reveal text-white" : "border-slate-300 dark:border-slate-600"}`}
+                <span key={i} className={`flex h-10 w-10 items-center justify-center rounded-md border-2 text-lg font-bold ${shown ? "tile-reveal text-white" : "border-border"}`}
                   style={shown ? ({ "--tile-bg": WG_COLOR[row.colors[i] as string], "--tile-from": "transparent", "--tile-from-border": "#94a3b8", animationDelay: `${i * 120}ms` } as React.CSSProperties) : undefined}>
                   {shown || (typing && i < s.typed) ? c : ""}
                 </span>

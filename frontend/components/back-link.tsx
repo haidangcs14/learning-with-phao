@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 export const backButtonClass =
-  "group inline-flex items-center gap-2 rounded-xl border-2 border-indigo-300 bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700 shadow-sm transition hover:-translate-x-0.5 hover:border-indigo-600 hover:bg-indigo-600 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-200 dark:hover:border-indigo-500 dark:hover:bg-indigo-600 dark:hover:text-white";
-const arrow = "flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-xs text-white transition group-hover:bg-white group-hover:text-indigo-600";
+  "group inline-flex items-center gap-2 rounded-btn border-2 border-primary/40 bg-primary-soft px-4 py-1.5 text-sm font-semibold text-primary-text shadow-sm transition hover:-translate-x-0.5 hover:border-primary hover:bg-primary-hover hover:text-primary-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
+const arrow = "flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground transition group-hover:bg-surface group-hover:text-primary-text";
 const label = (children: ReactNode) => (typeof children === "string" ? children.replace(/^←\s*/, "") : children); // the arrow is drawn by the button
 
 /** Framed, coloured "back" link. Goes back to exactly where the user was (same filters, page and scroll);
