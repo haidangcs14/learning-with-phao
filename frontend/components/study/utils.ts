@@ -2,6 +2,7 @@
 export const POS: Record<string, string> = {
   noun: "Danh từ", verb: "Động từ", adjective: "Tính từ", adverb: "Trạng từ", preposition: "Giới từ", pronoun: "Đại từ",
   conjunction: "Liên từ", interjection: "Thán từ", determiner: "Hạn định từ", phrase: "Cụm từ", other: "Khác",
+  phrasal_verb: "Cụm động từ", idiom: "Thành ngữ", collocation: "Kết hợp từ", modal_verb: "Động từ khuyết thiếu",
 };
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 

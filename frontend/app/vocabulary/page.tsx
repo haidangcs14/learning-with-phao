@@ -1,209 +1,144 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useConfirm } from "@/components/confirm";
 import { Dialog } from "@/components/dialog";
 import { Protected } from "@/components/protected";
-import { ChoiceCard } from "@/components/study/choice-card";
-import { StudyCard } from "@/components/study/study-card";
-import { TopicSidebar, type TopicRow } from "@/components/study/topic-sidebar";
-import { DEFAULT_STUDY, type StudySettings } from "@/components/study/utils";
-import { WordPicture } from "@/components/study/word-picture";
-import { Button, ErrorBox, Spinner, inputCls } from "@/components/ui";
-import { KeyboardToggle, useVirtualKeyboard } from "@/components/virtual-keyboard";
-import { WordActions, useFavoriteIds } from "@/components/word-actions";
+import { Button, Card, Empty, ErrorBox, Page, Pager, Spinner, Tabs, inputCls } from "@/components/ui";
+import { SetTile } from "@/components/vocab/set-tile";
+import type { SetSummary } from "@/components/vocab/types";
 import { useGet, useSend } from "@/hooks/api";
 import { useT } from "@/lib/i18n";
 import { usePersistedState } from "@/lib/persist";
-import { topicInfo } from "@/lib/topics";
-import { qs } from "@/lib/utils";
-import { useLang } from "@/store/lang-store";
-import type { Word } from "@/types";
 
-type Mode = "guess" | "favorites" | "flashcard" | "quiz";
-const TABS: [Mode, string][] = [["guess", "Đoán"], ["favorites", "Yêu thích"], ["flashcard", "Thêm vào flashcard"], ["quiz", "Trắc nghiệm"]];
-const REASONS = [["wrong_meaning", "Sai nghĩa"], ["wrong_example", "Ví dụ chưa đúng"], ["typo", "Lỗi chính tả"], ["other", "Lỗi khác"]] as const;
+type Tab = "builtin" | "community" | "mine";
+const EMOJIS = ["📚", "✈️", "🍜", "💼", "🏥", "🎓", "🛍️", "🏠", "⚽", "🎵", "💻", "🌍"];
+const linkBtn = "lift inline-flex items-center justify-center rounded-btn px-3 py-1.5 text-sm font-bold";
 
-function WordRow({ w, isFav }: { w: Word; isFav: boolean }) {
-  const lang = useLang((s) => s.lang);
-  const m = w.meanings[0];
-  return (
-    <li className="flex items-center gap-3 rounded-card border-2 border-border bg-surface p-2.5 shadow-raised">
-      <WordPicture word={w} size={48} />
-      <div className="min-w-0 flex-1">
-        <Link href={`/vocabulary/${w.id}`} className="font-bold hover:text-primary-text">{w.word}</Link> <span className="text-xs text-muted-foreground">{w.phonetic}</span>
-        <p className="truncate text-sm text-muted-foreground">{lang === "vi" ? m?.translation_vi : m?.definition}</p>
-      </div>
-      <WordActions id={w.id} word={w.word} isFav={isFav} />
-    </li>
-  );
-}
-
-function FavoritesPanel() {
+function BuiltinSection() {
   const t = useT();
-  const { favs, ids } = useFavoriteIds();
-  if (favs.isLoading) return <Spinner />;
-  const list = favs.data?.data.map((f) => f.item).filter((w): w is Word => !!w) ?? [];
-  if (list.length === 0) return <p className="rounded-3xl border-2 border-dashed border-border p-8 text-center text-muted-foreground">{t("Chưa có từ yêu thích. Hãy bấm ♥ ở một từ để lưu lại.")}</p>;
-  return <ul className="space-y-2">{list.map((w) => <WordRow key={w.id} w={w} isFav={ids.has(w.id)} />)}</ul>;
-}
-
-function FlashcardPanel({ topic, words }: { topic: string; words: Word[] }) {
-  const t = useT();
-  const { ids } = useFavoriteIds();
-  const addAll = useSend<{ added: number }, { topic: string }>("POST", "/flashcards/topic", ["/flashcards"]);
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-primary-soft p-3">
-        <p className="text-sm">{t("Thêm từ vào bộ flashcard để ôn tập theo lịch lặp lại ngắt quãng.")}</p>
-        <span className="flex items-center gap-2">
-          {addAll.isSuccess && <span className="text-sm text-success-text">✓ {t("Đã thêm {n} từ vào flashcard", { n: addAll.data.data.added })}</span>}
-          <Button disabled={addAll.isPending || !topic} onClick={() => addAll.mutate({ topic })}>{t("+ Thêm cả chủ đề vào Flashcard")}</Button>
-        </span>
-      </div>
-      {addAll.error && <ErrorBox error={addAll.error} />}
-      <ul className="space-y-2">{words.map((w) => <WordRow key={w.id} w={w} isFav={ids.has(w.id)} />)}</ul>
-    </div>
-  );
-}
-
-function Study() {
-  const t = useT();
-  const lang = useLang((s) => s.lang);
   const topics = useGet<{ topic: string; count: number }[]>("/words/topics");
   const progress = useGet<Record<string, number>>("/study/progress");
-  const [saved, setTopic] = usePersistedState("study.topic", "");
-  const [mode, setMode] = usePersistedState<Mode>("study.mode", "guess");
-  const [settings, setSettings] = usePersistedState<StudySettings>("study.settings", DEFAULT_STUDY);
-  const [kb, setKb] = useVirtualKeyboard();
-  const all = topics.data?.data ?? [];
-  const active = all.some((x) => x.topic === saved) ? saved : all[0]?.topic ?? "";
-  const words = useGet<Word[]>(active ? `/words?${qs({ topic: active, limit: 100 })}` : null);
-  const learnedQ = useGet<string[]>(active ? `/study/learned?topic=${encodeURIComponent(active)}` : null);
-  const list = words.data?.data ?? [];
-
-  const [learned, setLearned] = useState<Set<string>>(new Set());
-  const [idx, setIdx] = useState(0);
-  const [review, setReview] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [dialog, setDialog] = useState<"settings" | "report" | null>(null);
-  const [reason, setReason] = useState<string>("wrong_meaning");
-  const [note, setNote] = useState("");
-  const [notice, setNotice] = useState("");
-  const initFor = useRef("");
-  const live = useRef({ idx, review, learned, list });
-  live.current = { idx, review, learned, list };
-  const answer = useSend<{ newly_learned: boolean; xp_awarded: number }, { word_id: string; correct: boolean }>("POST", "/study/answer", ["/leaderboard", "/study"]);
-  const report = useSend<unknown, { word_id: string; reason: string; note: string }>("POST", "/study/report");
-
-  useEffect(() => { // when a topic is (re)loaded start at its first word that is not learned yet
-    if (!active || !words.data || !learnedQ.data || initFor.current === active) return;
-    const ids = new Set(learnedQ.data.data), items = words.data.data, first = items.findIndex((w) => !ids.has(w.id));
-    initFor.current = active;
-    setLearned(ids); setIdx(first < 0 ? 0 : first); setFinished(first < 0 && items.length > 0); setReview(false);
-  }, [active, words.data, learnedQ.data]);
-  useEffect(() => { if (!notice) return; const id = setTimeout(() => setNotice(""), 3500); return () => clearTimeout(id); }, [notice]);
-
-  const word = list[idx];
-  async function onAnswer(correct: boolean): Promise<number> {
-    if (!word) return 0;
-    if (correct) { const next = new Set(live.current.learned).add(word.id); live.current.learned = next; setLearned(next); }
-    try { return (await answer.mutateAsync({ word_id: word.id, correct })).data.xp_awarded; } catch { return 0; }
-  }
-  const next = () => { // a stable function that reads the latest state from the ref
-    const { idx: i0, review: rv, learned: ln, list: items } = live.current;
-    for (let step = 1; step <= items.length; step++) {
-      const i = i0 + step;
-      if (rv) { if (i >= items.length) break; setIdx(i); return; }
-      const j = i % items.length, w = items[j];
-      if (w && !ln.has(w.id)) { setIdx(j); return; }
-    }
-    setFinished(true);
-  };
-  const pick = (topic: string) => { setTopic(topic); setFinished(false); };
-
-  const rows: TopicRow[] = all.map((x) => ({ topic: x.topic, count: x.count, learned: x.topic === active ? learned.size : progress.data?.data[x.topic] ?? 0 }));
-  const total = all.reduce((s, x) => s + x.count, 0);
-  const label = topicInfo(active, lang).label;
-  const pct = list.length ? (learned.size / list.length) * 100 : 0;
-  const pill = (on: boolean) => `rounded-btn px-3 py-1.5 text-sm font-semibold transition duration-200 ${on ? "bg-primary text-primary-foreground shadow" : "text-muted-foreground hover:bg-surface"}`;
-
+  const total = (topics.data?.data ?? []).reduce((s, x) => s + x.count, 0);
+  const done = Object.values(progress.data?.data ?? {}).reduce((s, n) => s + n, 0);
+  const pct = total ? Math.round((done / total) * 100) : 0;
   return (
-    <div className="mx-auto max-w-7xl space-y-5 px-4 py-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold sm:text-3xl">{t("{n} từ vựng thông dụng", { n: total })}</h1>
-        <div className="flex items-center gap-2">
-          <nav className="flex flex-wrap gap-1 rounded-2xl bg-surface-secondary p-1" aria-label={t("Chế độ học")}>
-            {TABS.map(([k, name]) => <button key={k} onClick={() => setMode(k)} aria-pressed={mode === k} className={pill(mode === k)}>{t(name)}</button>)}
-          </nav>
-          <KeyboardToggle on={kb} onChange={setKb} />
-          <button onClick={() => setDialog("settings")} aria-label={t("Cài đặt")} title={t("Cài đặt")} className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-border bg-surface text-lg hover:border-primary">⚙</button>
+    <div className="grid gap-4 sm:grid-cols-2">
+      <Card className="flex flex-col gap-3 sm:p-5">
+        <div className="flex items-start gap-3">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-btn bg-primary-soft text-2xl" aria-hidden="true">📚</span>
+          <div className="min-w-0"><h3 className="text-balance text-lg font-bold leading-snug">{t("{n} từ vựng thông dụng", { n: total })}</h3>
+            <span className="inline-block rounded-full bg-primary-soft px-2.5 py-0.5 text-xs font-bold text-primary-text">{t("Bộ từ có sẵn")}</span></div>
         </div>
-      </header>
+        <p className="text-pretty text-sm leading-relaxed text-muted-foreground">{t("Học theo chủ đề với 4 chế độ: Đoán, Yêu thích, Thêm vào flashcard và Trắc nghiệm.")}</p>
+        <div>
+          <div className="flex justify-between text-xs font-semibold text-muted-foreground"><span>{t("{a}/{b} thẻ đã thuộc", { a: done, b: total })}</span><span>{pct}%</span></div>
+          <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} /></div>
+        </div>
+        <p className="text-xs font-semibold text-muted-foreground">{t("{n} nhóm chủ đề", { n: topics.data?.data.length ?? 0 })}</p>
+        <Link href="/vocabulary/builtin" className={`${linkBtn} mt-auto bg-primary text-primary-foreground shadow-raised hover:bg-primary-hover`}>▶ {t("Học ngay")}</Link>
+      </Card>
+    </div>
+  );
+}
 
-      {topics.isLoading ? <Spinner /> : topics.error ? <ErrorBox error={topics.error} /> : (
-        <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
-          <TopicSidebar topics={rows} active={active} onPick={pick} />
-          <section className="min-w-0 space-y-4">
-            {(mode === "guess" || mode === "quiz") && (
-              <div>
-                <div className="flex items-center justify-between text-sm font-bold uppercase tracking-wide text-muted-foreground">
-                  <span>{t("TIẾN ĐỘ")} - {label.toUpperCase()}</span><span>{learned.size} / {list.length} {t("THẺ")}</span>
-                </div>
-                <div className="mt-1.5 h-3 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
-                  <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
-                </div>
-              </div>
-            )}
-            {notice && <p role="status" className="rounded-btn bg-success-soft px-3 py-2 text-sm font-medium text-success-text">{notice}</p>}
+function CommunitySection() {
+  const t = useT();
+  const [text, setText] = useState("");
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
+  const sets = useGet<SetSummary[]>(`/vocab-sets?scope=public&limit=12&page=${page}${q ? `&q=${encodeURIComponent(q)}` : ""}`);
+  const items = sets.data?.data ?? [];
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <input className={inputCls} value={text} placeholder={t("Tìm bộ từ vựng...")} aria-label={t("Tìm bộ từ vựng...")} maxLength={80} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setQ(text.trim()); setPage(1); } }} />
+        <Button onClick={() => { setQ(text.trim()); setPage(1); }}>{t("Tìm")}</Button>
+      </div>
+      {sets.isLoading ? <Spinner /> : sets.error ? <ErrorBox error={sets.error} />
+        : items.length === 0 ? <Empty>{q ? t("Không có bộ từ nào khớp với tìm kiếm.") : t("Chưa có bộ từ nào được chia sẻ. Hãy là người đầu tiên!")}</Empty>
+        : <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{items.map((s) => (
+            <SetTile key={s.id} set={s} actions={<Link href={`/vocabulary/sets/${s.id}`} className={`${linkBtn} bg-primary text-primary-foreground hover:bg-primary-hover`}>▶ {t("Học")}</Link>} />
+          ))}</div>}
+      <Pager meta={sets.data?.meta} onPage={setPage} />
+    </div>
+  );
+}
 
-            {words.isLoading ? <Spinner /> : (mode === "guess" || mode === "quiz") && finished ? (
-              <div className="rounded-card border-2 border-border bg-surface p-8 text-center shadow-raised">
-                <p className="text-5xl">🏆</p>
-                <h2 className="mt-2 text-2xl font-bold">{t("Bạn đã học hết chủ đề này!")}</h2>
-                <p className="mt-1 text-muted-foreground">{t("{a}/{b} thẻ đã thuộc", { a: learned.size, b: list.length })}</p>
-                <div className="mt-4 flex flex-wrap justify-center gap-2">
-                  <Button onClick={() => { setReview(true); setIdx(0); setFinished(false); }}>{t("Ôn lại từ đầu")}</Button>
-                  <Button variant="ghost" onClick={() => { const i = all.findIndex((x) => x.topic === active); pick(all[(i + 1) % all.length]?.topic ?? active); }}>{t("Chủ đề tiếp theo")}</Button>
-                </div>
-              </div>
-            ) : mode === "guess" && word ? (
-              <StudyCard key={word.id} word={word} settings={settings} keyboard={kb} onAnswer={onAnswer} onNext={next} onReport={() => { setDialog("report"); setNote(""); }} />
-            ) : mode === "quiz" && word ? (
-              <ChoiceCard key={word.id} word={word} pool={list} settings={settings} onAnswer={onAnswer} onNext={next} />
-            ) : mode === "favorites" ? <FavoritesPanel /> : mode === "flashcard" ? <FlashcardPanel topic={active} words={list} /> : null}
+function MineSection() {
+  const t = useT();
+  const router = useRouter();
+  const confirm = useConfirm();
+  const mine = useGet<SetSummary[]>("/vocab-sets?scope=mine");
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({ title: "", description: "", emoji: "📚" });
+  const create = useSend<{ id: string }, typeof form>("POST", "/vocab-sets", ["/vocab-sets"]);
+  const remove = useSend<unknown, string>("DELETE", (id) => `/vocab-sets/${id}`, ["/vocab-sets"]);
+  const reorder = useSend<unknown, string[]>("POST", "/vocab-sets/reorder", ["/vocab-sets"], (ids) => ({ ids }));
+  const items = mine.data?.data ?? [];
 
-            {(mode === "guess" || mode === "quiz") && !finished && (
-              <p className="text-center text-xs font-medium text-muted-foreground">{t("Nhóm học {a}/{b} • Tổng cộng {c} thẻ trong bộ thẻ", { a: Math.max(1, all.findIndex((x) => x.topic === active) + 1), b: all.length, c: total })}</p>
-            )}
-          </section>
+  function move(i: number, d: -1 | 1) {
+    const ids = items.map((s) => s.id), j = i + d;
+    if (j < 0 || j >= ids.length) return;
+    [ids[i], ids[j]] = [ids[j] as string, ids[i] as string];
+    reorder.mutate(ids);
+  }
+  async function del(s: SetSummary) {
+    if (await confirm({ title: t("Xóa bộ từ vựng?"), message: t("Toàn bộ nhóm và thẻ trong bộ “{name}” sẽ bị xóa vĩnh viễn.", { name: s.title }), confirmLabel: t("Xóa"), danger: true })) remove.mutate(s.id);
+  }
+  const arrow = "flex h-7 w-7 items-center justify-center rounded-btn border border-border bg-surface text-xs hover:bg-surface-secondary disabled:cursor-not-allowed disabled:opacity-40";
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="max-w-xl text-sm text-muted-foreground">{t("Tạo bộ từ vựng riêng: đặt tên bộ, tạo các nhóm thẻ rồi thêm thẻ vào từng nhóm. Bộ mới luôn ở trạng thái Nháp cho đến khi bạn chọn Công khai.")}</p>
+        <Button onClick={() => { setForm({ title: "", description: "", emoji: "📚" }); setCreating(true); }}>＋ {t("Tạo bộ từ vựng")}</Button>
+      </div>
+      {mine.isLoading ? <Spinner /> : mine.error ? <ErrorBox error={mine.error} /> : items.length === 0 ? <Empty>{t("Bạn chưa có bộ từ vựng nào.")}</Empty> : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((s, i) => (
+            <SetTile key={s.id} set={s} mine
+              tools={items.length > 1 ? <span className="flex flex-col gap-1"><button className={arrow} onClick={() => move(i, -1)} disabled={i === 0 || reorder.isPending} aria-label={t("Chuyển lên")}>▲</button><button className={arrow} onClick={() => move(i, 1)} disabled={i === items.length - 1 || reorder.isPending} aria-label={t("Chuyển xuống")}>▼</button></span> : undefined}
+              actions={<>
+                {s.card_count > 0 && <Link href={`/vocabulary/sets/${s.id}`} className={`${linkBtn} border border-input bg-surface hover:bg-surface-secondary`}>▶ {t("Học")}</Link>}
+                <Link href={`/vocabulary/sets/${s.id}/edit`} className={`${linkBtn} bg-primary text-primary-foreground hover:bg-primary-hover`}>✏️ {t("Chỉnh sửa")}</Link>
+                <button onClick={() => void del(s)} aria-label={t("Xóa")} title={t("Xóa")} className={`${linkBtn} border border-input bg-surface text-error-text hover:bg-error-soft`}>🗑</button>
+              </>} />
+          ))}
         </div>
       )}
+      {remove.error && <ErrorBox error={remove.error} />}
 
-      <Dialog open={dialog === "settings"} title={t("Cài đặt học từ")} onClose={() => setDialog(null)}>
+      <Dialog open={creating} title={t("Tạo bộ từ vựng")} onClose={() => setCreating(false)}>
         <div className="space-y-3 text-sm">
-          <label className="flex items-center gap-2"><input type="checkbox" checked={settings.auto} onChange={(e) => setSettings({ ...settings, auto: e.target.checked })} />{t("Tự chuyển sang từ tiếp theo khi trả lời đúng")}</label>
-          <label className="flex items-center gap-2"><input type="checkbox" checked={settings.speak} onChange={(e) => setSettings({ ...settings, speak: e.target.checked })} />{t("Đọc từ sau khi trả lời")}</label>
-          <label className="flex items-center gap-2"><input type="checkbox" checked={kb} onChange={(e) => setKb(e.target.checked)} />{t("Hiện bàn phím ảo (tiện cho điện thoại)")}</label>
-          <div className="flex justify-end"><Button onClick={() => setDialog(null)}>{t("Xong")}</Button></div>
-        </div>
-      </Dialog>
-      <Dialog open={dialog === "report" && !!word} title={t("Báo lỗi từ này")} onClose={() => setDialog(null)}>
-        <div className="space-y-3 text-sm">
-          <p className="rounded bg-surface-secondary p-2"><b>{word?.word}</b> · {word?.meanings[0]?.translation_vi}</p>
-          {REASONS.map(([k, name]) => <label key={k} className="flex items-center gap-2"><input type="radio" name="reason" checked={reason === k} onChange={() => setReason(k)} />{t(name)}</label>)}
-          <textarea className={inputCls} rows={3} maxLength={300} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("Ghi chú (không bắt buộc)")} />
-          {report.error && <ErrorBox error={report.error} />}
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setDialog(null)}>{t("Huỷ bỏ")}</Button>
-            <Button disabled={report.isPending} onClick={() => word && report.mutate({ word_id: word.id, reason, note }, { onSuccess: () => { setDialog(null); setNotice(t("Đã gửi báo lỗi. Cảm ơn bạn!")); } })}>{t("Gửi báo lỗi")}</Button>
-          </div>
+          <label className="block font-medium">{t("Tên bộ từ vựng")} <span className="text-error-text">*</span>
+            <input className={`${inputCls} mt-1`} value={form.title} maxLength={80} placeholder={t("VD: Từ vựng du lịch")} onChange={(e) => setForm({ ...form, title: e.target.value })} /></label>
+          <label className="block font-medium">{t("Mô tả (tùy chọn)")}
+            <textarea className={`${inputCls} mt-1 min-h-20 resize-y`} value={form.description} maxLength={300} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
+          <div><p className="mb-1 font-medium">{t("Biểu tượng")}</p>
+            <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t("Biểu tượng")}>{EMOJIS.map((e) => (
+              <button key={e} role="radio" aria-checked={form.emoji === e} onClick={() => setForm({ ...form, emoji: e })} className={`flex h-10 w-10 items-center justify-center rounded-btn border-2 text-xl ${form.emoji === e ? "border-primary bg-primary-soft" : "border-border bg-surface hover:border-primary/60"}`}>{e}</button>))}</div></div>
+          {create.error && <ErrorBox error={create.error} />}
+          <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => setCreating(false)}>{t("Hủy")}</Button>
+            <Button disabled={!form.title.trim() || create.isPending} onClick={() => create.mutate(form, { onSuccess: (r) => { setCreating(false); router.push(`/vocabulary/sets/${r.data.id}/edit`); } })}>{t("Tạo bộ từ")}</Button></div>
         </div>
       </Dialog>
     </div>
+  );
+}
+
+function Library() {
+  const t = useT();
+  const [tab, setTab] = usePersistedState<Tab>("vocab.library.tab", "builtin");
+  return (
+    <Page title={t("Từ vựng")}>
+      <Tabs<Tab> value={tab} onChange={setTab} options={[["builtin", t("Bộ từ có sẵn")], ["community", t("Cộng đồng")], ["mine", t("Của tôi")]]} />
+      {tab === "builtin" ? <BuiltinSection /> : tab === "community" ? <CommunitySection /> : <MineSection />}
+    </Page>
   );
 }
 
 export default function VocabularyPage() {
-  return <Protected><Study /></Protected>;
+  return <Protected><Library /></Protected>;
 }

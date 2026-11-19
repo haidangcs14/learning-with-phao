@@ -42,7 +42,7 @@ export function ChoiceCard({ word, pool, settings, onAnswer, onNext }: { word: W
     <div className="rounded-card border-2 border-border bg-surface p-5 text-center shadow-raised sm:p-7">
       <div className="flex justify-center"><WordPicture word={word} /></div>
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-        <h2 className={`font-bold text-secondary-text ${lang === "vi" ? "text-3xl" : "text-xl"}`}>{lang === "vi" ? m.translation_vi : m.definition}</h2>
+        <h2 className={`font-bold text-secondary-text ${lang === "vi" ? "text-3xl" : "text-xl"}`}>{lang === "vi" || !m.definition ? m.translation_vi : m.definition}</h2>
         <span className="rounded-md border border-border bg-surface px-2 py-0.5 text-xs font-semibold">{t(POS[m.part_of_speech] ?? "Khác")}</span>
       </div>
       {lang === "vi" && m.definition_vi && <p className="mx-auto mt-2 max-w-xl text-muted-foreground">{m.definition_vi}</p>}

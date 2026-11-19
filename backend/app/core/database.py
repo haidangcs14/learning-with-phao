@@ -49,6 +49,11 @@ async def connect() -> None:
         ("video_lessons", [("visibility", 1), ("owner_id", 1), ("created_at", -1)], {}),
         ("video_progress", [("user_id", 1), ("lesson_id", 1)], {"unique": True}),
         ("video_reports", [("status", 1), ("lesson_id", 1), ("created_at", -1)], {}),
+        ("vocab_sets", [("owner_id", 1), ("position", 1)], {}),
+        ("vocab_sets", [("status", 1), ("published_at", -1)], {}),
+        ("vocab_cards", [("set_id", 1), ("group_id", 1), ("position", 1)], {}),
+        ("card_study", [("user_id", 1), ("card_id", 1)], {"unique": True}),
+        ("card_study", [("user_id", 1), ("set_id", 1), ("group_id", 1), ("learned", 1)], {}),
         ("notifications", [("user_id", 1), ("created_at", -1)], {}),
         ("notifications", [("created_at", 1)], {"expireAfterSeconds": 60 * 24 * 3600}),  # kept for 60 days
         ("word_study", [("user_id", 1), ("word_id", 1)], {"unique": True}),

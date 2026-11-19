@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useT } from "@/lib/i18n";
 import { useLang } from "@/store/lang-store";
 
@@ -16,100 +16,123 @@ export const STAGES = [
   { key: "other", label: "Cấu trúc & chủ đề khác", fill: "fill-secondary-hover", fg: "fill-secondary-foreground", text: "text-secondary-text", hover: "hover:border-secondary-hover" },
 ] as const;
 
-const ROW = 160, CARD_H = 108, TOP = 120, LABEL = 26;
+const HEAD = 112, FOOT = 130, GAP = 56; // flag area, trophy area, space between two lessons (px)
 
-function useWidth() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    setW(el.clientWidth);
-    const ro = new ResizeObserver(() => setW(el.clientWidth));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-  return [ref, w] as const;
-}
+interface Geo { y: number; edge: number }
+const sameGeo = (a: Geo[], b: Geo[]) => a.length === b.length && a.every((g, i) => g.y === b[i]?.y && g.edge === b[i]?.edge);
 
-/** A winding dashed path from the flag down to the trophy. The lessons hang off it on alternating sides, with a "Stage n" label
- *  above the first lesson of every stage. On phones the path runs down the left edge and the cards sit to its right. */
+/** A winding dashed path from the flag down to the trophy, with the lessons hanging off it on alternating sides.
+ *  The cards are ordinary content (auto height, nothing clipped); their real positions are measured, so the path always meets them
+ *  whatever the text length or screen width. On phones the path runs down the left edge and the cards sit to its right. */
 export function Roadmap({ steps, visited, next }: { steps: RoadStep[]; visited: Set<string>; next: number }) {
   const t = useT();
   const lang = useLang((s) => s.lang);
-  const [ref, W] = useWidth();
+  const box = useRef<HTMLDivElement>(null);
+  const cards = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [W, setW] = useState(0);
+  const [H, setH] = useState(0);
+  const [geo, setGeo] = useState<Geo[]>([]);
   const n = steps.length;
-  const narrow = W < 640;
+  const narrow = W > 0 && W < 640;
+
+  const measure = useCallback(() => {
+    const el = box.current;
+    if (!el) return;
+    const b = el.getBoundingClientRect(), nw = Math.round(b.width), nh = Math.round(b.height), isNarrow = nw < 640;
+    const g = steps.map((_, i) => {
+      const c = cards.current[i];
+      if (!c) return { y: 0, edge: 0 };
+      const r = c.getBoundingClientRect();
+      const toRight = !isNarrow && i % 2 === 0; // left-hand cards connect on their right edge
+      return { y: Math.round(r.top - b.top + r.height / 2), edge: Math.round(toRight ? r.right - b.left + 4 : r.left - b.left - 4) };
+    });
+    setW(nw); setH(nh); setGeo((prev) => (sameGeo(prev, g) ? prev : g));
+  }, [steps]);
+
+  useLayoutEffect(() => {
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (box.current) ro.observe(box.current);
+    cards.current.forEach((c) => c && ro.observe(c));
+    return () => ro.disconnect();
+  }, [measure, n]);
+  useEffect(() => { void document.fonts?.ready.then(measure); }, [measure]); // the web font changes line breaks once it has loaded
+
   const cx = narrow ? 26 : W / 2, amp = narrow ? 6 : 16;
-  const cardW = narrow ? W - 58 : Math.max(220, W / 2 - 64);
   const px = (i: number) => cx + (i % 2 === 0 ? -amp : amp);
-  const py = (i: number) => TOP + i * ROW + ROW / 2;
-  const H = TOP + n * ROW + 130;
   const flag = { x: narrow ? 26 : Math.max(70, W * 0.2), y: 56 };
-  const trophy = { x: cx, y: TOP + n * ROW + 50 };
+  const trophy = { x: cx, y: H - FOOT + 50 };
+  const ready = W > 0 && geo.length === n && n > 0 && geo.every((g) => g.y > 0);
 
-  const s0 = { x: narrow ? flag.x : flag.x + 30, y: narrow ? flag.y + 32 : flag.y + 14 };
-  let d = narrow ? `M ${s0.x},${s0.y} L ${px(0)},${py(0) - 40} L ${px(0)},${py(0)}`
-    : `M ${s0.x},${s0.y} C ${s0.x + 110},${s0.y - 6} ${px(0)},${py(0) - 110} ${px(0)},${py(0)}`;
-  for (let i = 0; i < n - 1; i++) { const m = (py(i) + py(i + 1)) / 2; d += ` C ${px(i)},${m} ${px(i + 1)},${m} ${px(i + 1)},${py(i + 1)}`; }
-  if (n > 0) { const m = (py(n - 1) + trophy.y) / 2; d += ` C ${px(n - 1)},${m} ${trophy.x},${m} ${trophy.x},${trophy.y - 30}`; }
+  let d = "";
+  if (ready) {
+    const first = geo[0] as Geo, s0 = { x: narrow ? flag.x : flag.x + 30, y: narrow ? flag.y + 30 : flag.y + 14 };
+    d = narrow ? `M ${s0.x},${s0.y} L ${px(0)},${first.y - 40} L ${px(0)},${first.y}`
+      : `M ${s0.x},${s0.y} C ${s0.x + 110},${s0.y - 6} ${px(0)},${first.y - 110} ${px(0)},${first.y}`;
+    for (let i = 0; i < n - 1; i++) { const a = (geo[i] as Geo).y, c = (geo[i + 1] as Geo).y, m = (a + c) / 2; d += ` C ${px(i)},${m} ${px(i + 1)},${m} ${px(i + 1)},${c}`; }
+    const last = (geo[n - 1] as Geo).y, m = (last + trophy.y) / 2;
+    d += ` C ${px(n - 1)},${m} ${trophy.x},${m} ${trophy.x},${trophy.y - 30}`;
+  }
   const lastSeen = steps.reduce((acc, s, i) => (visited.has(s.l.slug) ? i : acc), -1);
-  const progressY = lastSeen >= 0 ? py(lastSeen) + 24 : 0;
+  const progressY = ready && lastSeen >= 0 ? (geo[lastSeen] as Geo).y + 28 : 0;
 
-  if (W === 0) return <div ref={ref} style={{ minHeight: 400 }} />;
   return (
-    <div ref={ref} className="relative" style={{ height: H }}>
-      <svg width={W} height={H} className="absolute inset-0" aria-hidden="true">
-        <defs><clipPath id="grammar-progress"><rect x="0" y="0" width={W} height={progressY} /></clipPath></defs>
-        <path d={d} className="fill-none stroke-input" strokeWidth="3" strokeDasharray="9 9" strokeLinecap="round" />
-        <path d={d} className="fill-none stroke-primary" strokeWidth="4" strokeDasharray="9 9" strokeLinecap="round" clipPath="url(#grammar-progress)" />
-        {steps.map(({ l, stage }, i) => {
-          const left = !narrow && i % 2 === 0;
-          const edge = narrow ? 52 : left ? cardW + 4 : W - cardW - 4;
-          const st = STAGES[stage] ?? STAGES[3];
-          const seen = visited.has(l.slug);
-          return (
-            <g key={l.id}>
-              <line x1={px(i)} y1={py(i)} x2={edge} y2={py(i)} className="stroke-input" strokeWidth="2.5" strokeDasharray="4 6" strokeLinecap="round" />
-              {i === next && <circle cx={px(i)} cy={py(i)} r="22" className="animate-pulse fill-none stroke-accent" strokeWidth="3" />}
-              <circle cx={px(i)} cy={py(i)} r="16" className={`${seen ? "fill-success" : st.fill} stroke-background`} strokeWidth="3" />
-              <text x={px(i)} y={py(i)} textAnchor="middle" dominantBaseline="central" className={`${seen ? "fill-success-foreground" : st.fg} text-[13px] font-bold`}>{seen ? "✓" : i + 1}</text>
-            </g>
-          );
-        })}
-      </svg>
+    <div ref={box} className="relative">
+      {ready && (
+        <svg width={W} height={H} className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+          <defs><clipPath id="grammar-progress"><rect x="0" y="0" width={W} height={progressY} /></clipPath></defs>
+          <path d={d} className="fill-none stroke-input" strokeWidth="3" strokeDasharray="9 9" strokeLinecap="round" />
+          <path d={d} className="fill-none stroke-primary" strokeWidth="4" strokeDasharray="9 9" strokeLinecap="round" clipPath="url(#grammar-progress)" />
+          {steps.map(({ l, stage }, i) => {
+            const g = geo[i] as Geo, st = STAGES[stage] ?? STAGES[3], seen = visited.has(l.slug);
+            return (
+              <g key={l.id}>
+                <line x1={px(i)} y1={g.y} x2={g.edge} y2={g.y} className="stroke-input" strokeWidth="2.5" strokeDasharray="4 6" strokeLinecap="round" />
+                {i === next && <circle cx={px(i)} cy={g.y} r="22" className="animate-pulse fill-none stroke-accent" strokeWidth="3" />}
+                <circle cx={px(i)} cy={g.y} r="16" className={`${seen ? "fill-success" : st.fill} stroke-background`} strokeWidth="3" />
+                <text x={px(i)} y={g.y} textAnchor="middle" dominantBaseline="central" className={`${seen ? "fill-success-foreground" : st.fg} text-[13px] font-bold`}>{seen ? "✓" : i + 1}</text>
+              </g>
+            );
+          })}
+        </svg>
+      )}
 
-      <div className="absolute flex flex-col items-center" style={{ left: flag.x - 32, top: flag.y - 32 }}>
-        <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-input bg-surface text-3xl shadow-raised" aria-hidden="true">🚩</span>
-        <span className="mt-1 text-xs font-bold text-muted-foreground">{t("Bắt đầu")}</span>
+      <div className="relative z-10" style={{ height: HEAD }}>
+        <div className="absolute flex flex-col items-center" style={{ left: flag.x - (narrow ? 26 : 32), top: flag.y - (narrow ? 26 : 32) }}>
+          <span className={`flex items-center justify-center rounded-full border-2 border-input bg-surface shadow-raised ${narrow ? "h-[52px] w-[52px] text-2xl" : "h-16 w-16 text-3xl"}`} aria-hidden="true">🚩</span>
+          <span className="mt-1 whitespace-nowrap text-xs font-bold text-muted-foreground">{t("Bắt đầu")}</span>
+        </div>
       </div>
 
-      <ol className="contents">
+      <ol className="relative z-10" style={{ display: "flex", flexDirection: "column", gap: GAP }}>
         {steps.map(({ l, stage }, i) => {
           const left = !narrow && i % 2 === 0, st = STAGES[stage] ?? STAGES[3];
-          const x = narrow ? 56 : left ? 0 : W - cardW;
-          const firstOfStage = i === 0 || steps[i - 1]?.stage !== stage;
-          const seen = visited.has(l.slug);
+          const first = i === 0 || steps[i - 1]?.stage !== stage, seen = visited.has(l.slug);
           return (
-            <li key={l.id} className="absolute" style={{ top: py(i) - CARD_H / 2 - LABEL, left: x, width: cardW, paddingTop: LABEL }}>
-              {firstOfStage && <p className={`absolute inset-x-0 top-0 truncate text-sm font-bold ${st.text} ${!narrow && !left ? "text-right" : ""}`}>{t("Giai đoạn {n}", { n: stage + 1 })} · {t(st.label)}</p>}
-              <Link href={`/grammar/${l.slug}`} className={`lift block overflow-hidden rounded-card border-2 border-border bg-surface p-3 shadow-raised transition hover:shadow-raised-hover ${st.hover} ${i === next ? "border-accent" : ""}`} style={{ height: CARD_H }}>
-                <span className="flex items-center gap-2">
-                  <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-bold text-primary-text">{l.level}</span>
-                  {i === next && <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-accent-foreground">{t("Tiếp theo")}</span>}
-                  {seen && <span className="text-xs font-semibold text-success-text">✓ {t("Đã xem")}</span>}
-                </span>
-                <span className="mt-1 block truncate text-lg font-bold">{l.title}</span>
-                <span className="line-clamp-2 block text-sm text-muted-foreground">{lang === "en" ? l.en?.description ?? l.description : l.description}</span>
-              </Link>
+            <li key={l.id} className={narrow ? "pl-14" : "grid grid-cols-2"}>
+              <div className={narrow ? "" : left ? "col-start-1 pr-14 lg:pr-16" : "col-start-2 pl-14 lg:pl-16"}>
+                {first && <p className={`mb-2 text-balance text-sm font-bold leading-snug ${st.text} ${!narrow && !left ? "text-right" : ""}`}>{t("Giai đoạn {n}", { n: stage + 1 })} · {t(st.label)}</p>}
+                <Link href={`/grammar/${l.slug}`} ref={(el) => { cards.current[i] = el; }}
+                  className={`lift block rounded-card border-2 bg-surface px-4 py-4 shadow-raised transition hover:shadow-raised-hover sm:px-5 ${i === next ? "border-accent" : `border-border ${st.hover}`}`}>
+                  <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-xs font-bold text-primary-text">{l.level}</span>
+                    {i === next && <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-accent-foreground">{t("Tiếp theo")}</span>}
+                    {seen && <span className="text-xs font-semibold text-success-text">✓ {t("Đã xem")}</span>}
+                  </span>
+                  <span className="mt-2 block text-balance text-lg font-bold leading-snug [overflow-wrap:anywhere]">{l.title}</span>
+                  <span className="mt-1.5 block text-pretty text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">{lang === "en" ? l.en?.description ?? l.description : l.description}</span>
+                </Link>
+              </div>
             </li>
           );
         })}
       </ol>
 
-      <div className="absolute flex flex-col items-center" style={{ left: trophy.x - 28, top: trophy.y - 28 }}>
-        <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-input bg-surface text-2xl shadow-raised" aria-hidden="true">🏆</span>
-        <span className="mt-1 whitespace-nowrap text-xs font-bold text-muted-foreground">{t("Hoàn thành lộ trình")}</span>
+      <div className="relative z-10" style={{ height: FOOT }}>
+        <div className="absolute flex flex-col items-center" style={{ left: trophy.x - 28, top: 22 }}>
+          <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-input bg-surface text-2xl shadow-raised" aria-hidden="true">🏆</span>
+          <span className="mt-1 whitespace-nowrap text-xs font-bold text-muted-foreground">{t("Hoàn thành lộ trình")}</span>
+        </div>
       </div>
     </div>
   );

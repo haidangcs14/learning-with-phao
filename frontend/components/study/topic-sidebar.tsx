@@ -6,11 +6,11 @@ import { useT } from "@/lib/i18n";
 import { topicInfo } from "@/lib/topics";
 import { useLang } from "@/store/lang-store";
 
-export interface TopicRow { topic: string; count: number; learned: number }
+export interface TopicRow { topic: string; count: number; learned: number; label?: string; icon?: string }
 
-function Tile({ topic, size = 44 }: { topic: string; size?: number }) {
+function Tile({ topic, icon, size = 44 }: { topic: string; icon?: string; size?: number }) {
   const lang = useLang((s) => s.lang);
-  return <span style={{ width: size, height: size, fontSize: size * 0.55 }} className={`flex shrink-0 items-center justify-center rounded-xl border-2 border-surface bg-gradient-to-br shadow ${tint(topic)}`} aria-hidden="true">{topicInfo(topic, lang).icon}</span>;
+  return <span style={{ width: size, height: size, fontSize: size * 0.55 }} className={`flex shrink-0 items-center justify-center rounded-xl border-2 border-surface bg-gradient-to-br shadow ${tint(topic)}`} aria-hidden="true">{icon ?? topicInfo(topic, lang).icon}</span>;
 }
 
 /** Desktop: the "DANH SÁCH CHỦ ĐỀ" cards. Phones: a scrollable row of chips. */
@@ -25,7 +25,7 @@ export function TopicSidebar({ topics, active, onPick }: { topics: TopicRow[]; a
         {topics.map((x) => (
           <button key={x.topic} onClick={() => onPick(x.topic)} aria-current={active === x.topic}
             className={`flex shrink-0 items-center gap-2 rounded-btn border-2 px-3 py-1.5 text-sm font-semibold ${active === x.topic ? "border-primary bg-primary text-primary-foreground" : "border-border bg-surface"}`}>
-            <span>{topicInfo(x.topic, lang).icon}</span><span className="whitespace-nowrap">{topicInfo(x.topic, lang).label}</span><span className="text-xs opacity-70">{x.learned}/{x.count}</span>
+            <span>{x.icon ?? topicInfo(x.topic, lang).icon}</span><span className="whitespace-nowrap">{x.label ?? topicInfo(x.topic, lang).label}</span><span className="text-xs opacity-70">{x.learned}/{x.count}</span>
           </button>
         ))}
       </nav>
@@ -38,8 +38,8 @@ export function TopicSidebar({ topics, active, onPick }: { topics: TopicRow[]; a
               <li key={x.topic}>
                 <div className={`flex items-center gap-3 rounded-card border-2 p-2.5 shadow-raised transition hover:-translate-y-0.5 ${on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-surface hover:border-primary/40"}`}>
                   <button onClick={() => onPick(x.topic)} className="flex min-w-0 flex-1 items-center gap-3 text-left" aria-current={on}>
-                    <Tile topic={x.topic} />
-                    <span className="min-w-0"><span className="block truncate text-sm font-bold">{topicInfo(x.topic, lang).label}</span>
+                    <Tile topic={x.topic} icon={x.icon} />
+                    <span className="min-w-0"><span className="block truncate text-sm font-bold">{x.label ?? topicInfo(x.topic, lang).label}</span>
                       <span className={`block text-xs ${on ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{t("{a}/{b} thẻ", { a: x.learned, b: x.count })}</span></span>
                   </button>
                   <button onClick={() => toggle(x.topic)} aria-expanded={open} aria-label={open ? t("Thu gọn") : t("Mở rộng")}

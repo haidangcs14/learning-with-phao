@@ -12,7 +12,7 @@ import type { Word } from "@/types";
 interface Props {
   word: Word; settings: StudySettings; keyboard: boolean;
   onAnswer: (correct: boolean) => Promise<number>; // returns the XP that was awarded
-  onNext: () => void; onReport: () => void;
+  onNext: () => void; onReport?: () => void; // no report button for user-made cards
 }
 
 /** The "guess the word" card: meaning + definitions + a gapped example, then type the English word. */
@@ -68,21 +68,21 @@ export function StudyCard({ word, settings, keyboard, onAnswer, onNext, onReport
 
   return (
     <div className="relative rounded-card border-2 border-border bg-surface p-5 pb-6 text-center shadow-raised sm:p-7">
-      <button onClick={onReport} className="absolute left-4 top-4 rounded-btn p-1.5 text-muted-foreground transition hover:bg-accent-soft hover:text-accent-text" title={t("Báo lỗi từ này")} aria-label={t("Báo lỗi từ này")}>
+      {onReport && <button onClick={onReport} className="absolute left-4 top-4 rounded-btn p-1.5 text-muted-foreground transition hover:bg-accent-soft hover:text-accent-text" title={t("Báo lỗi từ này")} aria-label={t("Báo lỗi từ này")}>
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /><path d="M12 9v4M12 17h.01" /></svg>
-      </button>
+      </button>}
 
       <div className="flex justify-center"><WordPicture word={word} /></div>
 
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-        <h2 className={`font-bold text-secondary-text ${lang === "vi" ? "text-3xl" : "text-xl"}`}>{lang === "vi" ? m.translation_vi : splitByWord(m.definition, target).map((p) => (p.hit && !done ? "*".repeat(p.text.length) : p.text)).join("")}</h2>
+        <h2 className={`font-bold text-secondary-text ${lang === "vi" ? "text-3xl" : "text-xl"}`}>{lang === "vi" || !m.definition ? m.translation_vi : splitByWord(m.definition, target).map((p) => (p.hit && !done ? "*".repeat(p.text.length) : p.text)).join("")}</h2>
         <span className="rounded-md border border-border bg-surface px-2 py-0.5 text-xs font-semibold text-foreground">{t(POS[m.part_of_speech] ?? "Khác")}</span>
       </div>
 
       <div className="mx-auto mt-3 max-w-xl space-y-2 text-sm text-foreground">
         {lang === "vi" && (
           <>
-            <div><p className="text-xs text-muted-foreground">{t("Định nghĩa Tiếng Anh:")}</p><p className="text-base">{mask(m.definition)}</p></div>
+            {m.definition && <div><p className="text-xs text-muted-foreground">{t("Định nghĩa Tiếng Anh:")}</p><p className="text-base">{mask(m.definition)}</p></div>}
             {m.definition_vi && <div><p className="text-xs text-muted-foreground">{t("Định nghĩa:")}</p><p className="text-base">{m.definition_vi}</p></div>}
           </>
         )}
