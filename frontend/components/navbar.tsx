@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { LevelAvatar } from "@/components/avatar";
+import { NotificationBell } from "@/components/notification-bell";
 import { displayName } from "@/lib/level";
 import { useGet } from "@/hooks/api";
 import { apiFetch } from "@/lib/api";
@@ -19,7 +20,7 @@ const GROUPS = [
   { label: "Luyện tập", items: [["/quiz", "Quiz"], ["/games", "Trò chơi"], ["/exams", "Bài kiểm tra"]] },
   { label: "Cộng đồng", items: [["/leaderboard", "Xếp hạng"], ["/friends", "Bạn bè"]] },
 ] as const;
-const ADMIN_LINKS = [["/admin", "Dashboard"], ["/admin/users", "Người dùng"], ["/admin/words", "Từ vựng"], ["/admin/questions", "Câu hỏi"], ["/admin/exams", "Bài kiểm tra"], ["/admin/videos", "Video bài nghe"]] as const;
+const ADMIN_LINKS = [["/admin", "Dashboard"], ["/admin/users", "Người dùng"], ["/admin/words", "Từ vựng"], ["/admin/questions", "Câu hỏi"], ["/admin/exams", "Bài kiểm tra"], ["/admin/videos", "Video bài nghe"], ["/admin/announcements", "Thông báo"]] as const;
 
 const ghost = "rounded-btn px-3 py-1.5 text-sm font-medium text-foreground hover:bg-surface-secondary";
 const menuItem = (active: boolean) =>
@@ -140,6 +141,7 @@ export function Navbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-1.5">
+          {ready && user && <NotificationBell />}
           <LangMenu />
           <ThemeMenu />
           {ready && (user ? (

@@ -97,7 +97,7 @@ function Intro() {
   if (!q.data) return <div className="p-6"><ErrorBox error={q.error} /></div>;
   const e = q.data.data;
   return (
-    <Page title={e.title}>
+    <Page visibleTitle title={e.title}>
       <BackLink href="/exams">{t("← Tất cả bài kiểm tra")}</BackLink>
       <Card className="space-y-3">
         <ul className="space-y-1 text-sm">

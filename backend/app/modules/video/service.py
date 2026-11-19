@@ -1,6 +1,7 @@
 from app.common.exceptions import AppException, NotFoundError
 from app.common.mongo import to_oid
 from app.modules.leaderboard.service import XpService
+from app.modules.notifications.emit import emit
 from app.modules.video.dictation import check_answer
 from app.modules.video.repository import VideoRepository
 from app.modules.video.schema import CheckIn, LessonCreate, ProgressIn, ReportIn, SentenceEdit
@@ -117,5 +118,8 @@ class VideoService:
                 | {"open_reports": reports.get(i["id"], 0)} for i in counts]
 
     async def resolve_report(self, report_id: str) -> None:
-        if not await self.repo.resolve_report(report_id):
+        report = await self.repo.get_report(report_id)
+        if not report or not await self.repo.resolve_report(report_id):
             raise NotFoundError("REPORT_NOT_FOUND", "Report not found")
+        if report.get("status") != "resolved":  # tell the learner who reported it, once
+            await emit(self.xp.db, report["reporter_id"], "report_resolved", {"title": report.get("lesson_title", "")}, f"/listening/video/{report['lesson_id']}")

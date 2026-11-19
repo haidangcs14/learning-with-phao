@@ -1,6 +1,8 @@
 from app.common.exceptions import AppException, NotFoundError
+from app.common.mongo import to_oid
 from app.modules.friends.repository import FriendRepository
 from app.modules.leaderboard.service import XpService
+from app.modules.notifications.emit import emit
 
 
 class FriendService:
@@ -15,6 +17,11 @@ class FriendService:
             return "friends"
         return "pending_sent" if f["requester_id"] == me else "pending_received"
 
+    async def _name(self, user_id: str) -> str:
+        oid = to_oid(user_id)
+        u = (await self.xp.db["users"].find_one({"_id": oid}, {"username": 1, "full_name": 1}) if oid else None) or {}
+        return (u.get("full_name") or "").strip() or u.get("username", "")  # the full name is the display name
+
     async def search(self, me: str, q: str) -> list[dict]:
         users = await self.repo.search_users(q, me)
         for u in users:
@@ -28,7 +35,9 @@ class FriendService:
             raise NotFoundError("USER_NOT_FOUND", "User not found")
         if await self.repo.find_pair(me, target_id):
             raise AppException(409, "ALREADY_EXISTS", "A request or friendship already exists")
-        return await self.repo.create(me, target_id)
+        created = await self.repo.create(me, target_id)
+        await emit(self.xp.db, target_id, "friend_request", {"name": await self._name(me)}, "/friends")
+        return created
 
     async def requests(self, me: str) -> dict:
         inc, out = await self.repo.incoming(me), await self.repo.outgoing(me)
@@ -42,6 +51,8 @@ class FriendService:
         if not f or f["receiver_id"] != me or f["status"] != "pending":
             raise NotFoundError("REQUEST_NOT_FOUND", "Request not found")
         await (self.repo.accept(friendship_id) if accept else self.repo.delete(friendship_id))
+        if accept:
+            await emit(self.xp.db, f["requester_id"], "friend_accepted", {"name": await self._name(me)}, "/friends")
 
     async def remove(self, me: str, other_id: str) -> None:
         f = await self.repo.find_pair(me, other_id)

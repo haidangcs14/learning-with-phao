@@ -21,7 +21,7 @@ export default function WordDetailPage() {
   if (q.error || !q.data) return <div className="p-6"><ErrorBox error={q.error} /></div>;
   const w = q.data.data;
   return (
-    <Page title={w.word}>
+    <Page visibleTitle title={w.word}>
       <BackLink href="/vocabulary">{t("← Danh sách từ")}</BackLink>
       <p className="text-lg text-muted-foreground">{w.phonetic} · {w.level}</p>
       <WordVisual word={w} size="lg" />

@@ -19,7 +19,7 @@ function Dashboard() {
   if (xp.isLoading || fc.isLoading) return <Spinner />;
   const bySource = xp.data?.data.by_source ?? {};
   return (
-    <Page title={t("Xin chào, {name}!", { name: user ? displayName(user) : "" })}>
+    <Page visibleTitle title={t("Xin chào, {name}!", { name: user ? displayName(user) : "" })}>
       {xp.data && (
         <Card className="flex items-center gap-4">
           {me && <LevelAvatar user={me} level={xp.data.data.level} size={56} />}

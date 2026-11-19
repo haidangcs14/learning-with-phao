@@ -24,7 +24,7 @@ function Result() {
   const wrong = r.scored_count - r.correct_count;
   const pct = r.max_score ? Math.round((r.score / r.max_score) * 100) : 0;
   return (
-    <Page title={exam.title}>
+    <Page visibleTitle title={exam.title}>
       <BackLink href="/exams">{t("← Tất cả bài kiểm tra")}</BackLink>
       <Card className="flex flex-wrap items-center gap-4">
         <div className="flex h-24 w-24 shrink-0 flex-col items-center justify-center rounded-full bg-primary text-primary-foreground"><span className="text-2xl font-bold">{r.score}</span><span className="text-xs">/ {r.max_score}</span></div>

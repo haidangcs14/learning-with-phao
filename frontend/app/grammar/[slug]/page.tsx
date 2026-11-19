@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ErrorBox, Spinner } from "@/components/ui";
 import { VideoEmbed } from "@/components/video-embed";
 import { useGet } from "@/hooks/api";
@@ -63,6 +63,12 @@ export default function GrammarDetailPage() {
   const lang = useLang((s) => s.lang);
   const { slug } = useParams<{ slug: string }>();
   const q = useGet<Lesson>(`/grammar/${slug}`);
+  useEffect(() => { // the roadmap on /grammar ticks off the lessons you opened
+    try {
+      const seen = new Set(JSON.parse(localStorage.getItem("grammar.visited") ?? "[]") as string[]);
+      localStorage.setItem("grammar.visited", JSON.stringify([...seen.add(slug)]));
+    } catch { /* ignore */ }
+  }, [slug]);
   if (q.isLoading) return <Spinner />;
   if (!q.data) return <div className="p-6"><ErrorBox error={q.error} /></div>;
   const raw = q.data.data;

@@ -54,10 +54,12 @@ export function Empty({ children }: { children: ReactNode }) {
   return <div className="rounded-card border-2 border-dashed border-border bg-surface/60 p-8 text-center text-muted-foreground">{children}</div>;
 }
 
-export function Page({ title, children }: { title: string; children: ReactNode }) {
+/** `title` names the page for screen readers and the document outline; it is only drawn on screen with `visibleTitle`
+ *  (use that when the title is content: an exam name, a word, a greeting). */
+export function Page({ title, children, visibleTitle = false }: { title: string; children: ReactNode; visibleTitle?: boolean }) {
   return (
-    <main className="mx-auto max-w-5xl space-y-6 px-4 py-8">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
+    <main className={`mx-auto max-w-5xl space-y-6 px-4 ${visibleTitle ? "py-8" : "pb-8 pt-6"}`}>
+      <h1 className={visibleTitle ? "text-3xl font-bold tracking-tight text-foreground" : "sr-only"}>{title}</h1>
       {children}
     </main>
   );

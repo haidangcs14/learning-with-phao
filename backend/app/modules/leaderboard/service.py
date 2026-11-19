@@ -3,6 +3,7 @@ from datetime import timedelta
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.common.mongo import to_oid, utcnow
+from app.modules.notifications.emit import emit
 
 
 LEVEL_XP = 100
@@ -47,6 +48,9 @@ class XpService:
         await self.col.insert_one(
             {"user_id": user_id, "source": source, "amount": amount, "created_at": utcnow()}
         )
+        total = await self.total(user_id, "all")
+        if level_of(total) > level_of(total - amount):  # this award crossed a level boundary
+            await emit(self.db, user_id, "level_up", {"level": level_of(total)}, "/dashboard")
         return amount
 
     async def board(self, period: str, limit: int) -> list[dict]:

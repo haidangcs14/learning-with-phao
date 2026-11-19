@@ -4,8 +4,9 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { apiFetch } from "@/lib/api";
 
 /** Server state: GET with caching. Pass null to disable the query. */
-export function useGet<T>(path: string | null) {
+export function useGet<T>(path: string | null, options: { refetchInterval?: number } = {}) {
   return useQuery({
+    refetchInterval: options.refetchInterval,
     queryKey: [path],
     queryFn: () => apiFetch<T>(path as string),
     enabled: path !== null,
@@ -15,7 +16,7 @@ export function useGet<T>(path: string | null) {
 
 /** Mutation helper. `invalidate` = path prefixes whose cached queries must be refetched on success. */
 export function useSend<T = unknown, V = void>(
-  method: "GET" | "POST" | "PATCH" | "DELETE" | "PUT",
+  method: "GET" | "POST" | "PATCH" | "DELETE",
   path: string | ((v: V) => string),
   invalidate: string[] = [],
   body?: (v: V) => unknown,

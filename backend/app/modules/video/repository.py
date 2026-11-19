@@ -74,6 +74,10 @@ class VideoRepository:
     async def list_reports(self, status: str):
         return [serialize(r) async for r in self.reports.find({"status": status}).sort("created_at", -1).limit(200)]
 
+    async def get_report(self, report_id: str):
+        oid = to_oid(report_id)
+        return await self.reports.find_one({"_id": oid}) if oid else None
+
     async def resolve_report(self, report_id: str) -> bool:
         oid = to_oid(report_id)
         return bool(oid) and (await self.reports.update_one({"_id": oid}, {"$set": {"status": "resolved", "resolved_at": utcnow()}})).matched_count == 1
