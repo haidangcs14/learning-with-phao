@@ -68,3 +68,11 @@ async def test_leaderboard_rows_carry_the_full_name(api, db):
     await _xp(db, await _me(api, h), 40)
     row = (await api.get("/api/v1/leaderboard?period=all")).json()["data"][0]
     assert row["full_name"] == "Nguyen Van A" and row["username"] == "nguyen"
+
+
+async def test_my_xp_includes_the_all_time_rank(api, db):
+    ha, hb, hc = await signup(api, "a@x.com", "alice"), await signup(api, "b@x.com", "bobby"), await signup(api, "c@x.com", "carol")
+    await _xp(db, await _me(api, ha), 30)
+    await _xp(db, await _me(api, hb), 20)
+    ranks = [(await api.get("/api/v1/leaderboard/me", headers=h)).json()["data"]["rank"] for h in (ha, hb, hc)]
+    assert ranks == [1, 2, None]                                                       # nobody above alice; carol has no XP yet

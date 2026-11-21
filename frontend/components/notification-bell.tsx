@@ -34,7 +34,7 @@ function ago(iso: string, t: T): string {
 export function NotificationBell() {
   const t = useT();
   const router = useRouter();
-  const feed = useGet<Feed>("/notifications?limit=20", { refetchInterval: 60_000 });
+  const feed = useGet<Feed>("/notifications?limit=20", { refetchInterval: 60_000, refetchOnWindowFocus: true });
   const markRead = useSend<unknown, string>("POST", (id) => `/notifications/${id}/read`, ["/notifications"]);
   const markAll = useSend("POST", "/notifications/read-all", ["/notifications"]);
   const remove = useSend<unknown, string>("DELETE", (id) => `/notifications/${id}`, ["/notifications"]);
@@ -72,7 +72,7 @@ export function NotificationBell() {
 
       {open && (
         <div role="dialog" aria-label={t("Thông báo")}
-          className="fixed inset-x-2 top-14 z-50 overflow-hidden rounded-card border border-border bg-surface text-foreground shadow-hover sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[24rem]">
+          className="fixed inset-x-3 top-[4.75rem] z-50 overflow-hidden rounded-card border border-border bg-surface text-foreground shadow-hover sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[24rem]">
           <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
             <h2 className="text-base font-bold">{t("Thông báo")}</h2>
             <button onClick={() => markAll.mutate()} disabled={unread === 0 || markAll.isPending} className="rounded-btn px-2 py-1 text-xs font-semibold text-primary-text hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-40">{t("Đánh dấu đã đọc tất cả")}</button>

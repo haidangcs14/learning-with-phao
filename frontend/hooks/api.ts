@@ -4,9 +4,10 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { apiFetch } from "@/lib/api";
 
 /** Server state: GET with caching. Pass null to disable the query. */
-export function useGet<T>(path: string | null, options: { refetchInterval?: number } = {}) {
+export function useGet<T>(path: string | null, options: { refetchInterval?: number; refetchOnWindowFocus?: boolean } = {}) {
   return useQuery({
     refetchInterval: options.refetchInterval,
+    refetchOnWindowFocus: options.refetchOnWindowFocus,
     queryKey: [path],
     queryFn: () => apiFetch<T>(path as string),
     enabled: path !== null,

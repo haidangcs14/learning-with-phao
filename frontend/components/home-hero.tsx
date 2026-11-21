@@ -53,7 +53,7 @@ export function HomeHero() {
   }, [router, user]);
 
   return (
-    <section className="relative isolate h-[calc(100svh-3.5rem)] min-h-[620px] overflow-hidden bg-gradient-to-br from-background via-primary-soft to-secondary-soft text-foreground">
+    <section className="relative isolate h-[calc(100svh-5rem)] min-h-[620px] overflow-hidden bg-gradient-to-br from-background via-primary-soft to-secondary-soft text-foreground">
       <KeyboardHero keys={keys} onKeyClick={onKeyClick} onKeyHover={setHovered} catSrc="/cute.gif" />
       <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-6xl flex-col px-6 pt-8 lg:justify-center lg:pt-0">
         <div className="max-w-md space-y-5">
@@ -64,7 +64,7 @@ export function HomeHero() {
           <p className="text-lg text-foreground/90">{t("Học tiếng Anh mỗi ngày")}</p>
           <p className="hidden text-sm text-muted-foreground sm:block">{t("Bấm vào các phím trên bàn phím 3D để chọn kỹ năng bạn muốn luyện.")}</p>
           <div className="pointer-events-auto flex flex-wrap gap-3">
-            <Link href={user ? "/dashboard" : "/register"} className="lift lift rounded-btn bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-raised hover:bg-primary-hover">
+            <Link href={user ? "/dashboard" : "/register"} className="lift rounded-btn bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-raised hover:bg-primary-hover">
               {user ? t("Tiếp tục học →") : t("Bắt đầu học")}
             </Link>
             {!user && <Link href="/login" className="rounded-btn border border-input bg-surface px-5 py-2.5 text-sm font-semibold text-foreground shadow-soft hover:bg-surface-secondary">{t("Đăng nhập")}</Link>}

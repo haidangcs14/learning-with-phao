@@ -11,3 +11,12 @@ export function levelTier(level: number): Tier {
 
 /** The user's full name; the username only when no name was entered. */
 export const displayName = (u: { full_name?: string; username: string }): string => u.full_name?.trim() || u.username;
+
+/** Rank title shown on the dashboard (a translation key). */
+export function levelTitle(level: number): string {
+  if (level >= 35) return "Bậc thầy";
+  if (level >= 20) return "Chuyên gia";
+  if (level >= 10) return "Thành thạo";
+  if (level >= 5) return "Học viên";
+  return "Người mới";
+}

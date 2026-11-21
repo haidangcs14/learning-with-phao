@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { ChatWidget } from "@/components/chat-widget";
-import { Navbar } from "@/components/navbar";
+import { AppShell } from "@/components/shell/app-shell";
 import { Providers } from "@/components/providers";
 
 // Nunito: friendly and rounded. 400 body, 500 labels, 600 sub-headings, 700 headings. Self-hosted by Next (no layout shift).
@@ -22,8 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi" suppressHydrationWarning className={nunito.variable}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <Providers>
-          <Navbar />
-          {children}
+          <AppShell>{children}</AppShell>
           <ChatWidget />
         </Providers>
       </body>

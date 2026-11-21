@@ -81,7 +81,15 @@ class XpService:
         ])}
         total = sum(by_source.values())
         return {"total_xp": total, "by_source": by_source, "level": level_of(total),
-                "xp_into_level": total % LEVEL_XP, "xp_for_next": LEVEL_XP}
+                "xp_into_level": total % LEVEL_XP, "xp_for_next": LEVEL_XP, "rank": await self.rank_all_time(total)}
+
+    async def rank_all_time(self, total: int) -> int | None:
+        """1 + the number of players with more XP; None while the player has no XP yet."""
+        if total <= 0:
+            return None
+        async for r in self.col.aggregate([{"$group": {"_id": "$user_id", "xp": {"$sum": "$amount"}}}, {"$match": {"xp": {"$gt": total}}}, {"$count": "n"}]):
+            return r["n"] + 1
+        return 1
 
     async def total(self, user_id: str, period: str) -> int:
         start = period_start(period)
